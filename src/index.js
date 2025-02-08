@@ -7,9 +7,16 @@ function initApp() {
   
   if (rootElement) {
     // Add slight delay for Elementor compatibility
-    setTimeout(() => {
+ // In src/index.js - Update the setTimeout block
+setTimeout(() => {
+    console.log('Attempting to mount React app');
+    try {
       createRoot(rootElement).render(<LoanCalculator />);
-    }, 100);
+      console.log('React app mounted successfully');
+    } catch (error) {
+      console.error('Mounting failed:', error);
+    }
+  }, 100);
   }
 }
 

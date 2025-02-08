@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card'; // Use named imports
+import ErrorBoundary from './ErrorBoundary';
 
 const LoanCalculator = () => {
+
     const [formData, setFormData] = useState({
         amount: 3000,
         term: 36,
@@ -60,6 +62,7 @@ const LoanCalculator = () => {
     };
 
     return (
+        <ErrorBoundary>
         <Card className="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6">
                 {/* Amount Slider */}
@@ -158,6 +161,7 @@ const LoanCalculator = () => {
                 </div>
             </CardContent>
         </Card>
+        </ErrorBoundary>
     );
 };
 

@@ -27,12 +27,13 @@ function loan_calculator_enqueue_scripts() {
     );
 
 
-    wp_enqueue_style(
-        'loan-calculator-style',
-        plugins_url('dist/index.css', __FILE__),
-        [],
-        filemtime(plugin_dir_path(__FILE__) . 'dist/index.css')
-    );
+  // In loan-calculator.php
+wp_enqueue_style(
+    'loan-calculator-style',
+    plugins_url('build/index.css', __FILE__), // Changed from 'dist' to 'build'
+    [],
+    filemtime(plugin_dir_path(__FILE__) . 'build/index.css')
+);
 
     // Add any PHP variables to JavaScript
     wp_localize_script(
