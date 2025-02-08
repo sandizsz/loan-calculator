@@ -20,9 +20,9 @@ function loan_calculator_enqueue_scripts() {
     // Your existing enqueue code
     wp_enqueue_script(
         'loan-calculator', 
-        plugins_url('build/index.js', __FILE__),
+        plugins_url('index.js', __FILE__),
         ['react', 'react-dom'], // Explicit dependencies
-        filemtime(plugin_dir_path(__FILE__) . 'build/index.js'),
+        filemtime(plugin_dir_path(__FILE__) . 'index.js'),
         true
     );
 
@@ -30,9 +30,9 @@ function loan_calculator_enqueue_scripts() {
   // In loan-calculator.php
 wp_enqueue_style(
     'loan-calculator-style',
-    plugins_url('build/index.css', __FILE__), // Changed from 'dist' to 'build'
+    plugins_url('styles/main.css', __FILE__), // Changed from 'dist' to 'build'
     [],
-    filemtime(plugin_dir_path(__FILE__) . 'build/index.css')
+    filemtime(plugin_dir_path(__FILE__) . 'styles/main.css')
 );
 
     // Add any PHP variables to JavaScript
