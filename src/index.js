@@ -1,6 +1,7 @@
 // src/index.js
 import { createRoot } from 'react-dom/client';
 import LoanCalculator from './components/LoanCalculator';
+import './styles/main.css';
 
 function initApp() {
   const rootElement = document.getElementById('loan-calculator-root');

@@ -27,12 +27,12 @@ function loan_calculator_enqueue_scripts() {
     );
 
 
-  // In loan-calculator.php
+  // Enqueue the processed CSS from build directory
 wp_enqueue_style(
     'loan-calculator-style',
-    plugins_url('src/styles/main.css', __FILE__), // Changed from 'dist' to 'build'
+    plugins_url('build/main.css', __FILE__),
     [],
-    filemtime(plugin_dir_path(__FILE__) . 'src/styles/main.css')
+    filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
 );
 
     // Add any PHP variables to JavaScript
