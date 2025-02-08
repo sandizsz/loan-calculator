@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, Check, User, Mail, Phone, MapPin, CreditCard } from 'lucide-react';
+import { ChevronDown, Check, User, Mail, Phone, Building2, FileText, Briefcase, AlertCircle, Euro, Calendar, Clock, Target, Shield, Search, MessageCircle } from 'lucide-react';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
@@ -37,25 +37,90 @@ const Input = ({ icon: Icon, ...props }) => (
 );
 
 const FullCalculator = () => {
+    const [currentStep, setCurrentStep] = useState(1);
+    const totalSteps = 4;
     const [formData, setFormData] = useState({
-        amount: '',
-        term: '',
-        email: '',
-        phone: '',
+        // Step 1: Basic Information
         firstName: '',
         lastName: '',
-        personalCode: '',
-        city: '',
-        gender: '',
-        income: '',
-        politicallyExposed: 'no',
-        dependents: 'no',
-        beneficiary: 'yes',
+        email: '',
+        phone: '',
+        
+        // Step 2: Company Information
+        companyName: '',
+        registrationNumber: '',
+        position: '',
+        mainActivity: '',
+        companyDescription: '',
+        
+        // Step 3: Financial Information
+        currentLoans: '',
+        currentLoansDetails: '',
+        taxDebt: 'none', // none, withSchedule, withoutSchedule
+        taxDebtAmount: '',
+        requiredAmount: '',
+        desiredTerm: '',
+        urgency: '',
+        
+        // Step 4: Additional Information
+        loanPurpose: '',
+        product: '',
+        collateral: '',
+        collateralDescription: '',
+        previousApplications: '',
+        previousApplicationsDetails: '',
+        howDidYouHear: '',
+        manager: '',
+        
+        // Terms
         acceptTerms: false,
         acceptMarketing: false
     });
     
     const [errors, setErrors] = useState({});
+
+    const validateStep = (step) => {
+        const newErrors = {};
+        
+        switch(step) {
+            case 1:
+                if (!formData.firstName) newErrors.firstName = 'Lūdzu ievadiet vārdu';
+                if (!formData.lastName) newErrors.lastName = 'Lūdzu ievadiet uzvārdu';
+                if (!formData.email) newErrors.email = 'Lūdzu ievadiet e-pastu';
+                if (!formData.phone) newErrors.phone = 'Lūdzu ievadiet tālruni';
+                break;
+                
+            case 2:
+                if (!formData.companyName) newErrors.companyName = 'Lūdzu ievadiet uzņēmuma nosaukumu';
+                if (!formData.registrationNumber) newErrors.registrationNumber = 'Lūdzu ievadiet reģistrācijas numuru';
+                if (!formData.position) newErrors.position = 'Lūdzu ievadiet pozīciju';
+                if (!formData.mainActivity) newErrors.mainActivity = 'Lūdzu ievadiet pamata darbību';
+                break;
+                
+            case 3:
+                if (!formData.requiredAmount) newErrors.requiredAmount = 'Lūdzu ievadiet nepieciešamo summu';
+                if (!formData.desiredTerm) newErrors.desiredTerm = 'Lūdzu ievadiet vēlamo termiņu';
+                break;
+                
+            case 4:
+                if (!formData.loanPurpose) newErrors.loanPurpose = 'Lūdzu ievadiet kredīta mērķi';
+                if (!formData.acceptTerms) newErrors.acceptTerms = 'Lūdzu piekrītiet noteikumiem';
+                break;
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const nextStep = () => {
+        if (validateStep(currentStep)) {
+            setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+        }
+    };
+
+    const prevStep = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+    };
     const [monthlyPayment, setMonthlyPayment] = useState(0);
 
     useEffect(() => {
@@ -88,6 +153,7 @@ const FullCalculator = () => {
     };
 
     const validateForm = () => {
+        return validateStep(currentStep);
         const newErrors = {};
         
         if (!formData.firstName) newErrors.firstName = 'Obligāti aizpildāms lauks';
@@ -113,7 +179,7 @@ const FullCalculator = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
+        if (validateStep(currentStep) && currentStep === totalSteps) {
             try {
                 const response = await fetch('/wp-admin/admin-ajax.php', {
                     method: 'POST',
@@ -147,9 +213,8 @@ const FullCalculator = () => {
                     <p className="text-muted-foreground mt-2">saņemiet aizdevumu!</p>
                 </div>
                 
-                <MonthlyPaymentBox monthlyPayment={monthlyPayment} />
-                
                 <form onSubmit={handleSubmit} className="space-y-8">
+                    {renderStep()}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FormField name="firstName" label="Vārds" error={errors.firstName}>
                             <Input 
@@ -297,12 +362,24 @@ const FullCalculator = () => {
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        className="w-full bg-primary text-white h-11 px-8 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                    >
-                        Iesniegt pieteikumu
-                    </button>
+                    <div className="flex justify-between gap-4 mt-8">
+                        {currentStep > 1 && (
+                            <button
+                                type="button"
+                                onClick={prevStep}
+                                className="flex-1 bg-gray-100 text-gray-700 h-11 px-8 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                            >
+                                Atpakaļ
+                            </button>
+                        )}
+                        <button
+                            type={currentStep === totalSteps ? 'submit' : 'button'}
+                            onClick={currentStep === totalSteps ? undefined : nextStep}
+                            className="flex-1 bg-primary text-white h-11 px-8 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                        >
+                            {currentStep === totalSteps ? 'Iesniegt pieteikumu' : 'Tālāk'}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
