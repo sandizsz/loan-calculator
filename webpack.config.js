@@ -2,9 +2,13 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
+  entry: {
+    main: './src/index.js',
+    fullCalculator: './src/full-calculator.js'
+  },
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'main.js'
+    filename: '[name].js'
   },
   externals: {
     react: 'React',
