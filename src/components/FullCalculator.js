@@ -1,38 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { 
-    TextField, 
-    Button, 
-    FormControl, 
-    FormControlLabel, 
-    FormHelperText,
-    Select,
-    MenuItem,
-    Checkbox,
-    Radio,
-    RadioGroup,
-    Container,
-    Paper,
-    Typography,
-    Box,
-    Grid,
-    InputLabel
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { useState, useEffect } from 'react';
+import { ChevronDown, Check, User, Mail, Phone, MapPin, CreditCard } from 'lucide-react';
+import * as Select from '@radix-ui/react-select';
+import * as Checkbox from '@radix-ui/react-checkbox';
+import * as RadioGroup from '@radix-ui/react-radio-group';
+import * as Label from '@radix-ui/react-label';
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(3),
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    borderRadius: theme.spacing(2)
-}));
+const MonthlyPaymentBox = ({ monthlyPayment }) => (
+    <div className="bg-gradient-to-br from-primary/5 to-primary/15 p-8 rounded-xl mb-8 text-center shadow-sm border border-primary/10">
+        <div className="space-y-2">
+            <h4 className="text-3xl font-bold text-primary tracking-tight">{monthlyPayment} €/mēn.</h4>
+            <p className="text-muted-foreground text-sm">Ikmēneša maksājums</p>
+        </div>
+    </div>
+);
 
-const MonthlyPaymentBox = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.light,
-    padding: theme.spacing(2),
-    borderRadius: theme.spacing(1),
-    marginBottom: theme.spacing(3),
-    textAlign: 'center'
-}));
+const FormField = ({ name, label, error, children }) => (
+    <div className="space-y-2">
+        <div className="flex items-baseline justify-between">
+            <Label.Root className="text-sm font-medium">{label}</Label.Root>
+            {error && (
+                <span className="text-sm text-red-500">{error}</span>
+            )}
+        </div>
+        {children}
+    </div>
+);
+
+const Input = ({ icon: Icon, ...props }) => (
+    <div className="relative">
+        <input
+            {...props}
+            className="w-full h-10 px-10 border rounded-lg focus:ring-2 focus:ring-primary/30 outline-none transition-all"
+        />
+        {Icon && <Icon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />}
+    </div>
+);
 
 const FullCalculator = () => {
     const [formData, setFormData] = useState({
@@ -138,239 +140,172 @@ const FullCalculator = () => {
     };
 
     return (
-        <Container maxWidth="md">
-            <StyledPaper elevation={3}>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Aizpildiet pieteikumu
-                </Typography>
-                <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
-                    saņemiet aizdevumu!
-                </Typography>
-
-                <MonthlyPaymentBox>
-                    <Typography variant="h4" component="div" gutterBottom>
-                        {monthlyPayment} €/mēn.
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        Ikmēneša maksājums
-                    </Typography>
-                </MonthlyPaymentBox>
-
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Vārds"
+        <div className="max-w-3xl mx-auto p-6">
+            <div className="shadow-xl rounded-xl p-8 bg-white/50 backdrop-blur-sm border border-gray-100">
+                <div className="border-b pb-6 mb-8">
+                    <h2 className="text-3xl font-bold tracking-tight">Aizpildiet pieteikumu</h2>
+                    <p className="text-muted-foreground mt-2">saņemiet aizdevumu!</p>
+                </div>
+                
+                <MonthlyPaymentBox monthlyPayment={monthlyPayment} />
+                
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <FormField name="firstName" label="Vārds" error={errors.firstName}>
+                            <Input 
+                                icon={User}
+                                type="text"
                                 name="firstName"
                                 value={formData.firstName}
                                 onChange={handleInputChange}
-                                error={!!errors.firstName}
-                                helperText={errors.firstName}
-                                variant="outlined"
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Uzvārds"
+                        </FormField>
+
+                        <FormField name="lastName" label="Uzvārds" error={errors.lastName}>
+                            <Input 
+                                icon={User}
+                                type="text"
                                 name="lastName"
                                 value={formData.lastName}
                                 onChange={handleInputChange}
-                                error={!!errors.lastName}
-                                helperText={errors.lastName}
-                                variant="outlined"
                             />
-                        </Grid>
+                        </FormField>
 
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Personas kods"
-                                name="personalCode"
-                                value={formData.personalCode}
-                                onChange={handleInputChange}
-                                error={!!errors.personalCode}
-                                helperText={errors.personalCode || 'Nepieciešams identifikācijas procesam'}
-                                variant="outlined"
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="E-pasts"
-                                name="email"
+                        <FormField name="email" label="E-pasts" error={errors.email}>
+                            <Input 
+                                icon={Mail}
                                 type="email"
+                                name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                error={!!errors.email}
-                                helperText={errors.email}
-                                variant="outlined"
                             />
-                        </Grid>
+                        </FormField>
 
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Tālrunis"
+                        <FormField name="phone" label="Tālrunis" error={errors.phone}>
+                            <Input 
+                                icon={Phone}
+                                type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                error={!!errors.phone}
-                                helperText={errors.phone}
-                                variant="outlined"
-                                InputProps={{
-                                    startAdornment: '+371'
-                                }}
                             />
-                        </Grid>
+                        </FormField>
 
-                        <Grid item xs={12}>
-                            <FormControl fullWidth error={!!errors.city}>
-                                <InputLabel>Jūsu pilsētība</InputLabel>
-                                <Select
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={handleInputChange}
-                                    label="Jūsu pilsētība"
-                                >
-                                    <MenuItem value="">Izvēlieties pilsētu</MenuItem>
-                                    <MenuItem value="riga">Rīga</MenuItem>
-                                    <MenuItem value="daugavpils">Daugavpils</MenuItem>
-                                    <MenuItem value="liepaja">Liepāja</MenuItem>
-                                    <MenuItem value="jelgava">Jelgava</MenuItem>
-                                    <MenuItem value="jurmala">Jūrmala</MenuItem>
-                                    <MenuItem value="ventspils">Ventspils</MenuItem>
-                                    <MenuItem value="rezekne">Rēzekne</MenuItem>
-                                    <MenuItem value="valmiera">Valmiera</MenuItem>
-                                </Select>
-                                {errors.city && <FormHelperText>{errors.city}</FormHelperText>}
-                            </FormControl>
-                        </Grid>
+                        <FormField name="city" label="Pilsēta" error={errors.city}>
+                            <Select.Root 
+                                value={formData.city}
+                                onValueChange={(value) => handleInputChange({ 
+                                    target: { name: 'city', value } 
+                                })}
+                            >
+                                <Select.Trigger className="w-full h-10 px-10 border rounded-lg flex items-center justify-between bg-white">
+                                    <Select.Value placeholder="Izvēlieties pilsētu" />
+                                    <MapPin className="absolute left-3 h-5 w-5 text-gray-400" />
+                                    <Select.Icon>
+                                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                                    </Select.Icon>
+                                </Select.Trigger>
 
-                        <Grid item xs={12}>
-                            <FormControl component="fieldset" error={!!errors.gender}>
-                                <Typography variant="body1" gutterBottom>Dzimums</Typography>
-                                <RadioGroup
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleInputChange}
-                                    row
-                                >
-                                    <FormControlLabel
-                                        value="female"
-                                        control={<Radio />}
-                                        label="Sieviete"
-                                    />
-                                    <FormControlLabel
-                                        value="male"
-                                        control={<Radio />}
-                                        label="Vīrietis"
-                                    />
-                                </RadioGroup>
-                                {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
-                            </FormControl>
-                        </Grid>
+                                <Select.Portal>
+                                    <Select.Content className="overflow-hidden bg-white rounded-lg shadow-lg border">
+                                        <Select.Viewport className="p-1">
+                                            {[
+                                                ["riga", "Rīga"],
+                                                ["daugavpils", "Daugavpils"],
+                                                ["liepaja", "Liepāja"],
+                                                ["jelgava", "Jelgava"],
+                                                ["jurmala", "Jūrmala"],
+                                                ["ventspils", "Ventspils"],
+                                                ["rezekne", "Rēzekne"],
+                                                ["valmiera", "Valmiera"]
+                                            ].map(([value, label]) => (
+                                                <Select.Item 
+                                                    key={value} 
+                                                    value={value}
+                                                    className="relative flex items-center px-8 py-2 rounded-md text-sm cursor-default hover:bg-gray-100 focus:bg-gray-100 outline-none"
+                                                >
+                                                    <Select.ItemText>{label}</Select.ItemText>
+                                                    <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
+                                                        <Check className="h-4 w-4" />
+                                                    </Select.ItemIndicator>
+                                                </Select.Item>
+                                            ))}
+                                        </Select.Viewport>
+                                    </Select.Content>
+                                </Select.Portal>
+                            </Select.Root>
+                        </FormField>
 
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel>Vai Jūs esat politiski nozīmīga persona?</InputLabel>
-                                <Select
-                                    name="politicallyExposed"
-                                    value={formData.politicallyExposed}
-                                    onChange={handleInputChange}
-                                    label="Vai Jūs esat politiski nozīmīga persona?"
-                                >
-                                    <MenuItem value="no">Nē, es neesmu</MenuItem>
-                                    <MenuItem value="yes">Jā, esmu</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
+                        <FormField name="gender" label="Dzimums" error={errors.gender}>
+                            <RadioGroup.Root
+                                className="flex gap-4"
+                                value={formData.gender}
+                                onValueChange={(value) => handleInputChange({
+                                    target: { name: 'gender', value }
+                                })}
+                            >
+                                {[
+                                    ['female', 'Sieviete'],
+                                    ['male', 'Vīrietis']
+                                ].map(([value, label]) => (
+                                    <div key={value} className="flex items-center">
+                                        <RadioGroup.Item
+                                            id={value}
+                                            value={value}
+                                            className="w-4 h-4 rounded-full border border-gray-300 mr-2"
+                                        >
+                                            <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2 after:h-2 after:rounded-full after:bg-primary" />
+                                        </RadioGroup.Item>
+                                        <Label.Root htmlFor={value} className="text-sm">
+                                            {label}
+                                        </Label.Root>
+                                    </div>
+                                ))}
+                            </RadioGroup.Root>
+                        </FormField>
+                    </div>
 
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel>Vai Jums ir apgādājamā/s personas?</InputLabel>
-                                <Select
-                                    name="dependents"
-                                    value={formData.dependents}
-                                    onChange={handleInputChange}
-                                    label="Vai Jums ir apgādājamā/s personas?"
-                                >
-                                    <MenuItem value="no">Nē, man nav</MenuItem>
-                                    <MenuItem value="yes">Jā, ir</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={formData.acceptTerms}
-                                            onChange={handleInputChange}
-                                            name="acceptTerms"
-                                        />
-                                    }
-                                    label={
-                                        <Typography variant="body2">
-                                            Apliecinu, ka sniegtā informācija ir patiesa un esmu iepazinies ar 
-                                            <a href="/terms" style={{ color: '#1976d2', marginLeft: '4px' }}>
-                                                datu apstrādes noteikumiem
-                                            </a>
-                                        </Typography>
-                                    }
-                                />
-                                {errors.acceptTerms && <FormHelperText error>{errors.acceptTerms}</FormHelperText>}
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={formData.acceptMarketing}
-                                            onChange={handleInputChange}
-                                            name="acceptMarketing"
-                                        />
-                                    }
-                                    label="Piekrītu saņemt jaunumus un personalizētus piedāvājumus"
-                                />
-                            </FormControl>
-                        </Grid>
-                    </Grid>
+                    <div className="space-y-4">
+                        <div className="flex items-start space-x-2">
+                            <Checkbox.Root
+                                id="terms"
+                                checked={formData.acceptTerms}
+                                onCheckedChange={(checked) => handleInputChange({
+                                    target: { name: 'acceptTerms', checked }
+                                })}
+                                className="w-4 h-4 border border-gray-300 rounded"
+                            >
+                                <Checkbox.Indicator>
+                                    <Check className="w-4 h-4 text-primary" />
+                                </Checkbox.Indicator>
+                            </Checkbox.Root>
+                            <Label.Root htmlFor="terms" className="text-sm">
+                                Apliecinu, ka sniegtā informācija ir patiesa un esmu iepazinies ar 
+                                <a href="/terms" className="text-primary hover:underline ml-1">
+                                    datu apstrādes noteikumiem
+                                </a>
+                            </Label.Root>
+                        </div>
+                        {errors.acceptTerms && (
+                            <p className="text-sm text-red-500">{errors.acceptTerms}</p>
+                        )}
+                    </div>
 
                     {errors.submit && (
-                        <Box sx={{ mt: 2, p: 2, bgcolor: '#ffebee', borderRadius: 1 }}>
-                            <Typography color="error">{errors.submit}</Typography>
-                        </Box>
+                        <div className="bg-red-50 text-red-500 p-4 rounded-lg">
+                            {errors.submit}
+                        </div>
                     )}
 
-                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            sx={{ minWidth: 200 }}
-                        >
-                            Iesniegt pieteikumu
-                        </Button>
-                    </Box>
-
-                    <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/>
-                        </svg>
-                        <Typography variant="body2" color="textSecondary">
-                            Mēs nodrošinām bankas līmeņa aizsardzību Jūsu datu drošībai
-                        </Typography>
-                    </Box>
-                </Box>
-            </StyledPaper>
-        </Container>
+                    <button
+                        type="submit"
+                        className="w-full bg-primary text-white h-11 px-8 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    >
+                        Iesniegt pieteikumu
+                    </button>
+                </form>
+            </div>
+        </div>
     );
 };
 
