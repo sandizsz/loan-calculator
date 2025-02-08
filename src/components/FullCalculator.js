@@ -1,26 +1,49 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, Check, User, Mail, Phone, Building2, FileText, Briefcase, AlertCircle, Euro, Calendar, Clock, Target, Shield, Search, MessageCircle } from 'lucide-react';
+import { ChevronDown, Check, User, Mail, Phone, Building2, FileText, Briefcase, 
+         AlertCircle, Euro, Calendar, Clock, Target, Shield, Search, MessageCircle } from 'lucide-react';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Label from '@radix-ui/react-label';
 
-const MonthlyPaymentBox = ({ monthlyPayment }) => (
-    <div className="bg-gradient-to-br from-primary/5 to-primary/15 p-8 rounded-xl mb-8 text-center shadow-sm border border-primary/10">
-        <div className="space-y-2">
-            <h4 className="text-3xl font-bold text-primary tracking-tight">{monthlyPayment} €/mēn.</h4>
-            <p className="text-muted-foreground text-sm">Ikmēneša maksājums</p>
+const StepIndicator = ({ currentStep, totalSteps }) => {
+    return (
+        <div className="mb-8">
+            <div className="flex justify-between mb-2">
+                {[...Array(totalSteps)].map((_, index) => (
+                    <div
+                        key={index}
+                        className={`flex items-center ${index < totalSteps - 1 ? 'flex-1' : ''}`}
+                    >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
+                            ${index + 1 === currentStep ? 'border-primary bg-primary text-white' : 
+                              index + 1 < currentStep ? 'border-primary bg-primary/10' : 'border-gray-300'}`}
+                        >
+                            {index + 1 < currentStep ? <Check className="w-4 h-4" /> : index + 1}
+                        </div>
+                        {index < totalSteps - 1 && (
+                            <div className={`flex-1 h-0.5 mx-2 
+                                ${index + 1 < currentStep ? 'bg-primary' : 'bg-gray-300'}`}
+                            />
+                        )}
+                    </div>
+                ))}
+            </div>
+            <div className="flex justify-between px-2">
+                <span className="text-sm">Personīgā informācija</span>
+                <span className="text-sm">Uzņēmuma info</span>
+                <span className="text-sm">Finanšu info</span>
+                <span className="text-sm">Papildus info</span>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const FormField = ({ name, label, error, children }) => (
     <div className="space-y-2">
         <div className="flex items-baseline justify-between">
             <Label.Root className="text-sm font-medium">{label}</Label.Root>
-            {error && (
-                <span className="text-sm text-red-500">{error}</span>
-            )}
+            {error && <span className="text-sm text-red-500">{error}</span>}
         </div>
         {children}
     </div>
@@ -40,44 +63,206 @@ const FullCalculator = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 4;
     const [formData, setFormData] = useState({
-        // Step 1: Basic Information
+        // Step 1
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         
-        // Step 2: Company Information
+        // Step 2
         companyName: '',
         registrationNumber: '',
         position: '',
         mainActivity: '',
-        companyDescription: '',
         
-        // Step 3: Financial Information
-        currentLoans: '',
-        currentLoansDetails: '',
-        taxDebt: 'none', // none, withSchedule, withoutSchedule
-        taxDebtAmount: '',
+        // Step 3
         requiredAmount: '',
         desiredTerm: '',
-        urgency: '',
+        currentLoans: 'no',
+        taxDebt: 'no',
         
-        // Step 4: Additional Information
+        // Step 4
         loanPurpose: '',
-        product: '',
         collateral: '',
-        collateralDescription: '',
-        previousApplications: '',
-        previousApplicationsDetails: '',
-        howDidYouHear: '',
-        manager: '',
-        
-        // Terms
         acceptTerms: false,
         acceptMarketing: false
     });
     
     const [errors, setErrors] = useState({});
+
+    const handleInputChange = (name, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const renderStepContent = () => {
+        switch(currentStep) {
+            case 1:
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField name="firstName" label="Vārds" error={errors.firstName}>
+                            <Input 
+                                icon={User}
+                                placeholder="Ievadiet vārdu"
+                                value={formData.firstName}
+                                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="lastName" label="Uzvārds" error={errors.lastName}>
+                            <Input 
+                                icon={User}
+                                placeholder="Ievadiet uzvārdu"
+                                value={formData.lastName}
+                                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="email" label="E-pasts" error={errors.email}>
+                            <Input 
+                                icon={Mail}
+                                type="email"
+                                placeholder="example@domain.com"
+                                value={formData.email}
+                                onChange={(e) => handleInputChange('email', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="phone" label="Tālrunis" error={errors.phone}>
+                            <Input 
+                                icon={Phone}
+                                placeholder="+371"
+                                value={formData.phone}
+                                onChange={(e) => handleInputChange('phone', e.target.value)}
+                            />
+                        </FormField>
+                    </div>
+                );
+            case 2:
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField name="companyName" label="Uzņēmuma nosaukums" error={errors.companyName}>
+                            <Input 
+                                icon={Building2}
+                                placeholder="SIA Example"
+                                value={formData.companyName}
+                                onChange={(e) => handleInputChange('companyName', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="registrationNumber" label="Reģistrācijas numurs" error={errors.registrationNumber}>
+                            <Input 
+                                icon={FileText}
+                                placeholder="40000000000"
+                                value={formData.registrationNumber}
+                                onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="position" label="Amats" error={errors.position}>
+                            <Input 
+                                icon={Briefcase}
+                                placeholder="Valdes loceklis"
+                                value={formData.position}
+                                onChange={(e) => handleInputChange('position', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="mainActivity" label="Galvenā darbības nozare" error={errors.mainActivity}>
+                            <Input 
+                                icon={Target}
+                                placeholder="Piemēram: Tirdzniecība"
+                                value={formData.mainActivity}
+                                onChange={(e) => handleInputChange('mainActivity', e.target.value)}
+                            />
+                        </FormField>
+                    </div>
+                );
+            case 3:
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField name="requiredAmount" label="Nepieciešamā summa" error={errors.requiredAmount}>
+                            <Input 
+                                icon={Euro}
+                                type="number"
+                                placeholder="50000"
+                                value={formData.requiredAmount}
+                                onChange={(e) => handleInputChange('requiredAmount', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="desiredTerm" label="Vēlamais termiņš (mēnešos)" error={errors.desiredTerm}>
+                            <Input 
+                                icon={Calendar}
+                                type="number"
+                                placeholder="24"
+                                value={formData.desiredTerm}
+                                onChange={(e) => handleInputChange('desiredTerm', e.target.value)}
+                            />
+                        </FormField>
+                        <FormField name="currentLoans" label="Esošie kredīti" error={errors.currentLoans}>
+                            <Select.Root 
+                                value={formData.currentLoans}
+                                onValueChange={(value) => handleInputChange('currentLoans', value)}
+                            >
+                                <Select.Trigger className="w-full h-11 px-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                                    <Select.Value placeholder="Izvēlieties" />
+                                    <Select.Icon>
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    </Select.Icon>
+                                </Select.Trigger>
+                                <Select.Portal>
+                                    <Select.Content className="bg-white rounded-lg shadow-lg border">
+                                        <Select.Viewport className="p-1">
+                                            <Select.Item value="no" className="relative flex items-center px-8 py-2 rounded-md text-sm hover:bg-gray-100">
+                                                <Select.ItemText>Nav</Select.ItemText>
+                                            </Select.Item>
+                                            <Select.Item value="yes" className="relative flex items-center px-8 py-2 rounded-md text-sm hover:bg-gray-100">
+                                                <Select.ItemText>Ir</Select.ItemText>
+                                            </Select.Item>
+                                        </Select.Viewport>
+                                    </Select.Content>
+                                </Select.Portal>
+                            </Select.Root>
+                        </FormField>
+                    </div>
+                );
+            case 4:
+                return (
+                    <div className="space-y-6">
+                        <FormField name="loanPurpose" label="Kredīta mērķis" error={errors.loanPurpose}>
+                            <Input 
+                                icon={Target}
+                                placeholder="Aprakstiet kredīta mērķi"
+                                value={formData.loanPurpose}
+                                onChange={(e) => handleInputChange('loanPurpose', e.target.value)}
+                            />
+                        </FormField>
+                        
+                        <div className="space-y-4">
+                            <div className="flex items-start space-x-2">
+                                <Checkbox.Root
+                                    id="terms"
+                                    checked={formData.acceptTerms}
+                                    onCheckedChange={(checked) => handleInputChange('acceptTerms', checked)}
+                                    className="w-5 h-5 border border-gray-200 rounded"
+                                >
+                                    <Checkbox.Indicator>
+                                        <Check className="w-4 h-4" />
+                                    </Checkbox.Indicator>
+                                </Checkbox.Root>
+                                <Label.Root htmlFor="terms" className="text-sm">
+                                    Apliecinu, ka sniegtā informācija ir patiesa un esmu iepazinies ar
+                                    <a href="/terms" className="text-primary hover:underline ml-1">
+                                        noteikumiem
+                                    </a>
+                                </Label.Root>
+                            </div>
+                            {errors.acceptTerms && (
+                                <p className="text-sm text-red-500">{errors.acceptTerms}</p>
+                            )}
+                        </div>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
 
     const validateStep = (step) => {
         const newErrors = {};
@@ -93,13 +278,11 @@ const FullCalculator = () => {
             case 2:
                 if (!formData.companyName) newErrors.companyName = 'Lūdzu ievadiet uzņēmuma nosaukumu';
                 if (!formData.registrationNumber) newErrors.registrationNumber = 'Lūdzu ievadiet reģistrācijas numuru';
-                if (!formData.position) newErrors.position = 'Lūdzu ievadiet pozīciju';
-                if (!formData.mainActivity) newErrors.mainActivity = 'Lūdzu ievadiet pamata darbību';
                 break;
                 
             case 3:
-                if (!formData.requiredAmount) newErrors.requiredAmount = 'Lūdzu ievadiet nepieciešamo summu';
-                if (!formData.desiredTerm) newErrors.desiredTerm = 'Lūdzu ievadiet vēlamo termiņu';
+                if (!formData.requiredAmount) newErrors.requiredAmount = 'Lūdzu ievadiet summu';
+                if (!formData.desiredTerm) newErrors.desiredTerm = 'Lūdzu ievadiet termiņu';
                 break;
                 
             case 4:
@@ -120,61 +303,6 @@ const FullCalculator = () => {
 
     const prevStep = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
-    };
-    const [monthlyPayment, setMonthlyPayment] = useState(0);
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        setFormData(prev => ({
-            ...prev,
-            amount: params.get('amount') || '',
-            term: params.get('term') || '',
-            email: params.get('email') || '',
-            phone: params.get('phone') || ''
-        }));
-    }, []);
-
-    useEffect(() => {
-        if (formData.amount && formData.term) {
-            const annualRate = 12 / 100;
-            const monthlyRate = annualRate / 12;
-            const payment = (formData.amount * monthlyRate * Math.pow(1 + monthlyRate, formData.term)) / 
-                          (Math.pow(1 + monthlyRate, formData.term) - 1);
-            setMonthlyPayment(payment.toFixed(2));
-        }
-    }, [formData.amount, formData.term]);
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
-
-    const validateForm = () => {
-        return validateStep(currentStep);
-        const newErrors = {};
-        
-        if (!formData.firstName) newErrors.firstName = 'Obligāti aizpildāms lauks';
-        if (!formData.lastName) newErrors.lastName = 'Obligāti aizpildāms lauks';
-        if (!formData.personalCode) newErrors.personalCode = 'Obligāti aizpildāms lauks';
-        if (!formData.email) {
-            newErrors.email = 'Obligāti aizpildāms lauks';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Nepareizs e-pasta formāts';
-        }
-        if (!formData.phone) {
-            newErrors.phone = 'Obligāti aizpildāms lauks';
-        } else if (!/^\d{8}$/.test(formData.phone)) {
-            newErrors.phone = 'Nepareizs tālruņa numura formāts';
-        }
-        if (!formData.city) newErrors.city = 'Obligāti aizpildāms lauks';
-        if (!formData.gender) newErrors.gender = 'Obligāti aizpildāms lauks';
-        if (!formData.acceptTerms) newErrors.acceptTerms = 'Jums jāpiekrīt noteikumiem';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
@@ -208,153 +336,15 @@ const FullCalculator = () => {
     return (
         <div className="max-w-3xl mx-auto p-6">
             <div className="shadow-xl rounded-xl p-8 bg-white/50 backdrop-blur-sm border border-gray-100">
-                <div className="border-b pb-6 mb-8">
+            <div className="border-b pb-6 mb-8">
                     <h2 className="text-3xl font-bold tracking-tight">Aizpildiet pieteikumu</h2>
                     <p className="text-muted-foreground mt-2">saņemiet aizdevumu!</p>
                 </div>
+
+                <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
                 
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    {renderStep()}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <FormField name="firstName" label="Vārds" error={errors.firstName}>
-                            <Input 
-                                icon={User}
-                                type="text"
-                                name="firstName"
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                            />
-                        </FormField>
-
-                        <FormField name="lastName" label="Uzvārds" error={errors.lastName}>
-                            <Input 
-                                icon={User}
-                                type="text"
-                                name="lastName"
-                                value={formData.lastName}
-                                onChange={handleInputChange}
-                            />
-                        </FormField>
-
-                        <FormField name="email" label="E-pasts" error={errors.email}>
-                            <Input 
-                                icon={Mail}
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                            />
-                        </FormField>
-
-                        <FormField name="phone" label="Tālrunis" error={errors.phone}>
-                            <Input 
-                                icon={Phone}
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleInputChange}
-                            />
-                        </FormField>
-
-                        <FormField name="city" label="Pilsēta" error={errors.city}>
-                            <Select.Root 
-                                value={formData.city}
-                                onValueChange={(value) => handleInputChange({ 
-                                    target: { name: 'city', value } 
-                                })}
-                            >
-                                <Select.Trigger className="relative w-full h-11 pl-10 pr-4 border border-gray-200 rounded-lg flex items-center justify-between bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                                    <MapPin className="absolute left-3 w-5 h-5 text-gray-400" />
-                                    <Select.Value placeholder="Izvēlieties pilsētu" className="text-gray-900" />
-                                    <Select.Icon className="ml-2">
-                                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                                    </Select.Icon>
-                                </Select.Trigger>
-
-                                <Select.Portal>
-                                    <Select.Content className="overflow-hidden bg-white rounded-lg shadow-lg border border-gray-200 min-w-[var(--radix-select-trigger-width)] max-h-[300px]">
-                                        <Select.Viewport className="p-1">
-                                            {[
-                                                ["riga", "Rīga"],
-                                                ["daugavpils", "Daugavpils"],
-                                                ["liepaja", "Liepāja"],
-                                                ["jelgava", "Jelgava"],
-                                                ["jurmala", "Jūrmala"],
-                                                ["ventspils", "Ventspils"],
-                                                ["rezekne", "Rēzekne"],
-                                                ["valmiera", "Valmiera"]
-                                            ].map(([value, label]) => (
-                                                <Select.Item 
-                                                    key={value} 
-                                                    value={value}
-                                                    className="relative flex items-center px-8 py-2 rounded-md text-sm cursor-default hover:bg-gray-100 focus:bg-gray-100 outline-none"
-                                                >
-                                                    <Select.ItemText>{label}</Select.ItemText>
-                                                    <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
-                                                        <Check className="h-4 w-4" />
-                                                    </Select.ItemIndicator>
-                                                </Select.Item>
-                                            ))}
-                                        </Select.Viewport>
-                                    </Select.Content>
-                                </Select.Portal>
-                            </Select.Root>
-                        </FormField>
-
-                        <FormField name="gender" label="Dzimums" error={errors.gender}>
-                            <RadioGroup.Root
-                                className="flex gap-6"
-                                value={formData.gender}
-                                onValueChange={(value) => handleInputChange({
-                                    target: { name: 'gender', value }
-                                })}
-                            >
-                                {[
-                                    ['female', 'Sieviete'],
-                                    ['male', 'Vīrietis']
-                                ].map(([value, label]) => (
-                                    <div key={value} className="flex items-center">
-                                        <RadioGroup.Item
-                                            id={value}
-                                            value={value}
-                                            className="w-5 h-5 rounded-full border border-gray-200 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                                        >
-                                            <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[] after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-primary" />
-                                        </RadioGroup.Item>
-                                        <Label.Root htmlFor={value} className="pl-2 text-sm text-gray-900">
-                                            {label}
-                                        </Label.Root>
-                                    </div>
-                                ))}
-                            </RadioGroup.Root>
-                        </FormField>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="flex items-start space-x-2">
-                            <Checkbox.Root
-                                id="terms"
-                                checked={formData.acceptTerms}
-                                onCheckedChange={(checked) => handleInputChange({
-                                    target: { name: 'acceptTerms', checked }
-                                })}
-                                className="w-5 h-5 border border-gray-200 rounded hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                            >
-                                <Checkbox.Indicator className="flex items-center justify-center">
-                                    <Check className="w-4 h-4 text-white" />
-                                </Checkbox.Indicator>
-                            </Checkbox.Root>
-                            <Label.Root htmlFor="terms" className="text-sm">
-                                Apliecinu, ka sniegtā informācija ir patiesa un esmu iepazinies ar 
-                                <a href="/terms" className="text-primary hover:underline ml-1">
-                                    datu apstrādes noteikumiem
-                                </a>
-                            </Label.Root>
-                        </div>
-                        {errors.acceptTerms && (
-                            <p className="text-sm text-red-500">{errors.acceptTerms}</p>
-                        )}
-                    </div>
+                    {renderStepContent()}
 
                     {errors.submit && (
                         <div className="bg-red-50 text-red-500 p-4 rounded-lg">
