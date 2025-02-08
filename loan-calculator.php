@@ -9,15 +9,23 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+
+
+// In loan-calculator.php
 function loan_calculator_enqueue_scripts() {
-    // Enqueue the built files
+    // Explicitly load WordPress React
+    wp_enqueue_script('react');
+    wp_enqueue_script('react-dom');
+    
+    // Your existing enqueue code
     wp_enqueue_script(
-        'loan-calculator',
-        plugins_url('dist/index.js', __FILE__),
-        ['wp-element'],  // This includes React
-        filemtime(plugin_dir_path(__FILE__) . 'dist/index.js'),
+        'loan-calculator', 
+        plugins_url('build/index.js', __FILE__),
+        ['react', 'react-dom'], // Explicit dependencies
+        filemtime(plugin_dir_path(__FILE__) . 'build/index.js'),
         true
     );
+
 
     wp_enqueue_style(
         'loan-calculator-style',
@@ -39,8 +47,13 @@ function loan_calculator_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
-// Add a shortcode to render the calculator
 function loan_calculator_shortcode() {
-    return '<div id="loan-calculator-root"></div>';
+    return '
+        <div id="loan-calculator-root">
+            <div class="loading-message" style="padding: 20px; text-align: center;">
+                Loading calculator...
+            </div>
+        </div>
+    ';
 }
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
