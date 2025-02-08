@@ -63,13 +63,13 @@ const LoanCalculator = () => {
 
     return (
         <ErrorBoundary>
-        <Card className="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-6">
+        <Card className="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-xl backdrop-blur-sm">
+            <CardContent className="p-8 space-y-6">
                 {/* Amount Slider */}
                 <div className="mb-8">
-                    <div className="flex justify-between mb-2">
-                        <span className="text-gray-700">Aizdevuma summa</span>
-                        <span className="font-medium">{formData.amount} €</span>
+                    <div className="flex justify-between mb-3">
+                        <span className="text-gray-700 font-medium">Aizdevuma summa</span>
+                        <span className="font-semibold text-blue-600">{formData.amount} €</span>
                     </div>
                     <input
                         type="range"
@@ -79,15 +79,15 @@ const LoanCalculator = () => {
                         onChange={(e) => handleInputChange({
                             target: { name: 'amount', value: e.target.value }
                         })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer range-lg accent-blue-600 hover:accent-blue-700 transition-colors"
                     />
                 </div>
 
                 {/* Term Slider */}
                 <div className="mb-8">
-                    <div className="flex justify-between mb-2">
-                        <span className="text-gray-700">Aizdevuma termiņš</span>
-                        <span className="font-medium">{formData.term} mēn.</span>
+                    <div className="flex justify-between mb-3">
+                        <span className="text-gray-700 font-medium">Aizdevuma termiņš</span>
+                        <span className="font-semibold text-blue-600">{formData.term} mēn.</span>
                     </div>
                     <input
                         type="range"
@@ -97,16 +97,16 @@ const LoanCalculator = () => {
                         onChange={(e) => handleInputChange({
                             target: { name: 'term', value: e.target.value }
                         })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer range-lg accent-blue-600 hover:accent-blue-700 transition-colors"
                     />
                 </div>
 
                 {/* Monthly Payment Display */}
-                <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <div className="bg-blue-50 p-6 rounded-lg mb-8 border border-blue-100">
                     <div className="flex items-center justify-center">
-                        <span className="text-2xl font-medium">{monthlyPayment} €/mēn.</span>
-                        <div className="tooltip-trigger ml-2">
-                            <svg className="w-4 h-4 text-blue-500 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                        <span className="text-3xl font-bold text-blue-800">{monthlyPayment} €/mēn.</span>
+                        <div className="tooltip-trigger ml-3">
+                            <svg className="w-5 h-5 text-blue-600 cursor-help hover:text-blue-700 transition-colors" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
                             </svg>
                             <div className="tooltip-content">
@@ -117,7 +117,7 @@ const LoanCalculator = () => {
                 </div>
 
                 {/* Contact Form */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="input-wrapper">
                         <input
                             type="email"
@@ -125,9 +125,11 @@ const LoanCalculator = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="Jūsu e-pasts"
-                            className={`form-input ${errors.email ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg border ${
+                                errors.email ? 'border-red-500' : 'border-gray-200'
+                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all`}
                         />
-                        {errors.email && <div className="error-text">{errors.email}</div>}
+                        {errors.email && <div className="text-red-600 text-sm mt-2 font-medium">{errors.email}</div>}
                     </div>
 
                     <div className="phone-input-container">
@@ -138,16 +140,18 @@ const LoanCalculator = () => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             placeholder="Jūsu tālrunis"
-                            className={`form-input phone ${errors.phone ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg border ${
+                                errors.phone ? 'border-red-500' : 'border-gray-200'
+                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all`}
                         />
-                        {errors.phone && <div className="error-text">{errors.phone}</div>}
+                        {errors.phone && <div className="text-red-600 text-sm mt-2 font-medium">{errors.phone}</div>}
                     </div>
                 </div>
 
                 {/* Submit Button */}
                 <button
                     onClick={handleSubmit}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg mt-6 text-lg font-medium transition-colors duration-200"
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl mt-8 text-lg font-semibold transition-all transform hover:scale-[1.02] active:scale-100 shadow-lg hover:shadow-xl"
                 >
                     Pieteikties
                 </button>
