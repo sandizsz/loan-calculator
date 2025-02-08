@@ -1,0 +1,110 @@
+/* assets/css/style.css */
+.loan-calculator-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Select styling */
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    background-color: #f8f8f8;
+}
+
+/* Labels and headings */
+.label-text {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Amount and term display */
+.value-display {
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Range inputs */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: #ddd;
+    margin: 20px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 2px solid #999;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Range labels */
+.range-limits {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-top: -15px;
+}
+
+/* Monthly payment box */
+.monthly-payment {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 25px 0;
+}
+
+.payment-amount {
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+    display: block;
+}
+
+.payment-label {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Form inputs */
+input[type="email"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Submit button */
+.submit-button {
+    background-color: transparent;
+    color: #e91e63;
+    border: 1px solid #e91e63;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    width: auto;
+    display: inline-block;
+}
+
+/* Slider sections */
+.slider-section {
+    margin-bottom: 25px;
+}
