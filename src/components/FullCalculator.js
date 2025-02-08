@@ -110,92 +110,42 @@ const FullCalculator = () => {
             <h2 className="text-2xl font-bold mb-6 text-center">Aizpildiet pieteikumu</h2>
             <p className="text-center text-gray-600 mb-8">saņemiet aizdevumu!</p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Monthly Payment Display */}
-                <div className="bg-blue-50 p-4 rounded-lg mb-8">
-                    <div className="flex items-center justify-center">
-                        <span className="text-2xl font-medium">{monthlyPayment} €/mēn.</span>
-                        <div className="tooltip-trigger ml-2">
-                            <svg className="w-4 h-4 text-blue-500 cursor-help" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
-                            </svg>
-                            <div className="tooltip-content">
-                                Kredīta kalkulatoram ir ilustratīva nozīme
-                            </div>
-                        </div>
-                    </div>
+            <form onSubmit={handleSubmit} className="application-form">
+                <div className="form-group">
+                    <label>Vārds</label>
+                    <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className={`form-input ${errors.firstName ? 'error' : ''}`}
+                    />
+                    {errors.firstName && <div className="error-text">{errors.firstName}</div>}
                 </div>
-
-                {/* Personal Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="input-wrapper">
-                        <input
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            placeholder="Vārds"
-                            className={`form-input ${errors.firstName ? 'error' : ''}`}
-                        />
-                        {errors.firstName && <div className="error-text">{errors.firstName}</div>}
-                    </div>
-
-                    <div className="input-wrapper">
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            placeholder="Uzvārds"
-                            className={`form-input ${errors.lastName ? 'error' : ''}`}
-                        />
-                        {errors.lastName && <div className="error-text">{errors.lastName}</div>}
-                    </div>
+                <div className="form-group">
+                    <label>Uzvārds</label>
+                    <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className={`form-input ${errors.lastName ? 'error' : ''}`}
+                    />
+                    {errors.lastName && <div className="error-text">{errors.lastName}</div>}
                 </div>
-
-                <div className="input-wrapper">
+                <div className="form-group">
+                    <label>Personas kods</label>
                     <input
                         type="text"
                         name="personalCode"
                         value={formData.personalCode}
                         onChange={handleInputChange}
-                        placeholder="Personas kods"
                         className={`form-input ${errors.personalCode ? 'error' : ''}`}
                     />
-                    <div className="text-xs text-gray-500 mt-1">Nepieciešams identifikācijas procesam</div>
                     {errors.personalCode && <div className="error-text">{errors.personalCode}</div>}
                 </div>
-
-                {/* Contact Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="input-wrapper">
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="E-pasts"
-                            className={`form-input ${errors.email ? 'error' : ''}`}
-                        />
-                        {errors.email && <div className="error-text">{errors.email}</div>}
-                    </div>
-
-                    <div className="phone-input-container">
-                        <span className="phone-prefix">+371</span>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            placeholder="Tālrunis"
-                            className={`form-input phone ${errors.phone ? 'error' : ''}`}
-                        />
-                        {errors.phone && <div className="error-text">{errors.phone}</div>}
-                    </div>
-                </div>
-
-                {/* City and Gender Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="form-group">
+                    <label>Jūsu pilsētība</label>
                     <select
                         name="city"
                         value={formData.city}
@@ -212,9 +162,12 @@ const FullCalculator = () => {
                         <option value="rezekne">Rēzekne</option>
                         <option value="valmiera">Valmiera</option>
                     </select>
-
-                    <div className="flex gap-4">
-                        <label className="flex items-center flex-1">
+                    {errors.city && <div className="error-text">{errors.city}</div>}
+                </div>
+                <div className="form-group">
+                    <label>Dzimums</label>
+                    <div>
+                        <label>
                             <input
                                 type="radio"
                                 name="gender"
@@ -225,7 +178,7 @@ const FullCalculator = () => {
                             />
                             Sieviete
                         </label>
-                        <label className="flex items-center flex-1">
+                        <label>
                             <input
                                 type="radio"
                                 name="gender"
@@ -237,107 +190,34 @@ const FullCalculator = () => {
                             Vīrietis
                         </label>
                     </div>
+                    {errors.gender && <div className="error-text">{errors.gender}</div>}
+                </div>
+                <div className="form-group">
+                    <label>Vai Jūs esat politiski nozīmīga persona?</label>
+                    <select
+                        name="politicallyExposed"
+                        value={formData.politicallyExposed}
+                        onChange={handleInputChange}
+                        className="form-input"
+                    >
+                        <option value="no">Nē, es neesmu</option>
+                        <option value="yes">Jā, esmu</option>
+                    </select>
+                </div>
+                <div className="form-group">
+                    <label>Esmu patiesā labuma guvējs</label>
+                    <select
+                        name="beneficiary"
+                        value={formData.beneficiary}
+                        onChange={handleInputChange}
+                        className="form-input"
+                    >
+                        <option value="yes">Jā, es esmu</option>
+                        <option value="no">Nē, neesmu</option>
+                    </select>
                 </div>
 
-                {/* Additional Questions */}
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Vai Jūs esat politiski nozīmīga persona?
-                            <span className="ml-1 text-blue-500 cursor-help tooltip-trigger">
-                                ⓘ
-                                <span className="tooltip-content">
-                                    Persona, kura ieņem vai ir ieņēmusi nozīmīgu publisku amatu
-                                </span>
-                            </span>
-                        </label>
-                        <select
-                            name="politicallyExposed"
-                            value={formData.politicallyExposed}
-                            onChange={handleInputChange}
-                            className="form-input"
-                        >
-                            <option value="no">Nē, es neesmu</option>
-                            <option value="yes">Jā, esmu</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Vai Jums ir apgādājamā/s personas?
-                        </label>
-                        <select
-                            name="dependents"
-                            value={formData.dependents}
-                            onChange={handleInputChange}
-                            className="form-input"
-                        >
-                            <option value="no">Nē, man nav</option>
-                            <option value="yes">Jā, ir</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Esmu patiesā labuma guvējs
-                        </label>
-                        <select
-                            name="beneficiary"
-                            value={formData.beneficiary}
-                            onChange={handleInputChange}
-                            className="form-input"
-                        >
-                            <option value="yes">Jā, es esmu</option>
-                            <option value="no">Nē, neesmu</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Terms and Marketing Consent */}
-                <div className="space-y-4">
-                    <label className="flex items-start gap-2">
-                        <input
-                            type="checkbox"
-                            name="acceptTerms"
-                            checked={formData.acceptTerms}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                        />
-                        <span className="text-sm">
-                            Apliecinu, ka sniegtā informācija ir patiesa un esmu iepazinies ar 
-                            <a href="/terms" className="text-blue-500 hover:underline ml-1">
-                                datu apstrādes noteikumiem
-                            </a>.
-                        </span>
-                    </label>
-                    {errors.acceptTerms && <div className="error-text">{errors.acceptTerms}</div>}
-
-                    <label className="flex items-start gap-2">
-                        <input
-                            type="checkbox"
-                            name="acceptMarketing"
-                            checked={formData.acceptMarketing}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                        />
-                        <span className="text-sm">
-                            Piekrītu saņemt jaunumus un personalizētus piedāvājumus.
-                        </span>
-                    </label>
-                </div>
-
-                {/* Error Message */}
-                {errors.submit && (
-                    <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-                        {errors.submit}
-                    </div>
-                )}
-
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    className="submit-button"
-                >
+                <button type="submit" className="submit-button">
                     Turpināt
                 </button>
 
