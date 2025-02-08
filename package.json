@@ -1,0 +1,23 @@
+{
+  "name": "loan-calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "^30.10.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

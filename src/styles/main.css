@@ -1,0 +1,66 @@
+/* Input styles */
+.form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-input.error {
+    @apply border-red-500;
+}
+
+.error-text {
+    @apply text-red-500 text-sm mt-1;
+}
+
+/* Range slider styles */
+input[type="range"] {
+    @apply appearance-none bg-gray-200 h-2 rounded-lg;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    @apply appearance-none w-6 h-6 bg-yellow-400 border-2 border-white rounded-full cursor-pointer shadow-md;
+}
+
+input[type="range"]::-moz-range-thumb {
+    @apply w-6 h-6 bg-yellow-400 border-2 border-white rounded-full cursor-pointer shadow-md;
+}
+
+/* Phone input container */
+.phone-input-container {
+    @apply relative;
+}
+
+.phone-prefix {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600;
+}
+
+input.phone {
+    @apply pl-12;
+}
+
+/* Tooltip styles */
+.tooltip-trigger {
+    @apply relative inline-flex items-center;
+}
+
+.tooltip-content {
+    @apply invisible absolute bottom-full left-1/2 transform -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 transition-all duration-200 whitespace-nowrap z-50 mb-2;
+}
+
+.tooltip-trigger:hover .tooltip-content {
+    @apply visible opacity-100;
+}
+
+/* Card styles */
+.calculator-container {
+    @apply bg-white/90 backdrop-blur-sm border border-gray-100 rounded-lg shadow-lg p-6;
+}
+
+/* Button styles */
+.submit-button {
+    @apply w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg text-lg font-medium transition-colors duration-200;
+}
+
+/* Security badge */
+.security-badge {
+    @apply flex items-center justify-center gap-2 text-sm text-gray-500 mt-4;
+}
