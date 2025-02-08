@@ -20,9 +20,9 @@ function loan_calculator_enqueue_scripts() {
     // Your existing enqueue code
     wp_enqueue_script(
         'loan-calculator', 
-        plugins_url('src/index.js', __FILE__),
+        plugins_url('build/index.js', __FILE__),
         ['react', 'react-dom'], // Explicit dependencies
-        filemtime(plugin_dir_path(__FILE__) . 'src/index.js'),
+        filemtime(plugin_dir_path(__FILE__) . 'build/index.js'),
         true
     );
 
