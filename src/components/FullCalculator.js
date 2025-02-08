@@ -27,12 +27,12 @@ const FormField = ({ name, label, error, children }) => (
 );
 
 const Input = ({ icon: Icon, ...props }) => (
-    <div className="relative">
+    <div className="relative flex items-center">
+        {Icon && <Icon className="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" />}
         <input
             {...props}
-            className="w-full h-10 px-10 border rounded-lg focus:ring-2 focus:ring-primary/30 outline-none transition-all"
+            className="w-full h-11 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400"
         />
-        {Icon && <Icon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />}
     </div>
 );
 
@@ -198,16 +198,16 @@ const FullCalculator = () => {
                                     target: { name: 'city', value } 
                                 })}
                             >
-                                <Select.Trigger className="w-full h-10 px-10 border rounded-lg flex items-center justify-between bg-white">
-                                    <Select.Value placeholder="Izvēlieties pilsētu" />
-                                    <MapPin className="absolute left-3 h-5 w-5 text-gray-400" />
-                                    <Select.Icon>
-                                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                                <Select.Trigger className="relative w-full h-11 pl-10 pr-4 border border-gray-200 rounded-lg flex items-center justify-between bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <MapPin className="absolute left-3 w-5 h-5 text-gray-400" />
+                                    <Select.Value placeholder="Izvēlieties pilsētu" className="text-gray-900" />
+                                    <Select.Icon className="ml-2">
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
                                     </Select.Icon>
                                 </Select.Trigger>
 
                                 <Select.Portal>
-                                    <Select.Content className="overflow-hidden bg-white rounded-lg shadow-lg border">
+                                    <Select.Content className="overflow-hidden bg-white rounded-lg shadow-lg border border-gray-200 min-w-[var(--radix-select-trigger-width)] max-h-[300px]">
                                         <Select.Viewport className="p-1">
                                             {[
                                                 ["riga", "Rīga"],
@@ -238,7 +238,7 @@ const FullCalculator = () => {
 
                         <FormField name="gender" label="Dzimums" error={errors.gender}>
                             <RadioGroup.Root
-                                className="flex gap-4"
+                                className="flex gap-6"
                                 value={formData.gender}
                                 onValueChange={(value) => handleInputChange({
                                     target: { name: 'gender', value }
@@ -252,11 +252,11 @@ const FullCalculator = () => {
                                         <RadioGroup.Item
                                             id={value}
                                             value={value}
-                                            className="w-4 h-4 rounded-full border border-gray-300 mr-2"
+                                            className="w-5 h-5 rounded-full border border-gray-200 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         >
-                                            <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2 after:h-2 after:rounded-full after:bg-primary" />
+                                            <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[] after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-primary" />
                                         </RadioGroup.Item>
-                                        <Label.Root htmlFor={value} className="text-sm">
+                                        <Label.Root htmlFor={value} className="pl-2 text-sm text-gray-900">
                                             {label}
                                         </Label.Root>
                                     </div>
@@ -273,10 +273,10 @@ const FullCalculator = () => {
                                 onCheckedChange={(checked) => handleInputChange({
                                     target: { name: 'acceptTerms', checked }
                                 })}
-                                className="w-4 h-4 border border-gray-300 rounded"
+                                className="w-5 h-5 border border-gray-200 rounded hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             >
-                                <Checkbox.Indicator>
-                                    <Check className="w-4 h-4 text-primary" />
+                                <Checkbox.Indicator className="flex items-center justify-center">
+                                    <Check className="w-4 h-4 text-white" />
                                 </Checkbox.Indicator>
                             </Checkbox.Root>
                             <Label.Root htmlFor="terms" className="text-sm">
