@@ -77,16 +77,28 @@ function loan_calculator_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
-// Shortcodes
+
+
+
 function loan_calculator_shortcode() {
-    ob_start();
-    ?>
-    <div id="loan-calculator-root">
-        <div class="loading-message" style="padding: 20px; text-align: center;">
-            Loading calculator...
+    return '
+        <div id="loan-calculator-root">
+            <div class="loading-message" style="padding: 20px; text-align: center;">
+                Loading calculator...
+            </div>
         </div>
-    </div>
-    <?php
-    return ob_get_clean();
+    ';
 }
+
+function full_loan_calculator_shortcode() {
+    return '
+        <div id="full-calculator-root">
+            <div class="loading-message" style="padding: 20px; text-align: center;">
+                Loading calculator...
+            </div>
+        </div>
+    ';
+}
+
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
+add_shortcode('full_loan_calculator', 'full_loan_calculator_shortcode');

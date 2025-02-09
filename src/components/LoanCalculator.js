@@ -221,10 +221,10 @@ const LoanCalculator = () => {
 
     // Function to render kredit icon
     const renderKreditIcon = (kredit) => {
-        if (kredit?.kredita_ikona) {
+        if (kredit?.icon) {
             return (
                 <img 
-                    src={kredit.kredita_ikona} 
+                    src={kredit.icon} 
                     alt="" 
                     className="kredit-icon"
                     onError={(e) => {
