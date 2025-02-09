@@ -9,11 +9,18 @@ const LoanCalculator = () => {
     const [phone, setPhone] = useState('');
     const [errors, setErrors] = useState({});
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
     const dropdownRef = useRef(null);
 
-    // Get all kredits from WordPress data
+    // Get kredits from WordPress data
     const kredits = window.loanCalculatorData?.kredits || [];
-    const [selectedKredit, setSelectedKredit] = useState(kredits[0] || null);
+    
+    // Try to find matching kredit based on current URL
+    const currentUrl = window.location.href;
+    const matchingKredit = kredits.find(kredit => currentUrl.includes(kredit.url));
+    
+    // Set initial selected kredit
+    const [selectedKredit, setSelectedKredit] = useState(matchingKredit || kredits[0] || null);
 
     // Handle clicking outside to close dropdown
     useEffect(() => {
@@ -147,19 +154,23 @@ const LoanCalculator = () => {
     return (
         <div className="calculator-container">
             {/* Dropdown Header */}
-            <div className="relative mb-8">
+            <div className="relative mb-8" ref={dropdownRef}>
                 <div
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center justify-between cursor-pointer"
+                    className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                 >
                     <div className="flex items-center gap-2">
-                        <img
-                            src={selectedKredit?.icon || ''}
-                            alt=""
-                            className="w-6 h-6 text-blue-500"
-                        />
+                        {selectedKredit?.icon ? (
+                            <img 
+                                src={selectedKredit.icon} 
+                                alt="" 
+                                className="w-6 h-6"
+                            />
+                        ) : (
+                            <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                        )}
                         <span className="text-gray-800 font-medium">
-                            {selectedKredit?.title}
+                            {selectedKredit?.title || 'Izvēlieties kredītu'}
                         </span>
                     </div>
                     <svg
@@ -175,14 +186,18 @@ const LoanCalculator = () => {
                 </div>
 
                 {isDropdownOpen && (
-                    <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1">
+                    <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
                         {kredits.map((kredit) => (
                             <a
-                                key={kredit.url}
+                                key={kredit.id}
                                 href={kredit.url}
-                                className="flex items-center gap-2 p-3 hover:bg-gray-50"
+                                className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
                             >
-                                <img src={kredit.icon} alt="" className="w-6 h-6" />
+                                {kredit.icon ? (
+                                    <img src={kredit.icon} alt="" className="w-6 h-6" />
+                                ) : (
+                                    <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                                )}
                                 <span className="text-gray-800">{kredit.title}</span>
                             </a>
                         ))}
@@ -258,7 +273,11 @@ const LoanCalculator = () => {
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
                 <div className="flex items-center">
                     <span className="text-2xl font-medium">{monthlyPayment} €/mēn.</span>
-                    <div className="tooltip-trigger ml-1">
+                    <div 
+                        className="relative ml-1"
+                        onMouseEnter={() => setIsTooltipVisible(true)}
+                        onMouseLeave={() => setIsTooltipVisible(false)}
+                    >
                         <svg
                             className="w-4 h-4 text-blue-500 cursor-help"
                             viewBox="0 0 20 20"
@@ -267,11 +286,29 @@ const LoanCalculator = () => {
                             <path
                                 fillRule="evenodd"
                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clipRule="evenodd"
                             />
                         </svg>
-                        <div className="tooltip-content">
-                            Kredīta kalkulatoram ir ilustratīva nozīme
-                        </div>
+                        {isTooltipVisible && (
+                            <div 
+                                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg whitespace-nowrap"
+                                style={{
+                                    filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))',
+                                }}
+                            >
+                                <div className="relative">
+                                    Kredīta kalkulatoram ir ilustratīva nozīme
+                                    <div 
+                                        className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1"
+                                        style={{
+                                            borderLeft: '6px solid transparent',
+                                            borderRight: '6px solid transparent',
+                                            borderTop: '6px solid #111827'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
