@@ -108,7 +108,8 @@ function loan_calculator_enqueue_scripts() {
         }, $kredits_data),
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('loan_calculator_nonce'),
-        'currentPostId' => get_the_ID()
+        'currentPostId' => get_the_ID(),
+        'siteUrl' => home_url()
     ];
 
     // Localize script for both calculators

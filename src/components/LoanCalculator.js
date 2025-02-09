@@ -291,7 +291,9 @@ const LoanCalculator = () => {
     };
 
     // Form submission
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        if (e) e.preventDefault(); // Prevent any default form submission if event exists
+        
         if (validateForm()) {
             const params = new URLSearchParams({
                 amount,
@@ -301,9 +303,34 @@ const LoanCalculator = () => {
                 kredit_id: selectedKredit?.id || ''
             }).toString();
             
-            // Ensure we redirect directly to /forma/ regardless of current page
-            const baseUrl = window.loanCalculatorData.siteUrl.replace(/\/+$/, ''); // Remove trailing slashes
-            window.location.href = `${baseUrl}/forma/?${params}`;
+            // Get the base URL with fallbacks
+            let baseUrl = 'https://findexo.lv'; // Default fallback
+            
+            try {
+                // Try to get from WordPress data
+                if (window.loanCalculatorData?.siteUrl) {
+                    baseUrl = window.loanCalculatorData.siteUrl;
+                } else if (window.location.origin) {
+                    // Fallback to current origin if WordPress data not available
+                    baseUrl = window.location.origin;
+                }
+            } catch (error) {
+                console.error('Error getting site URL:', error);
+                // Continue with default fallback
+            }
+            
+            // Clean the URL and redirect
+            const cleanBaseUrl = baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
+            const redirectUrl = `${cleanBaseUrl}/forma/?${params}`;
+            
+            // Perform the redirect
+            try {
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error during redirect:', error);
+                // Fallback to window.location.replace
+                window.location.replace(redirectUrl);
+            }
         }
     };
 
