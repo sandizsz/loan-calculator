@@ -533,7 +533,7 @@ const LoanCalculator = () => {
                             placeholder="Jūsu e-pasts"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.email ? 'border-red-500' : 'border-[#ffc600]'}`}
                         />
                         {errors.email && (
                             <div className="text-red-500 text-sm mt-1">{errors.email}</div>
@@ -542,8 +542,8 @@ const LoanCalculator = () => {
                 </div>
                 <div className="col-span-2 md:col-span-1">
                     <div className="relative">
-                        <div className="absolute left-0 top-0 bottom-0 flex items-center pl-3 pointer-events-none">
-                            <span className="text-gray-500 font-medium">+371</span>
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 bg-transparent pointer-events-none">
+                            <span className="text-gray-500 font-medium select-none">+371</span>
                         </div>
                         <input
                             type="tel"
@@ -557,7 +557,8 @@ const LoanCalculator = () => {
                                     setPhone(digits);
                                 }
                             }}
-                            className={`w-full px-4 pl-[4.5rem] py-2.5 border rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                            style={{ textIndent: '3.5rem' }}
+                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
                         />
                         {errors.phone && (
                             <div className="text-red-500 text-sm mt-1">{errors.phone}</div>

@@ -531,11 +531,12 @@ input[type="range"]::-webkit-slider-thumb {
 .relative {
   position: relative;
 }
+.inset-y-0 {
+  top: 0px;
+  bottom: 0px;
+}
 .-bottom-6 {
   bottom: -1.5rem;
-}
-.bottom-0 {
-  bottom: 0px;
 }
 .bottom-full {
   bottom: 100%;
@@ -555,9 +556,6 @@ input[type="range"]::-webkit-slider-thumb {
 .right-3 {
   right: 0.75rem;
 }
-.top-0 {
-  top: 0px;
-}
 .top-1\/2 {
   top: 50%;
 }
@@ -566,6 +564,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .top-full {
   top: 100%;
+}
+.z-10 {
+  z-index: 10;
 }
 .z-\[100\] {
   z-index: 100;
@@ -691,6 +692,11 @@ input[type="range"]::-webkit-slider-thumb {
 .cursor-pointer {
   cursor: pointer;
 }
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
 .appearance-none {
   -webkit-appearance: none;
      -moz-appearance: none;
@@ -807,6 +813,11 @@ input[type="range"]::-webkit-slider-thumb {
 .border-none {
   border-style: none;
 }
+.border-\[\#ffc600\] {
+  --tw-border-opacity: 1;
+  border-color: rgba(255, 198, 0, 1);
+  border-color: rgba(255, 198, 0, var(--tw-border-opacity, 1));
+}
 .border-gray-100 {
   --tw-border-opacity: 1;
   border-color: rgba(243, 244, 246, 1);
@@ -877,6 +888,9 @@ input[type="range"]::-webkit-slider-thumb {
   --tw-bg-opacity: 1;
   background-color: rgba(254, 242, 242, 1);
   background-color: rgba(254, 242, 242, var(--tw-bg-opacity, 1));
+}
+.bg-transparent {
+  background-color: transparent;
 }
 .bg-white {
   --tw-bg-opacity: 1;
@@ -951,9 +965,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .pl-3 {
   padding-left: 0.75rem;
-}
-.pl-\[4\.5rem\] {
-  padding-left: 4.5rem;
 }
 .pr-4 {
   padding-right: 1rem;
@@ -1152,6 +1163,11 @@ input[type="range"]::-webkit-slider-thumb {
 .hover\:underline:hover {
   text-decoration-line: underline;
 }
+.focus\:border-\[\#ffc600\]:focus {
+  --tw-border-opacity: 1;
+  border-color: rgba(255, 198, 0, 1);
+  border-color: rgba(255, 198, 0, var(--tw-border-opacity, 1));
+}
 .focus\:border-indigo-500:focus {
   --tw-border-opacity: 1;
   border-color: rgba(99, 102, 241, 1);
@@ -1172,6 +1188,10 @@ input[type="range"]::-webkit-slider-thumb {
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), 0 0 rgba(0,0,0,0);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 rgba(0,0,0,0));
+}
+.focus\:ring-\[\#ffc600\]:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgba(255, 198, 0, var(--tw-ring-opacity, 1));
 }
 .focus\:ring-indigo-500:focus {
   --tw-ring-opacity: 1;
