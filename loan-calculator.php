@@ -22,6 +22,30 @@ function loan_calculator_enqueue_scripts() {
     // Check if we're on the form page
     $is_form_page = has_shortcode($post->post_content, 'full_loan_calculator');
     
+    // Get all kredits posts
+    $kredits = get_posts([
+        'post_type' => 'kredits',
+        'posts_per_page' => -1,
+        'orderby' => 'menu_order',
+        'order' => 'ASC'
+    ]);
+
+    $kredits_data = array_map(function($kredit) {
+        return [
+            'id' => $kredit->ID,
+            'title' => $kredit->post_title,
+            'url' => get_permalink($kredit->ID),
+            'icon' => get_post_meta($kredit->ID, 'kredita_ikona', true)
+        ];
+    }, $kredits);
+
+    // Localize script with kredits data
+    wp_localize_script(
+        $is_form_page ? 'full-loan-calculator' : 'loan-calculator',
+        'loanCalculatorData',
+        ['kredits' => $kredits_data]
+    );
+    
     // Enqueue the appropriate script based on the page
     if ($is_form_page) {
         wp_enqueue_script(
@@ -41,14 +65,13 @@ function loan_calculator_enqueue_scripts() {
         );
     }
 
-
-  // Enqueue the processed CSS from build directory
-wp_enqueue_style(
-    'loan-calculator-style',
-    plugins_url('build/main.css', __FILE__),
-    [],
-    filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
-);
+    // Enqueue the processed CSS from build directory
+    wp_enqueue_style(
+        'loan-calculator-style',
+        plugins_url('build/main.css', __FILE__),
+        [],
+        filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
+    );
 
     // Add any PHP variables to JavaScript
     wp_localize_script(

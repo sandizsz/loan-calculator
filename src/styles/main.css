@@ -2,53 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-
-/* Input styles */
-.form-input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+.loan-calculator {
+    @apply bg-white rounded-lg shadow-lg p-6;
 }
 
-.form-input.error {
-    @apply border-red-500;
+.loan-type-dropdown {
+    @apply relative mb-6;
 }
 
-.error-text {
-    @apply text-red-500 text-sm mt-1;
+.loan-type-header {
+    @apply flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 rounded-lg;
+}
+
+.loan-type-icon {
+    @apply w-6 h-6 text-blue-500;
+}
+
+.loan-types-menu {
+    @apply absolute w-full bg-white mt-2 rounded-lg shadow-lg z-50 overflow-hidden;
+}
+
+.loan-type-item {
+    @apply flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors;
+}
+
+.loan-type-item svg {
+    @apply w-5 h-5 text-blue-500;
 }
 
 /* Range slider styles */
+.slider-container {
+    @apply mb-8;
+}
+
+.slider-header {
+    @apply flex justify-between items-center mb-2;
+}
+
+.slider-label {
+    @apply text-gray-700 text-lg;
+}
+
+.slider-value {
+    @apply text-2xl font-semibold;
+}
+
 input[type="range"] {
-    @apply appearance-none bg-gray-200 h-2 rounded-lg;
+    @apply w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer;
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    @apply appearance-none w-6 h-6 bg-yellow-400 border-2 border-white rounded-full cursor-pointer shadow-md;
+    @apply appearance-none w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 input[type="range"]::-moz-range-thumb {
-    @apply w-6 h-6 bg-yellow-400 border-2 border-white rounded-full cursor-pointer shadow-md;
+    @apply w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Phone input container */
-.phone-input-container {
-    @apply relative;
+.monthly-payment {
+    @apply bg-blue-50 p-4 rounded-lg mb-6 flex items-center justify-between;
 }
 
-.phone-prefix {
-    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600;
+.monthly-payment-label {
+    @apply text-gray-600;
 }
 
-input.phone {
-    @apply pl-12;
+.monthly-payment-value {
+    @apply text-2xl font-bold text-blue-600;
 }
 
-/* Tooltip styles */
-.tooltip-trigger {
-    @apply relative inline-flex items-center;
+.input-field {
+    @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
 }
 
-.tooltip-content {
-    @apply invisible absolute bottom-full left-1/2 transform -translate-x-1/2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 transition-all duration-200 whitespace-nowrap z-50 mb-2;
+.submit-button {
+    @apply w-full py-4 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-600 transition-colors;
 }
 
 .tooltip-trigger:hover .tooltip-content {
