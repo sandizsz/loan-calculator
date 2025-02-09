@@ -83,7 +83,7 @@ function loan_calculator_enqueue_scripts() {
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => $icon_url,
+            'icon' => $icon,
             'slug' => $kredit->post_name
         ];
     }, $kredits);
