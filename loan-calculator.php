@@ -42,7 +42,7 @@ function loan_calculator_enqueue_scripts() {
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => get_post_meta($kredit->ID, 'kredita_ikona', true),
+            'icon' => get_field('kredita_ikona', $kredit->ID),
             'slug' => $kredit->post_name
         ];
     }, $kredits);
@@ -77,28 +77,35 @@ function loan_calculator_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
-
-
-
+// Shortcodes
 function loan_calculator_shortcode() {
-    return '
-        <div id="loan-calculator-root">
-            <div class="loading-message" style="padding: 20px; text-align: center;">
-                Loading calculator...
-            </div>
+    ob_start();
+    ?>
+    <div id="loan-calculator-root">
+        <div class="loading-message" style="padding: 20px; text-align: center;">
+            Loading calculator...
         </div>
-    ';
+    </div>
+    <?php
+    return ob_get_clean();
 }
-
-function full_loan_calculator_shortcode() {
-    return '
-        <div id="full-calculator-root">
-            <div class="loading-message" style="padding: 20px; text-align: center;">
-                Loading calculator...
-            </div>
-        </div>
-    ';
-}
-
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
+
+
+
+// Shortcodes
+function full_loan_calculator_shortcode() {
+    ob_start();
+    ?>
+    <div id="full-loan-calculator-root">
+        <div class="loading-message" style="padding: 20px; text-align: center;">
+            Loading calculator...
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
 add_shortcode('full_loan_calculator', 'full_loan_calculator_shortcode');
+
+
+
