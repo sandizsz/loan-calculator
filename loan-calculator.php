@@ -102,9 +102,23 @@ function loan_calculator_enqueue_scripts() {
     $should_load_calculator = false;
     $should_load_full_calculator = false;
     
-    if ($post && $post->post_content) {
-        $should_load_calculator = has_shortcode($post->post_content, 'loan_calculator');
-        $should_load_full_calculator = has_shortcode($post->post_content, 'full_calculator');
+    // Check in post/page content
+    if ($post) {
+        // Get the raw content before filters
+        $raw_content = $post->post_content;
+        // Get the filtered content
+        $filtered_content = apply_filters('the_content', $raw_content);
+        
+        // Check both raw and filtered content for shortcodes
+        $should_load_calculator = 
+            has_shortcode($raw_content, 'loan_calculator') || 
+            has_shortcode($filtered_content, 'loan_calculator') ||
+            strpos($raw_content, '[loan_calculator]') !== false;
+            
+        $should_load_full_calculator = 
+            has_shortcode($raw_content, 'full_calculator') || 
+            has_shortcode($filtered_content, 'full_calculator') ||
+            strpos($raw_content, '[full_calculator]') !== false;
     }
     
     // Also check for shortcodes in widgets
@@ -124,6 +138,15 @@ function loan_calculator_enqueue_scripts() {
         }
     }
 
+    // Debug output
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Loan Calculator Detection:');
+        error_log('Post ID: ' . ($post ? $post->ID : 'no post'));
+        error_log('Post Type: ' . ($post ? $post->post_type : 'no type'));
+        error_log('Should Load Calculator: ' . ($should_load_calculator ? 'yes' : 'no'));
+        error_log('Should Load Full Calculator: ' . ($should_load_full_calculator ? 'yes' : 'no'));
+    }
+
     // Enqueue scripts if needed
     if ($should_load_calculator) {
         wp_enqueue_script('loan-calculator');
@@ -139,11 +162,6 @@ function loan_calculator_enqueue_scripts() {
         [],
         filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
     );
-
-    // Debug output if needed
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('Loan Calculator Data: ' . print_r($calculator_data, true));
-    }
 }
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
