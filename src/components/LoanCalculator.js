@@ -436,7 +436,7 @@ const LoanCalculator = () => {
                         onClick={handleSubmit}
                         className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors border-none"
                     >
-                        PieteiktiesTESTeA
+                        PieteiktiesTESTeAa
                     </button>
         
                     {/* Security Note */}
