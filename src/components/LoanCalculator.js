@@ -542,7 +542,9 @@ const LoanCalculator = () => {
                 </div>
                 <div className="col-span-2 md:col-span-1">
                     <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">+371</span>
+                        <div className="absolute left-0 top-0 bottom-0 flex items-center pl-3 pointer-events-none">
+                            <span className="text-gray-500 font-medium">+371</span>
+                        </div>
                         <input
                             type="tel"
                             name="phone"
@@ -555,7 +557,7 @@ const LoanCalculator = () => {
                                     setPhone(digits);
                                 }
                             }}
-                            className={`w-full px-4 pl-14 py-2.5 border rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                            className={`w-full px-4 pl-[4.5rem] py-2.5 border rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                         />
                         {errors.phone && (
                             <div className="text-red-500 text-sm mt-1">{errors.phone}</div>
