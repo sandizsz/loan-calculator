@@ -2,102 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
-.loan-calculator {
-    @apply bg-white rounded-lg shadow-lg p-6;
-}
+@layer components {
+    .loan-calculator {
+        @apply bg-white rounded-xl shadow-sm p-6 max-w-md mx-auto;
+    }
 
-.loan-type-dropdown {
-    @apply relative mb-6;
-}
+    .loan-header {
+        @apply flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 rounded-lg;
+    }
 
-.loan-type-header {
-    @apply flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 rounded-lg;
-}
+    .loan-header-icon {
+        @apply w-6 h-6 text-blue-500;
+    }
 
-.loan-type-icon {
-    @apply w-6 h-6 text-blue-500;
-}
+    .loan-dropdown {
+        @apply absolute w-full bg-white mt-2 rounded-lg shadow-lg z-50;
+    }
 
-.loan-types-menu {
-    @apply absolute w-full bg-white mt-2 rounded-lg shadow-lg z-50 overflow-hidden;
-}
+    .loan-dropdown-item {
+        @apply flex items-center gap-3 p-4 hover:bg-gray-50;
+    }
 
-.loan-type-item {
-    @apply flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors;
-}
+    .slider-container {
+        @apply mb-6;
+    }
 
-.loan-type-item svg {
-    @apply w-5 h-5 text-blue-500;
-}
+    .slider-header {
+        @apply flex justify-between items-center mb-2;
+    }
 
-/* Range slider styles */
-.slider-container {
-    @apply mb-8;
-}
+    .slider-label {
+        @apply text-gray-700;
+    }
 
-.slider-header {
-    @apply flex justify-between items-center mb-2;
-}
+    .slider-value {
+        @apply text-3xl font-bold;
+    }
 
-.slider-label {
-    @apply text-gray-700 text-lg;
-}
+    .slider-track {
+        @apply relative w-full h-1 bg-gray-200 rounded-full;
+    }
 
-.slider-value {
-    @apply text-2xl font-semibold;
-}
+    .slider-range {
+        @apply absolute h-full;
+    }
 
-input[type="range"] {
-    @apply w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer;
-}
+    .amount-range {
+        @apply bg-blue-500;
+    }
 
-input[type="range"]::-webkit-slider-thumb {
-    @apply appearance-none w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    .term-range {
+        @apply bg-orange-500;
+    }
 
-input[type="range"]::-moz-range-thumb {
-    @apply w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    input[type="range"] {
+        @apply w-full h-1 appearance-none bg-transparent cursor-pointer;
+    }
 
-.monthly-payment {
-    @apply bg-blue-50 p-4 rounded-lg mb-6 flex items-center justify-between;
-}
+    input[type="range"]::-webkit-slider-thumb {
+        @apply appearance-none w-6 h-6 rounded-full cursor-pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-.monthly-payment-label {
-    @apply text-gray-600;
-}
+    input[type="range"].amount-slider::-webkit-slider-thumb {
+        @apply bg-blue-500;
+    }
 
-.monthly-payment-value {
-    @apply text-2xl font-bold text-blue-600;
-}
+    input[type="range"].term-slider::-webkit-slider-thumb {
+        @apply bg-orange-500;
+    }
 
-.input-field {
-    @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
-}
+    .monthly-payment {
+        @apply bg-blue-50 rounded-lg p-4 mb-6 flex items-center justify-between;
+    }
 
-.submit-button {
-    @apply w-full py-4 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-600 transition-colors;
-}
+    .monthly-payment-amount {
+        @apply text-2xl font-bold;
+    }
 
-.tooltip-trigger:hover .tooltip-content {
-    @apply visible opacity-100;
-}
+    .input-field {
+        @apply w-full p-3 bg-white border border-gray-200 rounded-lg;
+    }
 
-/* Card styles */
-.calculator-container {
-    @apply bg-white/90 backdrop-blur-sm border border-gray-100 rounded-lg shadow-lg p-6;
-}
+    .submit-button {
+        @apply w-full py-4 bg-[#82C341] text-white text-lg font-medium rounded-lg hover:bg-[#74B039] transition-colors;
+    }
 
-/* Button styles */
-.submit-button {
-    @apply w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg text-lg font-medium transition-colors duration-200;
-}
-
-/* Security badge */
-.security-badge {
-    @apply flex items-center justify-center gap-2 text-sm text-gray-500 mt-4;
+    .security-badge {
+        @apply flex items-center gap-2 text-sm text-gray-600 mt-4;
+    }
 }
