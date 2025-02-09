@@ -310,9 +310,20 @@ const LoanCalculator = () => {
                             {kredits.map((kredit) => (
                                 <div
                                     key={kredit.id}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault();
                                         setSelectedKredit(kredit);
                                         setIsDropdownOpen(false);
+                                        
+                                        if (kredit.url) {
+                                            // Add loading state to the clicked item
+                                            e.currentTarget.classList.add('opacity-50');
+                                            
+                                            // Use a small delay to show the selection before navigating
+                                            setTimeout(() => {
+                                                window.location.href = kredit.url;
+                                            }, 150);
+                                        }
                                     }}
                                     className={`flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer ${selectedKredit?.id === kredit.id ? 'bg-gray-50' : ''}`}
                                 >
