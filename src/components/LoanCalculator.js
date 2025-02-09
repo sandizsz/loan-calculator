@@ -301,7 +301,9 @@ const LoanCalculator = () => {
                 kredit_id: selectedKredit?.id || ''
             }).toString();
             
-            window.location.href = `${window.loanCalculatorData.siteUrl}/forma/?${params}`;
+            // Ensure we redirect directly to /forma/ regardless of current page
+            const baseUrl = window.loanCalculatorData.siteUrl.replace(/\/+$/, ''); // Remove trailing slashes
+            window.location.href = `${baseUrl}/forma/?${params}`;
         }
     };
 
