@@ -54,6 +54,14 @@ function loan_calculator_enqueue_scripts() {
         filemtime(plugin_dir_path(__FILE__) . 'build/main.js'),
         true
     );
+    
+    // Add defer attribute to script
+    add_filter('script_loader_tag', function($tag, $handle) {
+        if ('loan-calculator' === $handle) {
+            return str_replace(' src', ' defer src', $tag);
+        }
+        return $tag;
+    }, 10, 2);
 
     // Register full calculator script
     wp_register_script(
@@ -87,12 +95,19 @@ function loan_calculator_enqueue_scripts() {
         ];
     }, $kredits);
 
-    // Common data
+    // Optimize data structure
     $calculator_data = [
-        'kredits' => $kredits_data,
+        'kredits' => array_map(function($kredit) {
+            return [
+                'id' => $kredit['id'],
+                'title' => $kredit['title'],
+                'url' => $kredit['url'],
+                'icon' => $kredit['icon'],
+                'slug' => $kredit['slug']
+            ];
+        }, $kredits_data),
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('loan_calculator_nonce'),
-        'siteUrl' => get_site_url(),
         'currentPostId' => get_the_ID()
     ];
 

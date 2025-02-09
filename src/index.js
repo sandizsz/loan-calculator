@@ -7,16 +7,16 @@ function initApp() {
   const rootElement = document.getElementById('loan-calculator-root');
   
   if (rootElement) {
-    // Add slight delay for Elementor compatibility
-    setTimeout(() => {
-      console.log('Attempting to mount React app');
-      try {
+    // Check if Elementor is still initializing
+    if (window.elementorFrontend && !window.elementorFrontend.isEditMode()) {
+      // No delay needed if not in edit mode
+      createRoot(rootElement).render(<LoanCalculator />);
+    } else {
+      // Minimal delay for Elementor compatibility
+      setTimeout(() => {
         createRoot(rootElement).render(<LoanCalculator />);
-        console.log('React app mounted successfully');
-      } catch (error) {
-        console.error('Mounting failed:', error);
-      }
-    }, 100);
+      }, 50);
+    }
   } else {
     console.error('Root element not found');
   }
