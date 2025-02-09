@@ -3,23 +3,27 @@ import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 
 // Add styles for range input thumb
 const sliderStyles = `
+    input[type='range'] {
+        height: 8px;
+    }
     input[type='range']::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 24px;
-        height: 24px;
-        background: #4F46E5;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border: 2px solid #FFB800;
         border-radius: 50%;
         cursor: pointer;
-        margin-top: -8px;
+        margin-top: -6px;
     }
     input[type='range']::-moz-range-thumb {
-        width: 24px;
-        height: 24px;
-        background: #4F46E5;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border: 2px solid #FFB800;
         border-radius: 50%;
         cursor: pointer;
-        border: none;
     }
 `;
 
