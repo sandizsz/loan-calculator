@@ -49,7 +49,22 @@ const LoanCalculator = () => {
                 max-width: 600px;
                 margin: 0 auto;
             }
-            
+
+            .calculator-container button,
+            .calculator-container [type="button"],
+            .calculator-container [type="submit"] {
+                border: none;
+                background: #4F46E5;
+                color: white;
+                font-weight: 500;
+                border-radius: 6px;
+                transition: all 0.2s;
+            }
+
+            .calculator-container button:hover {
+                background: #4338CA;
+            }
+
             .range-input {
                 -webkit-appearance: none;
                 width: 100%;
