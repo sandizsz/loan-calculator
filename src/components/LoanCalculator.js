@@ -4,25 +4,40 @@ import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 // Add styles for range input thumb
 const sliderStyles = `
     input[type='range'] {
+        -webkit-appearance: none;
         height: 8px;
+        padding: 0;
+        margin: 0;
     }
     input[type='range']::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
+        width: 32px;
+        height: 32px;
         background: white;
-        border: 2px solid #FFB800;
+        border: 3px solid #FFB800;
         border-radius: 50%;
         cursor: pointer;
-        margin-top: -6px;
+        margin-top: -12px;
     }
     input[type='range']::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+        width: 32px;
+        height: 32px;
         background: white;
-        border: 2px solid #FFB800;
+        border: 3px solid #FFB800;
         border-radius: 50%;
+        cursor: pointer;
+    }
+    input[type='range']::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    input[type='range']::-moz-range-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
         cursor: pointer;
     }
 `;
