@@ -148,7 +148,12 @@ function loan_calculator_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
 // Shortcodes
-function loan_calculator_shortcode() {
+function loan_calculator_shortcode($atts) {
+    // Only output if we're actually using the shortcode in content or widgets
+    if (!did_action('wp_enqueue_scripts') || !wp_script_is('loan-calculator', 'enqueued')) {
+        return '';
+    }
+
     ob_start();
     ?>
     <div id="loan-calculator-root">
@@ -161,7 +166,12 @@ function loan_calculator_shortcode() {
 }
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
 
-function full_calculator_shortcode() {
+function full_calculator_shortcode($atts) {
+    // Only output if we're actually using the shortcode in content or widgets
+    if (!did_action('wp_enqueue_scripts') || !wp_script_is('full-calculator', 'enqueued')) {
+        return '';
+    }
+
     ob_start();
     ?>
     <div id="full-calculator-root">
