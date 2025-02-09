@@ -279,18 +279,22 @@ const LoanCalculator = () => {
                     {isDropdownOpen && (
                         <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
                             {kredits.map((kredit) => (
-                                <a
+                                <div
                                     key={kredit.id}
-                                    href={kredit.url}
-                                    className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
+                                    onClick={() => {
+                                        setSelectedKredit(kredit);
+                                        setIsDropdownOpen(false);
+                                        window.location.href = kredit.url;
+                                    }}
+                                    className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                                 >
                                     {renderKreditIcon(kredit)}
                                     <span className="text-gray-800">{kredit.title}</span>
-                                </a>
+                                </div>
                             ))}
                         </div>
                     )}
-                </div>
+                </div>      
             )}
 
             {/* Amount Slider */}
@@ -418,7 +422,7 @@ const LoanCalculator = () => {
                     {/* Submit Button */}
                     <button
                         onClick={handleSubmit}
-                        className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
+                        className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors border-none"
                     >
                         Pieteikties
                     </button>

@@ -756,6 +756,9 @@ input[type="range"]::-webkit-slider-thumb {
 .border-b {
   border-bottom-width: 1px;
 }
+.border-none {
+  border-style: none;
+}
 .border-gray-100 {
   --tw-border-opacity: 1;
   border-color: rgba(243, 244, 246, 1);
