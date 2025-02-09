@@ -276,7 +276,7 @@ const LoanCalculator = () => {
     }
 
     return (
-        <div className="calculator-container">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 max-w-[600px] mx-auto">
             {/* Dropdown Header */}
             <div className="relative mb-8" ref={dropdownRef}>
                 <div
@@ -355,10 +355,7 @@ const LoanCalculator = () => {
                         max="25000"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
-                        className="range-input"
-                        style={{
-                            background: getSliderBackground(amount, 500, 25000)
-                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
@@ -380,10 +377,7 @@ const LoanCalculator = () => {
                         max="120"
                         value={term}
                         onChange={(e) => setTerm(Number(e.target.value))}
-                        className="range-input"
-                        style={{
-                            background: getSliderBackground(term, 3, 120)
-                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>3 mēn.</span>
@@ -407,12 +401,7 @@ const LoanCalculator = () => {
                                 <div className="relative">
                                     Kredīta kalkulatoram ir ilustratīva nozīme
                                     <div 
-                                        className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1"
-                                        style={{
-                                            borderLeft: '6px solid transparent',
-                                            borderRight: '6px solid transparent',
-                                            borderTop: '6px solid #111827'
-                                        }}
+                                        className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-8 border-transparent border-t-gray-900"
                                     />
                                 </div>
                             </div>
@@ -433,17 +422,17 @@ const LoanCalculator = () => {
                             placeholder="Jūsu e-pasts"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`form-input ${errors.email ? 'error' : ''}`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                         />
                         {errors.email && (
-                            <div className="error-text">{errors.email}</div>
+                            <div className="text-red-500 text-sm mt-1">{errors.email}</div>
                         )}
                     </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">
                     <div className="input-wrapper">
-                        <div className="phone-input-container">
-                            <span className="phone-prefix">+371</span>
+                        <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+371</span>
                             <input
                                 type="tel"
                                 placeholder="Jūsu tālrunis"
