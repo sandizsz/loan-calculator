@@ -59,6 +59,15 @@ function loan_calculator_enqueue_scripts() {
         true
     );
 
+    // Register full calculator script
+    wp_register_script(
+        'full-calculator', 
+        plugins_url('build/fullCalculator.js', __FILE__),
+        ['react', 'react-dom', 'loan-calculator'],
+        filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
+        true
+    );
+
     // Get all kredits posts
     $kredits = get_posts([
         'post_type' => 'kredits',
@@ -88,11 +97,17 @@ function loan_calculator_enqueue_scripts() {
         'currentPostId' => $post->ID
     ];
 
-    // Localize script
+    // Localize script for both calculators
     wp_localize_script('loan-calculator', 'loanCalculatorData', $calculator_data);
+    wp_localize_script('full-calculator', 'loanCalculatorData', $calculator_data);
     
-    // Enqueue script
-    wp_enqueue_script('loan-calculator');
+    // Enqueue scripts based on shortcode presence
+    if (has_shortcode($post->post_content, 'loan_calculator')) {
+        wp_enqueue_script('loan-calculator');
+    }
+    if (has_shortcode($post->post_content, 'full_calculator')) {
+        wp_enqueue_script('full-calculator');
+    }
 
     // Enqueue styles
     wp_enqueue_style(
@@ -122,3 +137,16 @@ function loan_calculator_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
+
+function full_calculator_shortcode() {
+    ob_start();
+    ?>
+    <div id="full-calculator-root">
+        <div class="loading-message" style="padding: 20px; text-align: center;">
+            Loading full calculator...
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('full_calculator', 'full_calculator_shortcode');

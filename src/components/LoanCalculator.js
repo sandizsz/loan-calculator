@@ -221,10 +221,10 @@ const LoanCalculator = () => {
 
     // Function to render kredit icon
     const renderKreditIcon = (kredit) => {
-        if (kredit?.kredita_ikona) {
+        if (kredit?.icon) {
             return (
                 <img 
-                    src={kredit.kredita_ikona} 
+                    src={kredit.icon} 
                     alt="" 
                     className="kredit-icon"
                     onError={(e) => {
@@ -397,24 +397,24 @@ const LoanCalculator = () => {
                         {errors.phone && (
                             <div className="error-text">{errors.phone}</div>
                         )}</div>
+                        </div>
+                    </div>
+        
+                    {/* Submit Button */}
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
+                    >
+                        Pieteikties
+                    </button>
+        
+                    {/* Security Note */}
+                    <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
+                    </div>
                 </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-                onClick={handleSubmit}
-                className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
-            >
-                Pieteikties
-            </button>
-
-            {/* Security Note */}
-            <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-                <Shield className="w-4 h-4" />
-                Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
-            </div>
-        </div>
-    );
-};
-
-export default LoanCalculator;
+            );
+        };
+        
+        export default LoanCalculator;
