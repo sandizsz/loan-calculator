@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ErrorBoundary from './ErrorBoundary';
-import { InfoCircledIcon } from '@radix-ui/react-icons';
+import { InfoCircledIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 
 const LoanCalculator = () => {
     const [formData, setFormData] = useState({
@@ -10,6 +10,11 @@ const LoanCalculator = () => {
         phone: ''
     });
     const [monthlyPayment, setMonthlyPayment] = useState(92.49);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedKredit, setSelectedKredit] = useState(null);
+    
+    // Get kredits data from WordPress
+    const kredits = window.loanCalculatorData?.kredits || [];
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -34,16 +39,45 @@ const LoanCalculator = () => {
     return (
         <ErrorBoundary>
             <div className="bg-white rounded-lg shadow-sm p-6 max-w-md mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                        <img src="/path-to-calendar-icon.svg" alt="" className="w-6 h-6" />
-                        <h2 className="text-xl font-medium">Patēriņa kredīts</h2>
+                <div className="relative">
+                    <div 
+                        className="flex items-center justify-between mb-6 cursor-pointer"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                        <div className="flex items-center gap-2">
+                            {selectedKredit?.icon ? (
+                                <img src={selectedKredit.icon} alt="" className="w-6 h-6" />
+                            ) : (
+                                <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                            )}
+                            <h2 className="text-xl font-medium">
+                                {selectedKredit?.title || 'Izvēlieties kredīta veidu'}
+                            </h2>
+                        </div>
+                        <button className="text-gray-500">
+                            {isDropdownOpen ? <ChevronUpIcon className="w-6 h-6" /> : <ChevronDownIcon className="w-6 h-6" />}
+                        </button>
                     </div>
-                    <button className="text-gray-500">
-                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                    </button>
+
+                    {/* Kredits Dropdown */}
+                    {isDropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 bg-white rounded-lg shadow-lg mt-2 z-10 overflow-hidden">
+                            {kredits.map((kredit) => (
+                                <a
+                                    key={kredit.id}
+                                    href={kredit.url}
+                                    className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors"
+                                >
+                                    {kredit.icon ? (
+                                        <img src={kredit.icon} alt="" className="w-6 h-6" />
+                                    ) : (
+                                        <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                                    )}
+                                    <span className="text-gray-900">{kredit.title}</span>
+                                </a>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Amount Slider */}
