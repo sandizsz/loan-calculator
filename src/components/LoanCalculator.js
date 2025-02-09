@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 
 const LoanCalculator = () => {
-    // Initialize state with WordPress data
+    // State declarations
     const [kredits, setKredits] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [amount, setAmount] = useState(3000);
@@ -35,6 +35,128 @@ const LoanCalculator = () => {
         setIsLoading(false);
     }, []);
 
+    // Add styles to document head
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .calculator-container {
+                background: rgba(255, 255, 255, 0.90);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(4px);
+                border-radius: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                padding: 1.5rem;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            
+            .range-input {
+                -webkit-appearance: none;
+                width: 100%;
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 5px;
+                outline: none;
+                opacity: 1;
+                transition: opacity .2s;
+            }
+            
+            .range-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 24px;
+                height: 24px;
+                background-color: #FFC600;
+                border: 2px solid white;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            .range-input::-moz-range-thumb {
+                width: 24px;
+                height: 24px;
+                background-color: #FFC600;
+                border: 2px solid white;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            .input-wrapper {
+                position: relative;
+            }
+            
+            .phone-input-container {
+                position: relative;
+            }
+            
+            .phone-prefix {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #000;
+                font-size: 16px;
+                font-weight: normal;
+                z-index: 1;
+                pointer-events: none;
+            }
+            
+            .form-input {
+                height: 48px;
+                font-size: 16px;
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #D1D5DB;
+                border-radius: 6px;
+                outline: none;
+                transition: border-color 0.2s ease;
+            }
+            
+            .form-input.phone {
+                padding-left: 55px;
+            }
+            
+            .form-input:focus {
+                border-color: #FFC600;
+            }
+            
+            .form-input.error {
+                border-color: #EF4444;
+            }
+            
+            .error-text {
+                color: #EF4444;
+                font-size: 14px;
+                margin-top: 4px;
+            }
+
+            .range-track {
+                background: linear-gradient(to right, #FFC600 var(--range-progress), #e5e7eb var(--range-progress));
+            }
+
+            .kredit-icon {
+                width: 24px;
+                height: 24px;
+                object-fit: contain;
+                border-radius: 4px;
+            }
+
+            .kredit-icon-placeholder {
+                width: 24px;
+                height: 24px;
+                background: #f3f4f6;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
     // Calculate monthly payment
     useEffect(() => {
         const annualRate = 0.12; // 12% annual interest rate
@@ -55,6 +177,12 @@ const LoanCalculator = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Calculate range slider backgrounds
+    const getSliderBackground = (value, min, max) => {
+        const percentage = ((value - min) / (max - min)) * 100;
+        return `linear-gradient(to right, #FFC600 ${percentage}%, #e5e7eb ${percentage}%)`;
+    };
 
     // Form validation
     const validateForm = () => {
@@ -91,6 +219,24 @@ const LoanCalculator = () => {
         }
     };
 
+    // Function to render kredit icon
+    const renderKreditIcon = (kredit) => {
+        if (kredit?.kredita_ikona) {
+            return (
+                <img 
+                    src={kredit.kredita_ikona} 
+                    alt="" 
+                    className="kredit-icon"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.parentNode.innerHTML = '<div class="kredit-icon-placeholder"></div>';
+                    }}
+                />
+            );
+        }
+        return <div className="kredit-icon-placeholder" />;
+    };
+
     if (isLoading) {
         return <div className="p-4 text-center">Loading calculator...</div>;
     }
@@ -105,15 +251,7 @@ const LoanCalculator = () => {
                         className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                     >
                         <div className="flex items-center gap-2">
-                            {selectedKredit?.icon ? (
-                                <img 
-                                    src={selectedKredit.icon} 
-                                    alt="" 
-                                    className="w-6 h-6"
-                                />
-                            ) : (
-                                <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                            )}
+                            {renderKreditIcon(selectedKredit)}
                             <span className="text-gray-800 font-medium">
                                 {selectedKredit?.title || 'Izvēlieties kredītu'}
                             </span>
@@ -131,11 +269,7 @@ const LoanCalculator = () => {
                                     href={kredit.url}
                                     className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
                                 >
-                                    {kredit.icon ? (
-                                        <img src={kredit.icon} alt="" className="w-6 h-6" />
-                                    ) : (
-                                        <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                                    )}
+                                    {renderKreditIcon(kredit)}
                                     <span className="text-gray-800">{kredit.title}</span>
                                 </a>
                             ))}
@@ -158,6 +292,9 @@ const LoanCalculator = () => {
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                         className="range-input"
+                        style={{
+                            background: getSliderBackground(amount, 500, 25000)
+                        }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
@@ -180,6 +317,9 @@ const LoanCalculator = () => {
                         value={term}
                         onChange={(e) => setTerm(Number(e.target.value))}
                         className="range-input"
+                        style={{
+                            background: getSliderBackground(term, 3, 120)
+                        }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>3 mēn.</span>
@@ -201,7 +341,7 @@ const LoanCalculator = () => {
                         {isTooltipVisible && (
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg whitespace-nowrap">
                                 <div className="relative">
-                                    Kredīta kalkulatoram ir ilustratīva nozīme.
+                                    Kredīta kalkulatoram ir ilustratīva nozīme
                                     <div 
                                         className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1"
                                         style={{
@@ -256,26 +396,25 @@ const LoanCalculator = () => {
                         </div>
                         {errors.phone && (
                             <div className="error-text">{errors.phone}</div>
-                        )}
+                        )}</div>
+                        </div>
+                    </div>
+        
+                    {/* Submit Button */}
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
+                    >
+                        Pieteikties
+                    </button>
+        
+                    {/* Security Note */}
+                    <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
                     </div>
                 </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-                onClick={handleSubmit}
-                className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
-            >
-                Pieteikties
-            </button>
-
-            {/* Security Note */}
-            <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-                <Shield className="w-4 h-4" />
-                Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
-            </div>
-        </div>
-    );
-};
-
-export default LoanCalculator;
+            );
+        };
+        
+        export default LoanCalculator;
