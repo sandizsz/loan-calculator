@@ -15,11 +15,11 @@ const ProgressBar = ({ currentStep, totalSteps }) => {
     return (
         <div className="mb-8">
             <Progress.Root 
-                className="relative overflow-hidden bg-gray-200 rounded-full w-full h-1"
+                className="relative overflow-hidden bg-gray-200 rounded-full w-full h-2"
                 value={progress}
             >
                 <Progress.Indicator
-                    className="bg-[#ffc600] w-full h-full transition-transform duration-500 ease-out"
+                    className="bg-indigo-600 w-full h-full transition-transform duration-500 ease-out"
                     style={{ transform: `translateX(-${100 - progress}%)` }}
                 />
             </Progress.Root>
@@ -30,10 +30,12 @@ const ProgressBar = ({ currentStep, totalSteps }) => {
     );
 };
 
-const FormField = ({ name, label, error, required, children }) => (
+const FormField = ({ name, label, error, children }) => (
     <div className="mb-6">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-2">
+            {label}
+        </label>
         {children}
-        {required && <div className="text-red-500 text-xs mt-1">Obligāti aizpildāms lauks</div>}
         {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
     </div>
 );
@@ -44,7 +46,7 @@ const Input = ({ icon: Icon, ...props }) => (
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         )}
         <input
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${props.error ? 'border-red-500' : 'border-[#e5e5e5]'}`}
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${props.error ? 'border-red-500' : 'border-gray-300'}`}
             {...props}
         />
     </div>
@@ -77,7 +79,7 @@ const TextArea = ({ icon: Icon, ...props }) => (
             <Icon className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
         )}
         <textarea
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${props.error ? 'border-red-500' : 'border-[#e5e5e5]'} min-h-[100px]`}
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${props.error ? 'border-red-500' : 'border-gray-300'} min-h-[100px]`}
             {...props}
         />
     </div>
@@ -87,8 +89,6 @@ const TextArea = ({ icon: Icon, ...props }) => (
 function FullCalculator() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-        // Form state initialization
-
         // Personal Info
         fullName: '',
         email: '',
@@ -432,9 +432,9 @@ function FullCalculator() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
-            <h2 className="text-3xl font-bold text-center mb-2">Aizpildiet pieteikumu,</h2>
-            <p className="text-center text-gray-600 mb-8">saņemiet aizdevumu!</p>
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Pieteikums kredītu salīdzināšanai</h2>
+            <p className="text-gray-600 mb-8">Aizpildīšanas laiks var aizņemt līdz 5 minūtēm.</p>
             
             <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
             
@@ -446,16 +446,18 @@ function FullCalculator() {
                         <button
                             type="button"
                             onClick={prevStep}
-                            className="px-6 py-2.5 border border-[#e5e5e5] rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#ffc600]"
+                            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             Atpakaļ
                         </button>
                     )}
+                    
                     <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-[#ffc600] text-black rounded-lg hover:bg-[#e5b000] focus:outline-none focus:ring-1 focus:ring-[#ffc600] ml-auto font-medium"
+                        type="button"
+                        onClick={currentStep === TOTAL_STEPS ? handleSubmit : nextStep}
+                        className="ml-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                        {currentStep === TOTAL_STEPS ? 'Iesniegt' : 'Tālāk'}
+                        {currentStep === TOTAL_STEPS ? 'Nosūtīt pieteikumu' : 'Tālāk'}
                     </button>
                 </div>
             </form>
