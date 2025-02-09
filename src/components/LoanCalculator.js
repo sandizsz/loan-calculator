@@ -284,12 +284,15 @@ const LoanCalculator = () => {
                     className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg border border-gray-200"
                 >
                     <div className="flex items-center gap-2">
-                        {selectedKredit?.icon && (
+                        {selectedKredit?.icon && selectedKredit.icon.length > 10 && (
                             <img 
                                 src={selectedKredit.icon} 
                                 alt=""
                                 className="w-6 h-6 object-contain"
-                                onError={(e) => e.target.style.display = 'none'}
+                                onError={(e) => {
+                                    console.error('Failed to load icon:', selectedKredit.icon);
+                                    e.target.style.display = 'none';
+                                }}
                             />
                         )}
                         <span className="text-gray-800 font-medium">
@@ -316,12 +319,15 @@ const LoanCalculator = () => {
                                     }}
                                     className={`flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer ${selectedKredit?.id === kredit.id ? 'bg-gray-50' : ''}`}
                                 >
-                                    {kredit.icon && (
+                                    {kredit.icon && kredit.icon.length > 10 && (
                                         <img 
                                             src={kredit.icon} 
                                             alt=""
                                             className="w-6 h-6 object-contain"
-                                            onError={(e) => e.target.style.display = 'none'}
+                                            onError={(e) => {
+                                                console.error('Failed to load icon:', kredit.icon);
+                                                e.target.style.display = 'none';
+                                            }}
                                         />
                                     )}
                                     <span className="text-gray-800">{kredit.title}</span>

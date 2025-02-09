@@ -76,11 +76,19 @@ function loan_calculator_enqueue_scripts() {
     // Transform kredits data
     $kredits_data = array_map(function($kredit) {
         $icon = get_post_meta($kredit->ID, 'kredita_ikona', true);
+        $icon_url = !empty($icon) ? esc_url_raw($icon) : null;
+        
+        // Ensure icon URL is absolute and uses HTTPS
+        if ($icon_url && strpos($icon_url, 'http') !== 0) {
+            $icon_url = get_site_url(null, $icon_url);
+        }
+        $icon_url = str_replace('http://', 'https://', $icon_url);
+        
         return [
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => !empty($icon) ? esc_url($icon) : null,
+            'icon' => $icon_url,
             'slug' => $kredit->post_name
         ];
     }, $kredits);
