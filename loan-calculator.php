@@ -10,69 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Register Kredits Custom Post Type
-function register_kredits_post_type() {
-    register_post_type('kredits', [
-        'labels' => [
-            'name' => 'Kredits',
-            'singular_name' => 'Kredit',
-            'add_new' => 'Add New',
-            'add_new_item' => 'Add New Kredit',
-            'edit_item' => 'Edit Kredit',
-            'view_item' => 'View Kredit'
-        ],
-        'public' => true,
-        'has_archive' => true,
-        'show_in_rest' => true,
-        'supports' => ['title', 'editor', 'thumbnail', 'page-attributes'],
-        'menu_icon' => 'dashicons-money-alt',
-        'rewrite' => ['slug' => 'kredits']
-    ]);
-}
-add_action('init', 'register_kredits_post_type');
 
-// Add Meta Box for Kredit Icon
-function add_kredit_meta_boxes() {
-    add_meta_box(
-        'kredit_icon_meta_box',
-        'Kredit Icon',
-        'render_kredit_icon_meta_box',
-        'kredits',
-        'side',
-        'default'
-    );
-}
-add_action('add_meta_boxes', 'add_kredit_meta_boxes');
-
-function render_kredit_icon_meta_box($post) {
-    $icon = get_post_meta($post->ID, 'kredita_ikona', true);
-    wp_nonce_field('kredit_icon_meta_box', 'kredit_icon_meta_box_nonce');
-    ?>
-    <p>
-        <label for="kredita_ikona">Icon URL:</label>
-        <input type="text" id="kredita_ikona" name="kredita_ikona" value="<?php echo esc_attr($icon); ?>" style="width: 100%">
-    </p>
-    <?php
-}
-
-function save_kredit_meta_boxes($post_id) {
-    if (!isset($_POST['kredit_icon_meta_box_nonce'])) {
-        return;
-    }
-
-    if (!wp_verify_nonce($_POST['kredit_icon_meta_box_nonce'], 'kredit_icon_meta_box')) {
-        return;
-    }
-
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-
-    if (isset($_POST['kredita_ikona'])) {
-        update_post_meta($post_id, 'kredita_ikona', sanitize_text_field($_POST['kredita_ikona']));
-    }
-}
-add_action('save_post', 'save_kredit_meta_boxes');
 
 // Enqueue Scripts and Styles
 function loan_calculator_enqueue_scripts() {
