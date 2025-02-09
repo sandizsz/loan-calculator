@@ -76,14 +76,13 @@ function loan_calculator_enqueue_scripts() {
     // Transform kredits data
     $kredits_data = array_map(function($kredit) {
         // Get icon using ACF
-        $icon = get_field('kredita_ikona', $kredit->ID);
-        $icon_url = is_array($icon) ? $icon['url'] : null;
+       
         
         return [
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => $icon,
+            'icon' => get_field('kredita_ikona', $kredit->ID),
             'slug' => $kredit->post_name
         ];
     }, $kredits);
