@@ -22,10 +22,19 @@ function initApp() {
   }
 }
 
-// Wait for both DOM and WordPress assets
+// Initialize once WordPress is ready
+let hasInitialized = false;
+
+function init() {
+  if (!hasInitialized) {
+    hasInitialized = true;
+    initApp();
+  }
+}
+
+// Wait for WordPress and DOM to be ready
 if (document.readyState === 'complete') {
-  initApp();
+  init();
 } else {
-  document.addEventListener('DOMContentLoaded', initApp);
-  window.addEventListener('load', initApp);
+  window.addEventListener('load', init);
 }
