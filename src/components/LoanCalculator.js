@@ -67,37 +67,123 @@ const LoanCalculator = () => {
         }
     };
 
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .calculator-container {
+                background: rgba(255, 255, 255, 0.90);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(4px);
+                border-radius: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                padding: 1.5rem;
+            }
+            .range-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 24px;
+                height: 24px;
+                background-color: #FFC600;
+                border: 2px solid white;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .range-input::-moz-range-thumb {
+                width: 24px;
+                height: 24px;
+                background-color: #FFC600;
+                border: 2px solid white;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .input-wrapper {
+                position: relative;
+            }
+            .phone-input-container {
+                position: relative;
+            }
+            .phone-prefix {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #000;
+                font-size: 16px;
+                font-weight: normal;
+                z-index: 1;
+                pointer-events: none;
+            }
+            .form-input {
+                height: 48px;
+                font-size: 16px;
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #D1D5DB;
+                border-radius: 6px;
+                outline: none;
+                transition: border-color 0.2s ease;
+            }
+            .form-input.phone {
+                padding-left: 55px;
+            }
+            .form-input:focus {
+                border-color: #FFC600;
+            }
+            .form-input.error {
+                border-color: #EF4444;
+            }
+            .error-text {
+                color: #EF4444;
+                font-size: 14px;
+                margin-top: 4px;
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
     return (
-        <div className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-6">
-            {/* Simple Dropdown */}
-            <div className="relative mb-8" ref={dropdownRef}>
-                <button
+        <div className="calculator-container">
+            {/* Dropdown Header */}
+            <div className="relative mb-8">
+                <div
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between cursor-pointer"
                 >
                     <div className="flex items-center gap-2">
-                        {selectedKredit?.icon ? (
-                            <img src={selectedKredit.icon} alt="" className="w-6 h-6" />
-                        ) : (
-                            <Calendar className="w-6 h-6 text-blue-500" />
-                        )}
-                        <span className="text-lg font-medium">
-                            {selectedKredit?.title || 'Patēriņa kredīts'}
+                        <img
+                            src={selectedKredit?.icon || ''}
+                            alt=""
+                            className="w-6 h-6 text-blue-500"
+                        />
+                        <span className="text-gray-800 font-medium">
+                            {selectedKredit?.title}
                         </span>
                     </div>
-                    <ChevronDown className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
+                    <svg
+                        className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        />
+                    </svg>
+                </div>
 
                 {isDropdownOpen && (
-                    <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50">
+                    <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1">
                         {kredits.map((kredit) => (
                             <a
-                                key={kredit.id}
+                                key={kredit.url}
                                 href={kredit.url}
                                 className="flex items-center gap-2 p-3 hover:bg-gray-50"
                             >
                                 <img src={kredit.icon} alt="" className="w-6 h-6" />
-                                <span>{kredit.title}</span>
+                                <span className="text-gray-800">{kredit.title}</span>
                             </a>
                         ))}
                     </div>
@@ -110,20 +196,29 @@ const LoanCalculator = () => {
                     <span className="text-gray-700">Aizdevuma summa</span>
                     <span className="font-medium">{amount} €</span>
                 </div>
-                <input
-                    type="range"
-                    min="500"
-                    max="25000"
-                    value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    style={{
-                        background: `linear-gradient(to right, #3B82F6 ${(amount - 500) / (25000 - 500) * 100}%, #E5E7EB ${(amount - 500) / (25000 - 500) * 100}%)`
-                    }}
-                />
-                <div className="flex justify-between mt-1 text-sm text-gray-500">
-                    <span>500 €</span>
-                    <span>25000 €</span>
+                <div className="relative">
+                    <input
+                        type="range"
+                        min="500"
+                        max="25000"
+                        value={amount}
+                        onChange={(e) => setAmount(Number(e.target.value))}
+                        style={{
+                            width: '100%',
+                            height: '6px',
+                            WebkitAppearance: 'none',
+                            background: `linear-gradient(to right, #FFC600 ${(amount - 500) / (25000 - 500) * 100}%, #e5e7eb ${(amount - 500) / (25000 - 500) * 100}%)`,
+                            borderRadius: '5px',
+                            outline: 'none',
+                            opacity: '1',
+                            transition: 'opacity .2s'
+                        }}
+                        className="range-input"
+                    />
+                    <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
+                        <span>500 €</span>
+                        <span>25000 €</span>
+                    </div>
                 </div>
             </div>
 
@@ -133,86 +228,119 @@ const LoanCalculator = () => {
                     <span className="text-gray-700">Aizdevuma termiņš</span>
                     <span className="font-medium">{term} mēn.</span>
                 </div>
-                <input
-                    type="range"
-                    min="3"
-                    max="120"
-                    value={term}
-                    onChange={(e) => setTerm(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    style={{
-                        background: `linear-gradient(to right, #3B82F6 ${(term - 3) / (120 - 3) * 100}%, #E5E7EB ${(term - 3) / (120 - 3) * 100}%)`
-                    }}
-                />
-                <div className="flex justify-between mt-1 text-sm text-gray-500">
-                    <span>3 mēn.</span>
-                    <span>120 mēn.</span>
+                <div className="relative">
+                    <input
+                        type="range"
+                        min="3"
+                        max="120"
+                        value={term}
+                        onChange={(e) => setTerm(Number(e.target.value))}
+                        style={{
+                            width: '100%',
+                            height: '6px',
+                            WebkitAppearance: 'none',
+                            background: `linear-gradient(to right, #FFC600 ${(term - 3) / (120 - 3) * 100}%, #e5e7eb ${(term - 3) / (120 - 3) * 100}%)`,
+                            borderRadius: '5px',
+                            outline: 'none',
+                            opacity: '1',
+                            transition: 'opacity .2s'
+                        }}
+                        className="range-input"
+                    />
+                    <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
+                        <span>3 mēn.</span>
+                        <span>120 mēn.</span>
+                    </div>
                 </div>
             </div>
 
             {/* Monthly Payment Box */}
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center">
                     <span className="text-2xl font-medium">{monthlyPayment} €/mēn.</span>
-                    <Info className="w-4 h-4 text-blue-500 cursor-help" title="Kredīta kalkulatoram ir ilustratīva nozīme" />
+                    <div className="tooltip-trigger ml-1">
+                        <svg
+                            className="w-4 h-4 text-blue-500 cursor-help"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            />
+                        </svg>
+                        <div className="tooltip-content">
+                            Kredīta kalkulatoram ir ilustratīva nozīme
+                        </div>
+                    </div>
                 </div>
-                <span className="text-sm text-gray-600">Ikmēneša maksājums</span>
+                <div className="text-sm text-gray-600 mt-1">
+                    Ikmēneša maksājums
+                </div>
             </div>
 
             {/* Form */}
-            <div className="space-y-4">
-                <div>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Jūsu e-pasts"
-                        className={`w-full p-3 border rounded-lg outline-none transition-colors ${
-                            errors.email ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                    />
-                    {errors.email && (
-                        <div className="text-sm text-red-500 mt-1">{errors.email}</div>
-                    )}
-                </div>
-
-                <div>
-                    <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                            +371
-                        </span>
+            <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="col-span-2 md:col-span-1">
+                    <div className="input-wrapper">
                         <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, '');
-                                if (value.length <= 8) {
-                                    setPhone(value);
-                                }
-                            }}
-                            placeholder="Jūsu tālrunis"
-                            className={`w-full p-3 pl-12 border rounded-lg outline-none transition-colors ${
-                                errors.phone ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            type="email"
+                            placeholder="Jūsu e-pasts"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={`form-input ${errors.email ? 'error' : ''}`}
                         />
+                        {errors.email && (
+                            <div className="error-text">{errors.email}</div>
+                        )}
                     </div>
-                    {errors.phone && (
-                        <div className="text-sm text-red-500 mt-1">{errors.phone}</div>
-                    )}
                 </div>
-
-                <button
-                    onClick={handleSubmit}
-                    className="w-full py-3 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
-                >
-                    Pieteikties
-                </button>
+                <div className="col-span-2 md:col-span-1">
+                    <div className="input-wrapper">
+                        <div className="phone-input-container">
+                            <span className="phone-prefix">+371</span>
+                            <input
+                                type="tel"
+                                placeholder="Jūsu tālrunis"
+                                value={phone}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    const digits = value.replace(/\D/g, '');
+                                    if (digits.length <= 8) {
+                                        setPhone(digits);
+                                    }
+                                }}
+                                className={`form-input phone ${errors.phone ? 'error' : ''}`}
+                            />
+                        </div>
+                        {errors.phone && (
+                            <div className="error-text">{errors.phone}</div>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/* Security Badge */}
-            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-                <Shield className="w-4 h-4" />
-                <span>Nodrošinām bankas līmeņa aizsardzību Jūsu datiem</span>
+            {/* Submit Button */}
+            <button
+                onClick={handleSubmit}
+                className="w-full bg-green-500 text-white py-3 px-4 rounded-lg mt-4 font-medium hover:bg-green-600 transition-colors"
+            >
+                Pieteikties
+            </button>
+
+            {/* Security Note */}
+            <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
+                <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                >
+                    <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    />
+                </svg>
+                Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
             </div>
         </div>
     );
