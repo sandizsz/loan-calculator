@@ -75,14 +75,9 @@ function loan_calculator_enqueue_scripts() {
 
     // Transform kredits data
     $kredits_data = array_map(function($kredit) {
-        $icon = get_post_meta($kredit->ID, 'kredita_ikona', true);
-        $icon_url = !empty($icon) ? esc_url_raw($icon) : null;
-        
-        // Ensure icon URL is absolute and uses HTTPS
-        if ($icon_url && strpos($icon_url, 'http') !== 0) {
-            $icon_url = get_site_url(null, $icon_url);
-        }
-        $icon_url = str_replace('http://', 'https://', $icon_url);
+        // Get icon using ACF
+        $icon = get_field('kredita_ikona', $kredit->ID);
+        $icon_url = is_array($icon) ? $icon['url'] : null;
         
         return [
             'id' => $kredit->ID,
