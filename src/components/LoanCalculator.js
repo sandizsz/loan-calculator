@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 
 const LoanCalculator = () => {
+    // Initialize state with WordPress data
+    const [kredits, setKredits] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [amount, setAmount] = useState(3000);
     const [term, setTerm] = useState(36);
     const [monthlyPayment, setMonthlyPayment] = useState(92.49);
@@ -10,23 +13,38 @@ const LoanCalculator = () => {
     const [errors, setErrors] = useState({});
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const [selectedKredit, setSelectedKredit] = useState(null);
     const dropdownRef = useRef(null);
 
-    // Get kredits from WordPress data
-    const kredits = window.loanCalculatorData?.kredits || [];
-    
-    // Try to find matching kredit based on current URL
-    const currentUrl = window.location.href;
-    const matchingKredit = kredits.find(kredit => currentUrl.includes(kredit.url));
-    
-    // Set initial selected kredit
-    const [selectedKredit, setSelectedKredit] = useState(matchingKredit || kredits[0] || null);
-
+    // Load WordPress data
     useEffect(() => {
-        console.log('Kredits Data:', kredits);
+        const wpData = window.loanCalculatorData || {};
+        console.log('WordPress Data:', wpData);
+        
+        if (wpData.kredits && Array.isArray(wpData.kredits)) {
+            setKredits(wpData.kredits);
+            
+            // Set initial selected kredit
+            const currentUrl = window.location.href;
+            const matchingKredit = wpData.kredits.find(kredit => 
+                currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
+            );
+            setSelectedKredit(matchingKredit || wpData.kredits[0]);
+        }
+        
+        setIsLoading(false);
     }, []);
 
-    // Handle clicking outside to close dropdown
+    // Calculate monthly payment
+    useEffect(() => {
+        const annualRate = 0.12; // 12% annual interest rate
+        const monthlyRate = annualRate / 12;
+        const payment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) / 
+                       (Math.pow(1 + monthlyRate, term) - 1);
+        setMonthlyPayment(payment.toFixed(2));
+    }, [amount, term]);
+
+    // Handle click outside dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -38,15 +56,7 @@ const LoanCalculator = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Calculate monthly payment
-    useEffect(() => {
-        const annualRate = 0.12;
-        const monthlyRate = annualRate / 12;
-        const payment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) / 
-                       (Math.pow(1 + monthlyRate, term) - 1);
-        setMonthlyPayment(payment.toFixed(2));
-    }, [amount, term]);
-
+    // Form validation
     const validateForm = () => {
         const newErrors = {};
         
@@ -66,151 +76,73 @@ const LoanCalculator = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Form submission
     const handleSubmit = () => {
         if (validateForm()) {
             const params = new URLSearchParams({
                 amount,
                 term,
                 email,
-                phone
+                phone,
+                kredit_id: selectedKredit?.id || ''
             }).toString();
-            window.location.href = `/forma/?${params}`;
+            
+            window.location.href = `${window.loanCalculatorData.siteUrl}/forma/?${params}`;
         }
     };
 
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.textContent = `
-            .calculator-container {
-                background: rgba(255, 255, 255, 0.90);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(4px);
-                border-radius: 10px;
-                border: 1px solid rgba(255, 255, 255, 0.18);
-                padding: 1.5rem;
-            }
-            .range-input::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 24px;
-                height: 24px;
-                background-color: #FFC600;
-                border: 2px solid white;
-                border-radius: 50%;
-                cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            }
-            .range-input::-moz-range-thumb {
-                width: 24px;
-                height: 24px;
-                background-color: #FFC600;
-                border: 2px solid white;
-                border-radius: 50%;
-                cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            }
-            .input-wrapper {
-                position: relative;
-            }
-            .phone-input-container {
-                position: relative;
-            }
-            .phone-prefix {
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #000;
-                font-size: 16px;
-                font-weight: normal;
-                z-index: 1;
-                pointer-events: none;
-            }
-            .form-input {
-                height: 48px;
-                font-size: 16px;
-                width: 100%;
-                padding: 8px 12px;
-                border: 1px solid #D1D5DB;
-                border-radius: 6px;
-                outline: none;
-                transition: border-color 0.2s ease;
-            }
-            .form-input.phone {
-                padding-left: 55px;
-            }
-            .form-input:focus {
-                border-color: #FFC600;
-            }
-            .form-input.error {
-                border-color: #EF4444;
-            }
-            .error-text {
-                color: #EF4444;
-                font-size: 14px;
-                margin-top: 4px;
-            }
-        `;
-        document.head.appendChild(style);
-        return () => document.head.removeChild(style);
-    }, []);
+    if (isLoading) {
+        return <div className="p-4 text-center">Loading calculator...</div>;
+    }
 
     return (
         <div className="calculator-container">
             {/* Dropdown Header */}
-            <div className="relative mb-8" ref={dropdownRef}>
-                <div
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
-                >
-                    <div className="flex items-center gap-2">
-                        {selectedKredit?.icon ? (
-                            <img 
-                                src={selectedKredit.icon} 
-                                alt="" 
-                                className="w-6 h-6"
-                            />
-                        ) : (
-                            <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                        )}
-                        <span className="text-gray-800 font-medium">
-                            {selectedKredit?.title || 'Izvēlieties kredītu'}
-                        </span>
-                    </div>
-                    <svg
-                        className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+            {kredits.length > 0 && (
+                <div className="relative mb-8" ref={dropdownRef}>
+                    <div
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                     >
-                        <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        <div className="flex items-center gap-2">
+                            {selectedKredit?.icon ? (
+                                <img 
+                                    src={selectedKredit.icon} 
+                                    alt="" 
+                                    className="w-6 h-6"
+                                />
+                            ) : (
+                                <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                            )}
+                            <span className="text-gray-800 font-medium">
+                                {selectedKredit?.title || 'Izvēlieties kredītu'}
+                            </span>
+                        </div>
+                        <ChevronDown 
+                            className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                         />
-                    </svg>
-                </div>
-
-                {isDropdownOpen && (
-                    <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
-                       {kredits.map((kredit) => {
-    console.log('Rendering Kredit:', kredit);
-    return (
-        <a
-            key={kredit.id}
-            href={kredit.url}
-            className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
-        >
-            {kredit.icon ? (
-                <img src={kredit.icon} alt="" className="w-6 h-6" />
-            ) : (
-                <div className="w-6 h-6 bg-gray-200 rounded-full" />
-            )}
-            <span className="text-gray-800">{kredit.title}</span>
-        </a>
-    );
-})}
                     </div>
-                )}
-            </div>
+
+                    {isDropdownOpen && (
+                        <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
+                            {kredits.map((kredit) => (
+                                <a
+                                    key={kredit.id}
+                                    href={kredit.url}
+                                    className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
+                                >
+                                    {kredit.icon ? (
+                                        <img src={kredit.icon} alt="" className="w-6 h-6" />
+                                    ) : (
+                                        <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                                    )}
+                                    <span className="text-gray-800">{kredit.title}</span>
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Amount Slider */}
             <div className="mb-8">
@@ -225,16 +157,6 @@ const LoanCalculator = () => {
                         max="25000"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
-                        style={{
-                            width: '100%',
-                            height: '6px',
-                            WebkitAppearance: 'none',
-                            background: `linear-gradient(to right, #FFC600 ${(amount - 500) / (25000 - 500) * 100}%, #e5e7eb ${(amount - 500) / (25000 - 500) * 100}%)`,
-                            borderRadius: '5px',
-                            outline: 'none',
-                            opacity: '1',
-                            transition: 'opacity .2s'
-                        }}
                         className="range-input"
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
@@ -257,16 +179,6 @@ const LoanCalculator = () => {
                         max="120"
                         value={term}
                         onChange={(e) => setTerm(Number(e.target.value))}
-                        style={{
-                            width: '100%',
-                            height: '6px',
-                            WebkitAppearance: 'none',
-                            background: `linear-gradient(to right, #FFC600 ${(term - 3) / (120 - 3) * 100}%, #e5e7eb ${(term - 3) / (120 - 3) * 100}%)`,
-                            borderRadius: '5px',
-                            outline: 'none',
-                            opacity: '1',
-                            transition: 'opacity .2s'
-                        }}
                         className="range-input"
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
@@ -285,26 +197,11 @@ const LoanCalculator = () => {
                         onMouseEnter={() => setIsTooltipVisible(true)}
                         onMouseLeave={() => setIsTooltipVisible(false)}
                     >
-                        <svg
-                            className="w-4 h-4 text-blue-500 cursor-help"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
+                        <Info className="w-4 h-4 text-blue-500 cursor-help" />
                         {isTooltipVisible && (
-                            <div 
-                                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg whitespace-nowrap"
-                                style={{
-                                    filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))',
-                                }}
-                            >
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg whitespace-nowrap">
                                 <div className="relative">
-                                    Kredīta kalkulatoram ir ilustratīva nozīme
+                                    Kredīta kalkulatoram ir ilustratīva nozīme.
                                     <div 
                                         className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1"
                                         style={{
@@ -374,16 +271,7 @@ const LoanCalculator = () => {
 
             {/* Security Note */}
             <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-                <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                >
-                    <path
-                        fillRule="evenodd"
-                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    />
-                </svg>
+                <Shield className="w-4 h-4" />
                 Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
             </div>
         </div>
