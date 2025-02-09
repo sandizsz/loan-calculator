@@ -22,6 +22,10 @@ const LoanCalculator = () => {
     // Set initial selected kredit
     const [selectedKredit, setSelectedKredit] = useState(matchingKredit || kredits[0] || null);
 
+    useEffect(() => {
+        console.log('Kredits Data:', kredits);
+    }, []);
+
     // Handle clicking outside to close dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -187,20 +191,23 @@ const LoanCalculator = () => {
 
                 {isDropdownOpen && (
                     <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
-                        {kredits.map((kredit) => (
-                            <a
-                                key={kredit.id}
-                                href={kredit.url}
-                                className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
-                            >
-                                {kredit.icon ? (
-                                    <img src={kredit.icon} alt="" className="w-6 h-6" />
-                                ) : (
-                                    <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                                )}
-                                <span className="text-gray-800">{kredit.title}</span>
-                            </a>
-                        ))}
+                       {kredits.map((kredit) => {
+    console.log('Rendering Kredit:', kredit);
+    return (
+        <a
+            key={kredit.id}
+            href={kredit.url}
+            className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors"
+        >
+            {kredit.icon ? (
+                <img src={kredit.icon} alt="" className="w-6 h-6" />
+            ) : (
+                <div className="w-6 h-6 bg-gray-200 rounded-full" />
+            )}
+            <span className="text-gray-800">{kredit.title}</span>
+        </a>
+    );
+})}
                     </div>
                 )}
             </div>
