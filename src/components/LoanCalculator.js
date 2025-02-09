@@ -22,20 +22,14 @@ const LoanCalculator = () => {
         console.log('WordPress Data:', wpData);
         
         if (wpData.kredits && Array.isArray(wpData.kredits)) {
-            // Ensure icons are properly formatted with full URLs
-            const processedKredits = wpData.kredits.map(kredit => ({
-                ...kredit,
-                icon: kredit.icon ? new URL(kredit.icon, window.location.origin).href : null
-            }));
-            
-            setKredits(processedKredits);
+            setKredits(wpData.kredits);
             
             // Set initial selected kredit
             const currentUrl = window.location.href;
-            const matchingKredit = processedKredits.find(kredit => 
+            const matchingKredit = wpData.kredits.find(kredit => 
                 currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
             );
-            setSelectedKredit(matchingKredit || processedKredits[0]);
+            setSelectedKredit(matchingKredit || wpData.kredits[0]);
         }
         
         setIsLoading(false);
@@ -157,21 +151,30 @@ const LoanCalculator = () => {
                 background: linear-gradient(to right, #FFC600 var(--range-progress), #e5e7eb var(--range-progress));
             }
 
-            .kredit-icon {
+            .kredit-icon-wrapper {
                 width: 24px;
                 height: 24px;
+                position: relative;
+            }
+
+            .kredit-icon {
+                width: 100%;
+                height: 100%;
                 object-fit: contain;
                 border-radius: 4px;
             }
 
             .kredit-icon-placeholder {
-                width: 24px;
-                height: 24px;
+                width: 100%;
+                height: 100%;
                 background: #f3f4f6;
                 border-radius: 4px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: absolute;
+                top: 0;
+                left: 0;
             }
         `;
         document.head.appendChild(style);
@@ -242,19 +245,20 @@ const LoanCalculator = () => {
 
     // Function to render kredit icon
     const renderKreditIcon = (kredit) => {
+        const [hasError, setHasError] = useState(false);
+
         if (kredit?.icon) {
             return (
                 <div className="kredit-icon-wrapper">
-                    <img 
-                        src={kredit.icon} 
-                        alt="" 
-                        className="kredit-icon"
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
-                    />
-                    <div className="kredit-icon-placeholder" style={{ display: 'none' }} />
+                    {!hasError && (
+                        <img 
+                            src={kredit.icon} 
+                            alt="" 
+                            className="kredit-icon"
+                            onError={() => setHasError(true)}
+                        />
+                    )}
+                    {hasError && <div className="kredit-icon-placeholder" />}
                 </div>
             );
         }
@@ -272,11 +276,9 @@ const LoanCalculator = () => {
                 <div 
                     className="relative mb-8" 
                     ref={dropdownRef}
-                    onMouseLeave={() => setIsDropdownOpen(false)}
                 >
                     <div
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        onMouseEnter={() => setIsDropdownOpen(true)}
                         className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                     >
                         <div className="flex items-center gap-2">
@@ -292,8 +294,7 @@ const LoanCalculator = () => {
 
                     {isDropdownOpen && (
                         <div 
-                            className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-[100] py-1 border border-gray-100"
-                            onMouseEnter={() => setIsDropdownOpen(true)}
+                            className="absolute w-full top-full bg-white rounded-lg shadow-lg z-[100] py-1 border border-gray-100"
                         >
                             {kredits.map((kredit) => (
                                 <div
