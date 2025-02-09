@@ -46,15 +46,11 @@ add_action('save_post', 'save_kredit_meta_boxes');
 
 // Enqueue Scripts and Styles
 function loan_calculator_enqueue_scripts() {
-    global $post;
-    
-    if (!$post) return;
-
     // Register scripts
     wp_register_script(
         'loan-calculator', 
         plugins_url('build/main.js', __FILE__),
-        ['react', 'react-dom'],
+        ['wp-element'], // wp-element contains React
         filemtime(plugin_dir_path(__FILE__) . 'build/main.js'),
         true
     );
@@ -63,7 +59,7 @@ function loan_calculator_enqueue_scripts() {
     wp_register_script(
         'full-calculator', 
         plugins_url('build/fullCalculator.js', __FILE__),
-        ['react', 'react-dom', 'loan-calculator'],
+        ['wp-element', 'loan-calculator'],
         filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
         true
     );
@@ -94,18 +90,45 @@ function loan_calculator_enqueue_scripts() {
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('loan_calculator_nonce'),
         'siteUrl' => get_site_url(),
-        'currentPostId' => $post->ID
+        'currentPostId' => get_the_ID()
     ];
 
     // Localize script for both calculators
     wp_localize_script('loan-calculator', 'loanCalculatorData', $calculator_data);
     wp_localize_script('full-calculator', 'loanCalculatorData', $calculator_data);
     
-    // Enqueue scripts based on shortcode presence
-    if (has_shortcode($post->post_content, 'loan_calculator')) {
+    // Check for shortcodes in the current content
+    global $post;
+    $should_load_calculator = false;
+    $should_load_full_calculator = false;
+    
+    if ($post && $post->post_content) {
+        $should_load_calculator = has_shortcode($post->post_content, 'loan_calculator');
+        $should_load_full_calculator = has_shortcode($post->post_content, 'full_calculator');
+    }
+    
+    // Also check for shortcodes in widgets
+    if (!$should_load_calculator && !$should_load_full_calculator) {
+        $widgets = get_option('widget_text');
+        if (is_array($widgets)) {
+            foreach ($widgets as $widget) {
+                if (is_array($widget) && isset($widget['text'])) {
+                    if (strpos($widget['text'], '[loan_calculator]') !== false) {
+                        $should_load_calculator = true;
+                    }
+                    if (strpos($widget['text'], '[full_calculator]') !== false) {
+                        $should_load_full_calculator = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Enqueue scripts if needed
+    if ($should_load_calculator) {
         wp_enqueue_script('loan-calculator');
     }
-    if (has_shortcode($post->post_content, 'full_calculator')) {
+    if ($should_load_full_calculator) {
         wp_enqueue_script('full-calculator');
     }
 
