@@ -943,6 +943,9 @@ input[type="range"]::-webkit-slider-thumb {
 .pl-10 {
   padding-left: 2.5rem;
 }
+.pl-14 {
+  padding-left: 3.5rem;
+}
 .pr-4 {
   padding-right: 1rem;
 }

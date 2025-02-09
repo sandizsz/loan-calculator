@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
+import { Calendar, ChevronDown, Info, Shield, Mail, Phone } from 'lucide-react';
 
 // Add styles for range input thumb
 const sliderStyles = `
@@ -47,6 +47,29 @@ const getSliderBackground = (value, min, max) => {
     const percentage = ((value - min) / (max - min)) * 100;
     return `linear-gradient(to right, #4F46E5 ${percentage}%, #E5E7EB ${percentage}%)`;
 };
+
+// Form Components
+const FormField = ({ name, label, error, children }) => (
+    <div className="mb-6">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-2">
+            {label}
+        </label>
+        {children}
+        {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+    </div>
+);
+
+const Input = ({ icon: Icon, className = '', ...props }) => (
+    <div className="relative">
+        {Icon && (
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        )}
+        <input
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${props.error ? 'border-red-500' : 'border-gray-300'} ${className}`}
+            {...props}
+        />
+    </div>
+);
 
 const LoanCalculator = () => {
     // Add slider styles to document
@@ -503,25 +526,25 @@ const LoanCalculator = () => {
             {/* Form */}
             <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="col-span-2 md:col-span-1">
-                    <div className="input-wrapper">
-                        <input
+                    <FormField name="email" label="Jūsu e-pasts" error={errors.email}>
+                        <Input
+                            icon={Mail}
                             type="email"
+                            name="email"
                             placeholder="Jūsu e-pasts"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                            error={errors.email}
                         />
-                        {errors.email && (
-                            <div className="text-red-500 text-sm mt-1">{errors.email}</div>
-                        )}
-                    </div>
+                    </FormField>
                 </div>
                 <div className="col-span-2 md:col-span-1">
-                    <div className="input-wrapper">
+                    <FormField name="phone" label="Jūsu tālrunis" error={errors.phone}>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+371</span>
-                            <input
+                            <Input
                                 type="tel"
+                                name="phone"
                                 placeholder="Jūsu tālrunis"
                                 value={phone}
                                 onChange={(e) => {
@@ -531,14 +554,13 @@ const LoanCalculator = () => {
                                         setPhone(digits);
                                     }
                                 }}
-                                className={`form-input phone ${errors.phone ? 'error' : ''}`}
+                                className="pl-14"
+                                error={errors.phone}
                             />
                         </div>
-                        {errors.phone && (
-                            <div className="error-text">{errors.phone}</div>
-                        )}</div>
-                        </div>
-                    </div>
+                    </FormField>
+                </div>
+            </div>
         
                     {/* Submit Button */}
                     <button
