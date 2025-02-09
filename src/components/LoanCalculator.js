@@ -22,14 +22,20 @@ const LoanCalculator = () => {
         console.log('WordPress Data:', wpData);
         
         if (wpData.kredits && Array.isArray(wpData.kredits)) {
-            setKredits(wpData.kredits);
+            // Ensure icons are properly formatted with full URLs
+            const processedKredits = wpData.kredits.map(kredit => ({
+                ...kredit,
+                icon: kredit.icon ? new URL(kredit.icon, window.location.origin).href : null
+            }));
+            
+            setKredits(processedKredits);
             
             // Set initial selected kredit
             const currentUrl = window.location.href;
-            const matchingKredit = wpData.kredits.find(kredit => 
+            const matchingKredit = processedKredits.find(kredit => 
                 currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
             );
-            setSelectedKredit(matchingKredit || wpData.kredits[0]);
+            setSelectedKredit(matchingKredit || processedKredits[0]);
         }
         
         setIsLoading(false);
@@ -238,15 +244,18 @@ const LoanCalculator = () => {
     const renderKreditIcon = (kredit) => {
         if (kredit?.icon) {
             return (
-                <img 
-                    src={kredit.icon} 
-                    alt="" 
-                    className="kredit-icon"
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.parentNode.innerHTML = '<div class="kredit-icon-placeholder"></div>';
-                    }}
-                />
+                <div className="kredit-icon-wrapper">
+                    <img 
+                        src={kredit.icon} 
+                        alt="" 
+                        className="kredit-icon"
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                    />
+                    <div className="kredit-icon-placeholder" style={{ display: 'none' }} />
+                </div>
             );
         }
         return <div className="kredit-icon-placeholder" />;
@@ -293,10 +302,10 @@ const LoanCalculator = () => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         setSelectedKredit(kredit);
-                                        // Delay navigation to allow hover effect
-                                        setTimeout(() => {
+                                        setIsDropdownOpen(false);
+                                        if (kredit.url) {
                                             window.location.href = kredit.url;
-                                        }, 150);
+                                        }
                                     }}
                                     className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                                 >
