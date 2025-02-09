@@ -18,41 +18,21 @@ const LoanCalculator = () => {
 
     // Load WordPress data
     useEffect(() => {
-        try {
-            const wpData = window.loanCalculatorData;
-            console.log('WordPress Data:', wpData);
-            
-            if (!wpData || !wpData.kredits) {
-                console.error('No kredits data found');
-                setIsLoading(false);
-                return;
-            }
-
-            // Ensure kredits is an array
-            const kreditsArray = Array.isArray(wpData.kredits) ? wpData.kredits : [];
-            console.log('Kredits array:', kreditsArray);
-
-            if (kreditsArray.length === 0) {
-                console.error('No kredits available');
-                setIsLoading(false);
-                return;
-            }
-
-            setKredits(kreditsArray);
+        const wpData = window.loanCalculatorData || {};
+        console.log('WordPress Data:', wpData);
+        
+        if (wpData.kredits && Array.isArray(wpData.kredits)) {
+            setKredits(wpData.kredits);
             
             // Set initial selected kredit
             const currentUrl = window.location.href;
-            const matchingKredit = kreditsArray.find(kredit => 
-                kredit && kredit.url && currentUrl.includes(kredit.url)
-            ) || kreditsArray[0];
-
-            console.log('Selected kredit:', matchingKredit);
-            setSelectedKredit(matchingKredit);
-            setIsLoading(false);
-        } catch (error) {
-            console.error('Error loading calculator data:', error);
-            setIsLoading(false);
+            const matchingKredit = wpData.kredits.find(kredit => 
+                currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
+            );
+            setSelectedKredit(matchingKredit || wpData.kredits[0]);
         }
+        
+        setIsLoading(false);
     }, []);
 
     // Add styles to document head
@@ -289,47 +269,36 @@ const LoanCalculator = () => {
         return <div className="p-4 text-center">Loading calculator...</div>;
     }
 
-    if (!kredits || kredits.length === 0) {
-        return <div className="p-4 text-center">Nav pieejami kredīti.</div>;
-    }
-
-    if (!selectedKredit) {
-        return <div className="p-4 text-center">Nav izvēlēts kredīts.</div>;
-    }
-
     return (
         <div className="calculator-container">
             {/* Dropdown Header */}
-            <div className="relative mb-8" ref={dropdownRef}>
-                <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="w-full flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg border border-gray-200"
-                >
-                    <div className="flex items-center gap-2">
-                        {selectedKredit.icon && (
-                            <img 
-                                src={selectedKredit.icon} 
-                                alt=""
-                                className="w-6 h-6 object-contain"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
-                                }}
-                            />
-                        )}
-                        <span className="text-gray-800 font-medium">
-                            {selectedKredit.title}
-                        </span>
-                    </div>
-                    <ChevronDown 
-                        className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                    />
-                </button>
-
-                {isDropdownOpen && (
-                    <div 
-                        className="absolute w-full top-[calc(100%_-_1px)] bg-white rounded-b-lg shadow-lg z-[100] border border-t-0 border-gray-200"
+            {kredits.length > 0 && (
+                <div className="relative mb-8" ref={dropdownRef}>
+                    <div
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                     >
+                        <div className="flex items-center gap-2">
+                            {selectedKredit?.icon && (
+                                <img 
+                                    src={selectedKredit.icon} 
+                                    alt=""
+                                    className="w-6 h-6 object-contain"
+                                    onError={(e) => e.target.style.display = 'none'}
+                                />
+                            )}
+                            <span className="text-gray-800 font-medium">
+                                {selectedKredit?.title || 'Izvēlieties kredītu'}
+                            </span>
+                        </div>
+                        <ChevronDown 
+                            className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        />
+                    </div>
+
+                    {isDropdownOpen && (
+                        <div className="absolute w-full mt-1 bg-white rounded-lg shadow-lg z-[100] border border-gray-200">
+
                             {kredits.map((kredit) => (
                                 <div
                                     key={kredit.id}
@@ -351,7 +320,7 @@ const LoanCalculator = () => {
                         </div>
                     )}
                 </div>      
-            ){"}"}
+            )}
 
             {/* Amount Slider */}
             <div className="mb-8">

@@ -549,9 +549,6 @@ input[type="range"]::-webkit-slider-thumb {
 .right-0 {
   right: 0px;
 }
-.top-\[calc\(100\%_-_1px\)\] {
-  top: calc(100% - 1px);
-}
 .top-full {
   top: 100%;
 }
@@ -756,10 +753,6 @@ input[type="range"]::-webkit-slider-thumb {
 .rounded-xl {
   border-radius: 0.75rem;
 }
-.rounded-b-lg {
-  border-bottom-right-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-}
 .border {
   border-width: 1px;
 }
@@ -768,9 +761,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .border-b {
   border-bottom-width: 1px;
-}
-.border-t-0 {
-  border-top-width: 0px;
 }
 .border-none {
   border-style: none;
