@@ -795,6 +795,11 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: rgba(209, 213, 219, 1);
   background-color: rgba(209, 213, 219, var(--tw-bg-opacity, 1));
 }
+.bg-gray-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgba(249, 250, 251, 1);
+  background-color: rgba(249, 250, 251, var(--tw-bg-opacity, 1));
+}
 .bg-gray-900 {
   --tw-bg-opacity: 1;
   background-color: rgba(17, 24, 39, 1);

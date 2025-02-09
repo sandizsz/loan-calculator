@@ -22,14 +22,20 @@ const LoanCalculator = () => {
         console.log('WordPress Data:', wpData);
         
         if (wpData.kredits && Array.isArray(wpData.kredits)) {
-            setKredits(wpData.kredits);
+            // Ensure all icon URLs are HTTPS
+            const secureKredits = wpData.kredits.map(kredit => ({
+                ...kredit,
+                icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
+            }));
+            
+            setKredits(secureKredits);
             
             // Set initial selected kredit
             const currentUrl = window.location.href;
-            const matchingKredit = wpData.kredits.find(kredit => 
+            const matchingKredit = secureKredits.find(kredit => 
                 currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
             );
-            setSelectedKredit(matchingKredit || wpData.kredits[0]);
+            setSelectedKredit(matchingKredit || secureKredits[0]);
         }
         
         setIsLoading(false);
@@ -272,55 +278,58 @@ const LoanCalculator = () => {
     return (
         <div className="calculator-container">
             {/* Dropdown Header */}
-            {kredits.length > 0 && (
-                <div className="relative mb-8" ref={dropdownRef}>
-                    <div
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
-                    >
-                        <div className="flex items-center gap-2">
-                            {selectedKredit?.icon && (
-                                <img 
-                                    src={selectedKredit.icon} 
-                                    alt=""
-                                    className="w-6 h-6 object-contain"
-                                    onError={(e) => e.target.style.display = 'none'}
-                                />
-                            )}
-                            <span className="text-gray-800 font-medium">
-                                {selectedKredit?.title || 'Izvēlieties kredītu'}
-                            </span>
-                        </div>
-                        <ChevronDown 
-                            className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                        />
+            <div className="relative mb-8" ref={dropdownRef}>
+                <div
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg border border-gray-200"
+                >
+                    <div className="flex items-center gap-2">
+                        {selectedKredit?.icon && (
+                            <img 
+                                src={selectedKredit.icon} 
+                                alt=""
+                                className="w-6 h-6 object-contain"
+                                onError={(e) => e.target.style.display = 'none'}
+                            />
+                        )}
+                        <span className="text-gray-800 font-medium">
+                            {selectedKredit?.title || 'Izvēlieties kredītu'}
+                        </span>
                     </div>
+                    <ChevronDown 
+                        className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    />
+                </div>
 
-                    {isDropdownOpen && (
-                        <div className="absolute w-full mt-1 bg-white rounded-lg shadow-lg z-[100] border border-gray-200">
+                {isDropdownOpen && (
+                    <div 
+                        className="absolute w-full mt-1 bg-white rounded-lg shadow-lg z-[100] border border-gray-200"
+                        style={{ maxHeight: '300px', overflowY: 'auto' }}
+                    >
 
                             {kredits.map((kredit) => (
                                 <div
                                     key={kredit.id}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
+                                    onClick={() => {
                                         setSelectedKredit(kredit);
                                         setIsDropdownOpen(false);
-                                        if (kredit.url) {
-                                            window.location.href = kredit.url;
-                                        }
                                     }}
-                                    className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                                    className={`flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer ${selectedKredit?.id === kredit.id ? 'bg-gray-50' : ''}`}
                                 >
-                                    {renderKreditIcon(kredit)}
+                                    {kredit.icon && (
+                                        <img 
+                                            src={kredit.icon} 
+                                            alt=""
+                                            className="w-6 h-6 object-contain"
+                                            onError={(e) => e.target.style.display = 'none'}
+                                        />
+                                    )}
                                     <span className="text-gray-800">{kredit.title}</span>
                                 </div>
                             ))}
                         </div>
                     )}
-                </div>      
-            )}
+                </div>
 
             {/* Amount Slider */}
             <div className="mb-8">
