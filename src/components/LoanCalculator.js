@@ -1,7 +1,58 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 
+// Slider styles
+const sliderStyles = `
+  .range-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #E5E7EB;
+    outline: none;
+    position: relative;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4F46E5;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+  }
+
+  .range-slider::-webkit-slider-thumb:hover {
+    background: #4338CA;
+    transform: scale(1.1);
+  }
+
+  .range-slider::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    width: 100%;
+    cursor: pointer;
+    background: linear-gradient(to right, #4F46E5 var(--range-progress), #E5E7EB var(--range-progress));
+    border-radius: 4px;
+  }
+`;
+
 const LoanCalculator = () => {
+    // Add slider styles to document
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = sliderStyles;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
+    // Update slider progress
+    const updateSliderProgress = (value, min, max) => {
+        const progress = ((value - min) / (max - min)) * 100;
+        return `${progress}%`;
+    };
     // State declarations
     const [kredits, setKredits] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -355,7 +406,8 @@ const LoanCalculator = () => {
                         max="25000"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        className="range-slider"
+                        style={{ '--range-progress': updateSliderProgress(amount, 500, 25000) }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
@@ -377,7 +429,8 @@ const LoanCalculator = () => {
                         max="120"
                         value={term}
                         onChange={(e) => setTerm(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        className="range-slider"
+                        style={{ '--range-progress': updateSliderProgress(term, 3, 120) }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>3 mēn.</span>
