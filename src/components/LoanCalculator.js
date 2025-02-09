@@ -558,7 +558,7 @@ const LoanCalculator = () => {
                                 }
                             }}
                             style={{ textIndent: '2.2rem' }}
-                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
+                            className={`w-full px-4 border-color-[#e5e5e5] py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
                         />
                         {errors.phone && (
                             <div className="text-red-500 text-sm mt-1">{errors.phone}</div>
