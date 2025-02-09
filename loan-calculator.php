@@ -10,7 +10,39 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Register Kredits Custom Post Type
 
+
+
+function render_kredit_icon_meta_box($post) {
+    $icon = get_post_meta($post->ID, 'kredita_ikona', true);
+    wp_nonce_field('kredit_icon_meta_box', 'kredit_icon_meta_box_nonce');
+    ?>
+    <p>
+        <label for="kredita_ikona">Icon URL:</label>
+        <input type="text" id="kredita_ikona" name="kredita_ikona" value="<?php echo esc_attr($icon); ?>" style="width: 100%">
+    </p>
+    <?php
+}
+
+function save_kredit_meta_boxes($post_id) {
+    if (!isset($_POST['kredit_icon_meta_box_nonce'])) {
+        return;
+    }
+
+    if (!wp_verify_nonce($_POST['kredit_icon_meta_box_nonce'], 'kredit_icon_meta_box')) {
+        return;
+    }
+
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (isset($_POST['kredita_ikona'])) {
+        update_post_meta($post_id, 'kredita_ikona', sanitize_text_field($_POST['kredita_ikona']));
+    }
+}
+add_action('save_post', 'save_kredit_meta_boxes');
 
 // Enqueue Scripts and Styles
 function loan_calculator_enqueue_scripts() {
@@ -42,7 +74,7 @@ function loan_calculator_enqueue_scripts() {
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => get_field('kredita_ikona', $kredit->ID),
+            'icon' => get_post_meta($kredit->ID, 'kredita_ikona', true),
             'slug' => $kredit->post_name
         ];
     }, $kredits);
@@ -90,22 +122,3 @@ function loan_calculator_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('loan_calculator', 'loan_calculator_shortcode');
-
-
-
-// Shortcodes
-function full_loan_calculator_shortcode() {
-    ob_start();
-    ?>
-    <div id="full-loan-calculator-root">
-        <div class="loading-message" style="padding: 20px; text-align: center;">
-            Loading calculator...
-        </div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
-add_shortcode('full_loan_calculator', 'full_loan_calculator_shortcode');
-
-
-
