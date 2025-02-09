@@ -3,107 +3,185 @@
  * Plugin Name: Loan Calculator
  * Description: Modern loan calculator with React
  * Version: 1.0.0
+ * Author: Your Name
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
+// Register Kredits Custom Post Type
+
+
+
+function render_kredit_icon_meta_box($post) {
+    $icon = get_post_meta($post->ID, 'kredita_ikona', true);
+    wp_nonce_field('kredit_icon_meta_box', 'kredit_icon_meta_box_nonce');
+    ?>
+    <p>
+        <label for="kredita_ikona">Icon URL:</label>
+        <input type="text" id="kredita_ikona" name="kredita_ikona" value="<?php echo esc_attr($icon); ?>" style="width: 100%">
+    </p>
+    <?php
+}
+
+function save_kredit_meta_boxes($post_id) {
+    if (!isset($_POST['kredit_icon_meta_box_nonce'])) {
+        return;
+    }
+
+    if (!wp_verify_nonce($_POST['kredit_icon_meta_box_nonce'], 'kredit_icon_meta_box')) {
+        return;
+    }
+
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (isset($_POST['kredita_ikona'])) {
+        update_post_meta($post_id, 'kredita_ikona', sanitize_text_field($_POST['kredita_ikona']));
+    }
+}
+add_action('save_post', 'save_kredit_meta_boxes');
+
+// Enqueue Scripts and Styles
 function loan_calculator_enqueue_scripts() {
-    global $post;
-    
-    // Explicitly load WordPress React
-    wp_enqueue_script('react');
-    wp_enqueue_script('react-dom');
-    
-    // Check if we're on the form page
-    $is_form_page = has_shortcode($post->post_content, 'full_loan_calculator');
-    
+    // Register scripts
+    wp_register_script(
+        'loan-calculator', 
+        plugins_url('build/main.js', __FILE__),
+        ['wp-element', 'wp-components'], // wp-element contains React
+        filemtime(plugin_dir_path(__FILE__) . 'build/main.js'),
+        true
+    );
+
+    // Register full calculator script
+    wp_register_script(
+        'full-calculator', 
+        plugins_url('build/fullCalculator.js', __FILE__),
+        ['wp-element', 'wp-components', 'loan-calculator'],
+        filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
+        true
+    );
+
     // Get all kredits posts
     $kredits = get_posts([
         'post_type' => 'kredits',
         'posts_per_page' => -1,
         'orderby' => 'menu_order',
-        'order' => 'ASC'
+        'order' => 'ASC',
+        'post_status' => 'publish'
     ]);
 
+    // Transform kredits data
     $kredits_data = array_map(function($kredit) {
-        // Using ACF's get_field which automatically returns the URL for image fields
-        $icon = function_exists('get_field') ? get_field('kredita_ikona', $kredit->ID) : '';
+        $icon = get_post_meta($kredit->ID, 'kredita_ikona', true);
+        $icon_url = !empty($icon) ? esc_url_raw($icon) : null;
+        
+        // Ensure icon URL is absolute and uses HTTPS
+        if ($icon_url && strpos($icon_url, 'http') !== 0) {
+            $icon_url = get_site_url(null, $icon_url);
+        }
+        $icon_url = str_replace('http://', 'https://', $icon_url);
         
         return [
             'id' => $kredit->ID,
-            'title' => esc_html($kredit->post_title),
-            'url' => esc_url(get_permalink($kredit->ID)),
-            'icon' => esc_url($icon)
+            'title' => $kredit->post_title,
+            'url' => get_permalink($kredit->ID),
+            'icon' => $icon_url,
+            'slug' => $kredit->post_name
         ];
     }, $kredits);
 
-    // Localize script with kredits data
-    wp_localize_script(
-        $is_form_page ? 'full-loan-calculator' : 'loan-calculator',
-        'loanCalculatorData',
-        ['kredits' => $kredits_data]
-    );
+    // Common data
+    $calculator_data = [
+        'kredits' => $kredits_data,
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('loan_calculator_nonce'),
+        'siteUrl' => get_site_url(),
+        'currentPostId' => get_the_ID()
+    ];
+
+    // Localize script for both calculators
+    wp_localize_script('loan-calculator', 'loanCalculatorData', $calculator_data);
+    wp_localize_script('full-calculator', 'loanCalculatorData', $calculator_data);
     
-    // Enqueue the appropriate script based on the page
-    if ($is_form_page) {
-        wp_enqueue_script(
-            'full-loan-calculator',
-            plugins_url('build/fullCalculator.js', __FILE__),
-            ['react', 'react-dom'],
-            filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
-            true
-        );
-    } else {
-        wp_enqueue_script(
-            'loan-calculator', 
-            plugins_url('build/main.js', __FILE__),
-            ['react', 'react-dom'],
-            filemtime(plugin_dir_path(__FILE__) . 'build/main.js'),
-            true
-        );
+    // Check for shortcodes in the current content
+    global $post;
+    $should_load_calculator = false;
+    $should_load_full_calculator = false;
+    
+    if ($post && $post->post_content) {
+        $should_load_calculator = has_shortcode($post->post_content, 'loan_calculator');
+        $should_load_full_calculator = has_shortcode($post->post_content, 'full_calculator');
+    }
+    
+    // Also check for shortcodes in widgets
+    if (!$should_load_calculator && !$should_load_full_calculator) {
+        $widgets = get_option('widget_text');
+        if (is_array($widgets)) {
+            foreach ($widgets as $widget) {
+                if (is_array($widget) && isset($widget['text'])) {
+                    if (strpos($widget['text'], '[loan_calculator]') !== false) {
+                        $should_load_calculator = true;
+                    }
+                    if (strpos($widget['text'], '[full_calculator]') !== false) {
+                        $should_load_full_calculator = true;
+                    }
+                }
+            }
+        }
     }
 
-    // Enqueue the processed CSS from build directory
+    // Enqueue scripts if needed
+    if ($should_load_calculator) {
+        wp_enqueue_script('loan-calculator');
+    }
+    if ($should_load_full_calculator) {
+        wp_enqueue_script('full-calculator');
+    }
+
+    // Enqueue styles
     wp_enqueue_style(
         'loan-calculator-style',
         plugins_url('build/main.css', __FILE__),
         [],
         filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
     );
+
+    // Debug output if needed
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Loan Calculator Data: ' . print_r($calculator_data, true));
+    }
 }
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
-function loan_calculator_shortcode($atts) {
-    // Parse shortcode attributes with defaults
-    $attributes = shortcode_atts([
-        'min_amount' => 500,
-        'max_amount' => 25000,
-        'default_amount' => 3000,
-        'min_term' => 3,
-        'max_term' => 120,
-        'default_term' => 36,
-        'interest_rate' => 12, // Annual interest rate in percentage
-        'currency' => '€'
-    ], $atts);
-
-    // Pass attributes to JavaScript
-    wp_localize_script(
-        'loan-calculator',
-        'calculatorConfig',
-        $attributes
-    );
-
-    return '<div id="loan-calculator-root" class="loan-calculator-wrapper"></div>';
-}
-add_shortcode('loan_calculator', 'loan_calculator_shortcode');
-
-function full_loan_calculator_shortcode() {
-    return '<div id="full-calculator-root">
+// Shortcodes
+function loan_calculator_shortcode() {
+    // Enqueue the script
+    wp_enqueue_script('loan-calculator');
+    
+    ob_start();
+    ?>
+    <div id="loan-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
             Loading calculator...
         </div>
-    </div>';
+    </div>
+    <?php
+    return ob_get_clean();
 }
-add_shortcode('full_loan_calculator', 'full_loan_calculator_shortcode');
+add_shortcode('loan_calculator', 'loan_calculator_shortcode');
+
+function full_calculator_shortcode() {
+    ob_start();
+    ?>
+    <div id="full-calculator-root">
+        <div class="loading-message" style="padding: 20px; text-align: center;">
+            Loading full calculator...
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('full_calculator', 'full_calculator_shortcode');
