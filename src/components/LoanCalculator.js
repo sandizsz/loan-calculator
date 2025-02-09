@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronDown, Info, Shield } from 'lucide-react';
 
+// Add styles for range input thumb
+const sliderStyles = `
+    input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        background: #4F46E5;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -8px;
+    }
+    input[type='range']::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        background: #4F46E5;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+    }
+`;
+
 // Helper function to get slider background
 const getSliderBackground = (value, min, max) => {
     const percentage = ((value - min) / (max - min)) * 100;
@@ -8,6 +30,14 @@ const getSliderBackground = (value, min, max) => {
 };
 
 const LoanCalculator = () => {
+    // Add slider styles to document
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = sliderStyles;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
 
     // State declarations
     const [kredits, setKredits] = useState([]);
