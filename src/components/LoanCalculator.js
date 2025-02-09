@@ -260,9 +260,14 @@ const LoanCalculator = () => {
         <div className="calculator-container">
             {/* Dropdown Header */}
             {kredits.length > 0 && (
-                <div className="relative mb-8" ref={dropdownRef}>
+                <div 
+                    className="relative mb-8" 
+                    ref={dropdownRef}
+                    onMouseLeave={() => setIsDropdownOpen(false)}
+                >
                     <div
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        onMouseEnter={() => setIsDropdownOpen(true)}
                         className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-50 rounded-lg"
                     >
                         <div className="flex items-center gap-2">
@@ -277,14 +282,21 @@ const LoanCalculator = () => {
                     </div>
 
                     {isDropdownOpen && (
-                        <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-50 py-1 border border-gray-100">
+                        <div 
+                            className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-[100] py-1 border border-gray-100"
+                            onMouseEnter={() => setIsDropdownOpen(true)}
+                        >
                             {kredits.map((kredit) => (
                                 <div
                                     key={kredit.id}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
                                         setSelectedKredit(kredit);
-                                        setIsDropdownOpen(false);
-                                        window.location.href = kredit.url;
+                                        // Delay navigation to allow hover effect
+                                        setTimeout(() => {
+                                            window.location.href = kredit.url;
+                                        }, 150);
                                     }}
                                     className="flex items-center gap-2 p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                                 >
