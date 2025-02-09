@@ -50,7 +50,7 @@ function loan_calculator_enqueue_scripts() {
     wp_register_script(
         'loan-calculator', 
         plugins_url('build/main.js', __FILE__),
-        ['wp-element'], // wp-element contains React
+        ['wp-element', 'wp-components'], // wp-element contains React
         filemtime(plugin_dir_path(__FILE__) . 'build/main.js'),
         true
     );
@@ -59,7 +59,7 @@ function loan_calculator_enqueue_scripts() {
     wp_register_script(
         'full-calculator', 
         plugins_url('build/fullCalculator.js', __FILE__),
-        ['wp-element', 'loan-calculator'],
+        ['wp-element', 'wp-components', 'loan-calculator'],
         filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
         true
     );
@@ -75,11 +75,12 @@ function loan_calculator_enqueue_scripts() {
 
     // Transform kredits data
     $kredits_data = array_map(function($kredit) {
+        $icon = get_post_meta($kredit->ID, 'kredita_ikona', true);
         return [
             'id' => $kredit->ID,
             'title' => $kredit->post_title,
             'url' => get_permalink($kredit->ID),
-            'icon' => get_post_meta($kredit->ID, 'kredita_ikona', true),
+            'icon' => !empty($icon) ? esc_url($icon) : null,
             'slug' => $kredit->post_name
         ];
     }, $kredits);
@@ -149,6 +150,9 @@ add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
 // Shortcodes
 function loan_calculator_shortcode() {
+    // Enqueue the script
+    wp_enqueue_script('loan-calculator');
+    
     ob_start();
     ?>
     <div id="loan-calculator-root">

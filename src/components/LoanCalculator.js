@@ -18,21 +18,46 @@ const LoanCalculator = () => {
 
     // Load WordPress data
     useEffect(() => {
-        const wpData = window.loanCalculatorData || {};
-        console.log('WordPress Data:', wpData);
-        
-        if (wpData.kredits && Array.isArray(wpData.kredits)) {
-            setKredits(wpData.kredits);
+        try {
+            const wpData = window.loanCalculatorData;
+            console.log('WordPress Data:', wpData);
+            
+            if (!wpData) {
+                console.error('loanCalculatorData not found in window object');
+                setIsLoading(false);
+                return;
+            }
+
+            if (!Array.isArray(wpData.kredits)) {
+                console.error('kredits is not an array:', wpData.kredits);
+                setIsLoading(false);
+                return;
+            }
+
+            // Filter out kredits without required data
+            const validKredits = wpData.kredits.filter(kredit => 
+                kredit && kredit.title && (kredit.slug || kredit.url)
+            );
+
+            if (validKredits.length === 0) {
+                console.error('No valid kredits found');
+                setIsLoading(false);
+                return;
+            }
+
+            setKredits(validKredits);
             
             // Set initial selected kredit
             const currentUrl = window.location.href;
-            const matchingKredit = wpData.kredits.find(kredit => 
+            const matchingKredit = validKredits.find(kredit => 
                 currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
             );
-            setSelectedKredit(matchingKredit || wpData.kredits[0]);
+            setSelectedKredit(matchingKredit || validKredits[0]);
+        } catch (error) {
+            console.error('Error loading calculator data:', error);
+        } finally {
+            setIsLoading(false);
         }
-        
-        setIsLoading(false);
     }, []);
 
     // Add styles to document head
@@ -267,6 +292,10 @@ const LoanCalculator = () => {
 
     if (isLoading) {
         return <div className="p-4 text-center">Loading calculator...</div>;
+    }
+
+    if (kredits.length === 0) {
+        return <div className="p-4 text-center">No kredits available.</div>;
     }
 
     return (
