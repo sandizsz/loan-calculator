@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, User, Mail, Phone, Building2, FileText, Briefcase, 
-         AlertCircle, Euro, Calendar, Clock, Target, Shield, Search, MessageCircle } from 'lucide-react';
+         AlertCircle, Euro, Calendar, Clock, Target, Shield } from 'lucide-react';
 import * as Progress from '@radix-ui/react-progress';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
+import * as Select from '@radix-ui/react-select';
 
 // Constants
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 2;
 
 // Form Components
 const ProgressBar = ({ currentStep, totalSteps }) => {
@@ -89,16 +90,36 @@ const TextArea = ({ icon: Icon, ...props }) => (
 function FullCalculator() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-        // Personal Info
+        // Contact and Company Information
         fullName: '',
         email: '',
         phone: '',
-        
-        // Company Info
         companyName: '',
         registrationNumber: '',
+        companyAge: '',
+        annualTurnover: '',
+        profitLoss: '',
         position: '',
         mainActivity: '',
+
+        // Financial Information
+        currentLoanAmount: '',
+        currentLoanInstitution: '',
+        taxDebt: '',
+        taxDebtAmount: '',
+        delayedPayments: false,
+        requiredAmount: '',
+        desiredTerm: '',
+        urgency: '',
+        purpose: [],
+        financialProduct: '',
+        collateral: '',
+        collateralDescription: '',
+        otherInstitutions: false,
+        
+        // Consent
+        dataProcessing: false,
+        marketing: false,
         companyDescription: '',
         
         // Financial Info
@@ -432,7 +453,7 @@ function FullCalculator() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 rounded-xl shadow-lg">
+        <div className="max-w-2xl mx-auto p-6 rounded-xl">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Aizpildi pieteikumu</h2>
             <p className="text-gray-600 mb-8">Aizpildīšanas laiks var aizņemt līdz 5 minūtēm.</p>
             
