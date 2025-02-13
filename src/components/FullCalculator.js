@@ -1,13 +1,80 @@
 import React, { useState } from 'react';
 import { ChevronDown, User, Mail, Phone, Building2, FileText, Briefcase, 
-         AlertCircle, Euro, Calendar, Clock, Target, Shield } from 'lucide-react';
+         AlertCircle, Euro, Calendar, Clock, Target, Shield, Check } from 'lucide-react';
 import * as Progress from '@radix-ui/react-progress';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
-import * as Select from '@radix-ui/react-select';
 
 // Constants
 const TOTAL_STEPS = 2;
+
+// Form field options
+const COMPANY_AGE_OPTIONS = [
+    { value: 'less2', label: '< 2 gads' },
+    { value: '2to5', label: '2–5 gadi' },
+    { value: 'more5', label: '> 5 gadi' }
+];
+
+const TURNOVER_OPTIONS = [
+    { value: 'less200k', label: '< 200 000' },
+    { value: '200kto500k', label: '200 001 – 500 000' },
+    { value: '500kto1m', label: '500 001 – 1 000 000' },
+    { value: 'more1m', label: '> 1 000 000' }
+];
+
+const PROFIT_LOSS_OPTIONS = [
+    { value: 'profit', label: 'Peļņa' },
+    { value: 'loss', label: 'Zaudējumi' },
+    { value: 'noData', label: 'Nav pieejamu datu' }
+];
+
+const POSITION_OPTIONS = [
+    { value: 'owner', label: 'Īpašnieks' },
+    { value: 'board', label: 'Valdes loceklis' },
+    { value: 'finance', label: 'Finanšu direktors' },
+    { value: 'other', label: 'Cits' }
+];
+
+const TAX_DEBT_OPTIONS = [
+    { value: 'none', label: 'Nav' },
+    { value: 'withSchedule', label: 'Ir, ar VID grafiku' },
+    { value: 'withoutSchedule', label: 'Ir, bez VID grafika' }
+];
+
+const DELAYED_PAYMENTS_OPTIONS = [
+    { value: 'yes', label: 'Jā' },
+    { value: 'no', label: 'Nē' }
+];
+
+const PURPOSE_OPTIONS = [
+    { value: 'workingCapital', label: 'Apgrozāmie līdzekļi' },
+    { value: 'equipment', label: 'Iekārtu iegāde' },
+    { value: 'realEstate', label: 'Nekustamais īpašums' },
+    { value: 'vehicles', label: 'Transportlīdzekļi' },
+    { value: 'refinancing', label: 'Refinansēšana' },
+    { value: 'other', label: 'Cits' }
+];
+
+const FINANCIAL_PRODUCT_OPTIONS = [
+    { value: 'loan', label: 'Aizdevums' },
+    { value: 'creditLine', label: 'Kredītlīnija' },
+    { value: 'leasing', label: 'Līzings' },
+    { value: 'factoring', label: 'Faktorings' },
+    { value: 'other', label: 'Cits' }
+];
+
+const COLLATERAL_OPTIONS = [
+    { value: 'realEstate', label: 'Nekustamais īpašums' },
+    { value: 'vehicles', label: 'Transportlīdzekļi' },
+    { value: 'commercial', label: 'Komercķīla' },
+    { value: 'none', label: 'Nav nodrošinājuma' },
+    { value: 'other', label: 'Cits' }
+];
+
+const OTHER_INSTITUTIONS_OPTIONS = [
+    { value: 'yes', label: 'Jā' },
+    { value: 'no', label: 'Nē' }
+];
 
 // Form Components
 const ProgressBar = ({ currentStep, totalSteps }) => {
@@ -31,29 +98,29 @@ const ProgressBar = ({ currentStep, totalSteps }) => {
     );
 };
 
-const FormField = ({ name, label, error, children }) => (
+const FormField = ({ name, label, error, required = false, children }) => (
     <div className="mb-6">
         <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-2">
-            {label}
+            {label} {required && <span className="text-red-500">*</span>}
         </label>
         {children}
         {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
     </div>
 );
 
-const Input = ({ icon: Icon, ...props }) => (
+const Input = ({ icon: Icon, error, ...props }) => (
     <div className="relative">
         {Icon && (
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         )}
         <input
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${props.error ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
             {...props}
         />
     </div>
 );
 
-const SelectInput = ({ icon: Icon, options, value, onChange, placeholder }) => (
+const SelectInput = ({ icon: Icon, options, value, onChange, placeholder, error }) => (
     <div className="relative">
         {Icon && (
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -61,7 +128,7 @@ const SelectInput = ({ icon: Icon, options, value, onChange, placeholder }) => (
         <select
             value={value}
             onChange={onChange}
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 bg-white appearance-none cursor-pointer`}
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'} bg-white appearance-none cursor-pointer`}
         >
             <option value="">{placeholder}</option>
             {options.map((option) => (
@@ -74,19 +141,63 @@ const SelectInput = ({ icon: Icon, options, value, onChange, placeholder }) => (
     </div>
 );
 
-const TextArea = ({ icon: Icon, ...props }) => (
+const TextArea = ({ icon: Icon, error, ...props }) => (
     <div className="relative">
         {Icon && (
             <Icon className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
         )}
         <textarea
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${props.error ? 'border-red-500' : 'border-gray-300'} min-h-[100px]`}
+            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'} min-h-[100px]`}
             {...props}
         />
     </div>
 );
 
 // Main Component
+const RadioInput = ({ options, value, onChange }) => (
+    <RadioGroup.Root
+        className="flex gap-4 flex-wrap"
+        value={value}
+        onValueChange={onChange}
+    >
+        {options.map((option) => (
+            <div key={option.value} className="flex items-center">
+                <RadioGroup.Item
+                    id={option.value}
+                    value={option.value}
+                    className="w-4 h-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2 after:h-2 after:rounded-full after:bg-indigo-600" />
+                </RadioGroup.Item>
+                <label
+                    htmlFor={option.value}
+                    className="ml-2 text-sm text-gray-700"
+                >
+                    {option.label}
+                </label>
+            </div>
+        ))}
+    </RadioGroup.Root>
+);
+
+const CheckboxInput = ({ id, label, checked, onChange, error }) => (
+    <div className="flex items-start">
+        <Checkbox.Root
+            id={id}
+            checked={checked}
+            onCheckedChange={onChange}
+            className={`w-4 h-4 mt-1 rounded border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+        >
+            <Checkbox.Indicator>
+                <Check className="w-3 h-3 text-indigo-600" />
+            </Checkbox.Indicator>
+        </Checkbox.Root>
+        <label htmlFor={id} className="ml-2 text-sm text-gray-700">
+            {label}
+        </label>
+    </div>
+);
+
 function FullCalculator() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -107,7 +218,7 @@ function FullCalculator() {
         currentLoanInstitution: '',
         taxDebt: '',
         taxDebtAmount: '',
-        delayedPayments: false,
+        delayedPayments: 'no',
         requiredAmount: '',
         desiredTerm: '',
         urgency: '',
@@ -115,374 +226,364 @@ function FullCalculator() {
         financialProduct: '',
         collateral: '',
         collateralDescription: '',
-        otherInstitutions: false,
+        otherInstitutions: 'no',
         
         // Consent
         dataProcessing: false,
-        marketing: false,
-        companyDescription: '',
-        
-        // Financial Info
-        currentLoans: '',
-        taxDebt: 'none', // none, withSchedule, withoutSchedule
-        taxDebtAmount: '',
-        requiredAmount: '',
-        term: '',
-        urgency: '',
-        purpose: [],
-        product: '',
-        
-        // Additional Info
-        collateral: '',
-        collateralDescription: '',
-        previousApplications: '',
-        previousApplicationsDetails: '',
-        referralSource: '',
-        manager: '',
-        
-        // Agreements
-        acceptTerms: false,
-        acceptMarketing: false
+        marketing: false
     });
 
+    const [errors, setErrors] = useState({});
+
     const handleInputChange = (name, value) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const nextStep = () => {
-        if (currentStep < TOTAL_STEPS) {
-            setCurrentStep(prev => prev + 1);
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
         }
     };
 
-    const prevStep = () => {
-        if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // Required fields for Step 1
+        if (currentStep === 1) {
+            if (!formData.fullName) newErrors.fullName = 'Šis lauks ir obligāts';
+            if (!formData.email) newErrors.email = 'Šis lauks ir obligāts';
+            if (!formData.phone) newErrors.phone = 'Šis lauks ir obligāts';
+            if (!formData.companyName) newErrors.companyName = 'Šis lauks ir obligāts';
+            if (!formData.registrationNumber) newErrors.registrationNumber = 'Šis lauks ir obligāts';
+        }
+        
+        // Required fields for Step 2
+        if (currentStep === 2) {
+            if (!formData.currentLoanAmount) newErrors.currentLoanAmount = 'Šis lauks ir obligāts';
+            if (!formData.requiredAmount) newErrors.requiredAmount = 'Šis lauks ir obligāts';
+            if (!formData.desiredTerm) newErrors.desiredTerm = 'Šis lauks ir obligāts';
+            if (!formData.dataProcessing) newErrors.dataProcessing = 'Jums jāpiekrīt datu apstrādei';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleNext = () => {
+        if (validateForm()) {
+            setCurrentStep(prev => Math.min(prev + 1, TOTAL_STEPS));
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleBack = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission
-        console.log('Form submitted:', formData);
-    };
-
-    const renderStep = () => {
-        switch (currentStep) {
-            case 1:
-                return (
-                    <div className="space-y-6">
-                        <FormField name="fullName" label="Vārds Uzvārds">
-                            <Input 
-                                icon={User}
-                                type="text"
-                                name="fullName"
-                                value={formData.fullName}
-                                onChange={(e) => handleInputChange('fullName', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="email" label="E-pasts">
-                            <Input 
-                                icon={Mail}
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={(e) => handleInputChange('email', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="phone" label="Tālrunis">
-                            <Input 
-                                icon={Phone}
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={(e) => handleInputChange('phone', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-                );
-                
-            case 2:
-                return (
-                    <div className="space-y-6">
-                        <FormField name="companyName" label="Uzņēmuma nosaukums">
-                            <Input 
-                                icon={Building2}
-                                type="text"
-                                name="companyName"
-                                value={formData.companyName}
-                                onChange={(e) => handleInputChange('companyName', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="registrationNumber" label="Reģistrācijas nr.">
-                            <Input 
-                                icon={FileText}
-                                type="text"
-                                name="registrationNumber"
-                                value={formData.registrationNumber}
-                                onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="position" label="Jūsu pozīcija uzņēmumā">
-                            <Input 
-                                icon={Briefcase}
-                                type="text"
-                                name="position"
-                                value={formData.position}
-                                onChange={(e) => handleInputChange('position', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="mainActivity" label="Pamata darbība">
-                            <Input 
-                                type="text"
-                                name="mainActivity"
-                                value={formData.mainActivity}
-                                onChange={(e) => handleInputChange('mainActivity', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="companyDescription" label="Īsi aprakstiet ar ko nodarbojas uzņēmums">
-                            <TextArea 
-                                name="companyDescription"
-                                value={formData.companyDescription}
-                                onChange={(e) => handleInputChange('companyDescription', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-                );
-                
-            case 3:
-                return (
-                    <div className="space-y-6">
-                        <FormField name="currentLoans" label="Tekošās kredītsaistības">
-                            <TextArea 
-                                name="currentLoans"
-                                placeholder="Tekošās kredītsastības - pamatsummas atlikumu EUR un finanšu iestādi"
-                                value={formData.currentLoans}
-                                onChange={(e) => handleInputChange('currentLoans', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="taxDebt" label="Nodokļu parāds">
-                            <RadioGroup.Root
-                                className="flex flex-col space-y-2"
-                                value={formData.taxDebt}
-                                onValueChange={(value) => handleInputChange('taxDebt', value)}
-                            >
-                                <div className="flex items-center">
-                                    <RadioGroup.Item
-                                        value="none"
-                                        className="w-4 h-4 rounded-full border border-gray-300 mr-2"
-                                    />
-                                    <label>Nav</label>
-                                </div>
-                                <div className="flex items-center">
-                                    <RadioGroup.Item
-                                        value="withSchedule"
-                                        className="w-4 h-4 rounded-full border border-gray-300 mr-2"
-                                    />
-                                    <label>Ir, ar VID grafiku</label>
-                                </div>
-                                <div className="flex items-center">
-                                    <RadioGroup.Item
-                                        value="withoutSchedule"
-                                        className="w-4 h-4 rounded-full border border-gray-300 mr-2"
-                                    />
-                                    <label>Ir, bez VID grafika</label>
-                                </div>
-                            </RadioGroup.Root>
-                        </FormField>
-                        
-                        {formData.taxDebt !== 'none' && (
-                            <FormField name="taxDebtAmount" label="Nodokļu parāda summa">
-                                <Input 
-                                    icon={Euro}
-                                    type="number"
-                                    name="taxDebtAmount"
-                                    value={formData.taxDebtAmount}
-                                    onChange={(e) => handleInputChange('taxDebtAmount', e.target.value)}
-                                />
-                            </FormField>
-                        )}
-                        
-                        <FormField name="requiredAmount" label="Nepieciešamā summa EUR">
-                            <Input 
-                                icon={Euro}
-                                type="number"
-                                name="requiredAmount"
-                                value={formData.requiredAmount}
-                                onChange={(e) => handleInputChange('requiredAmount', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="term" label="Velamais terminš">
-                            <Input 
-                                icon={Calendar}
-                                type="text"
-                                name="term"
-                                placeholder="Norādot mēneši/gadi"
-                                value={formData.term}
-                                onChange={(e) => handleInputChange('term', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-                );
-                
-            case 4:
-                return (
-                    <div className="space-y-6">
-                        <FormField name="urgency" label="Cik ātri nepieciešams kredīts">
-                            <Input 
-                                icon={Clock}
-                                type="text"
-                                name="urgency"
-                                value={formData.urgency}
-                                onChange={(e) => handleInputChange('urgency', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="purpose" label="Kredīta mērķis (var būt vairāki)">
-                            <Input 
-                                icon={Target}
-                                type="text"
-                                name="purpose"
-                                value={formData.purpose}
-                                onChange={(e) => handleInputChange('purpose', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="product" label="Nepieciešamais produkts">
-                            <Input 
-                                type="text"
-                                name="product"
-                                value={formData.product}
-                                onChange={(e) => handleInputChange('product', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="collateral" label="Piedāvātais nodrošinājums">
-                            <Input 
-                                icon={Shield}
-                                type="text"
-                                name="collateral"
-                                value={formData.collateral}
-                                onChange={(e) => handleInputChange('collateral', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="collateralDescription" label="Aprakstiet piedāvāto nodrošinājumu">
-                            <TextArea 
-                                name="collateralDescription"
-                                value={formData.collateralDescription}
-                                onChange={(e) => handleInputChange('collateralDescription', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="previousApplications" label="Pēdējo 3 mēn. laikā esat vērsušies kādā no finanšu iestādēm?">
-                            <TextArea 
-                                icon={Search}
-                                name="previousApplications"
-                                placeholder="Ja jā - kur un kāda bija atbilde/statuss."
-                                value={formData.previousApplications}
-                                onChange={(e) => handleInputChange('previousApplications', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="referralSource" label="Kā par mums uzzinājāt?">
-                            <Input 
-                                icon={MessageCircle}
-                                type="text"
-                                name="referralSource"
-                                value={formData.referralSource}
-                                onChange={(e) => handleInputChange('referralSource', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <FormField name="manager" label="Jūsu menedžeris">
-                            <Input 
-                                type="text"
-                                name="manager"
-                                value={formData.manager}
-                                onChange={(e) => handleInputChange('manager', e.target.value)}
-                            />
-                        </FormField>
-                        
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox.Root
-                                    className="w-4 h-4 border border-gray-300 rounded"
-                                    checked={formData.acceptTerms}
-                                    onCheckedChange={(checked) => handleInputChange('acceptTerms', checked)}
-                                >
-                                    <Checkbox.Indicator>
-                                        <Check className="w-4 h-4 text-indigo-600" />
-                                    </Checkbox.Indicator>
-                                </Checkbox.Root>
-                                <label className="text-sm text-gray-600">
-                                    Spiežot pogu "Nosūtīt pieteikumu", Jūs piekrītat, ka norādītā informācija ir patiesa un piekrītat tās tālākai apstrādei. 
-                                    Kā arī piekrītat mūsu privātuma un lietošanas politikai.
-                                </label>
-                            </div>
-                            
-                            <div className="flex items-center space-x-2">
-                                <Checkbox.Root
-                                    className="w-4 h-4 border border-gray-300 rounded"
-                                    checked={formData.acceptMarketing}
-                                    onCheckedChange={(checked) => handleInputChange('acceptMarketing', checked)}
-                                >
-                                    <Checkbox.Indicator>
-                                        <Check className="w-4 h-4 text-indigo-600" />
-                                    </Checkbox.Indicator>
-                                </Checkbox.Root>
-                                <label className="text-sm text-gray-600">
-                                    Jā, es vēlētos saņemt mārketinga/informatīvās ziņas pa pastu, SMS vai telefonā.
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                );
-                
-            default:
-                return null;
+        if (validateForm()) {
+            // Handle form submission here
+            console.log('Form submitted:', formData);
         }
     };
+
+    const renderStep1 = () => (
+        <div className="space-y-6">
+            <h2 className="text-xl font-semibold mb-6">Kontaktinformācija un Uzņēmuma informācija</h2>
+            
+            <FormField name="fullName" label="Vārds, Uzvārds" required error={errors.fullName}>
+                <Input
+                    type="text"
+                    name="fullName"
+                    icon={User}
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    error={errors.fullName}
+                />
+            </FormField>
+
+            <FormField name="email" label="E-pasts" required error={errors.email}>
+                <Input
+                    type="email"
+                    name="email"
+                    icon={Mail}
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    error={errors.email}
+                />
+            </FormField>
+
+            <FormField name="phone" label="Tālrunis" required error={errors.phone}>
+                <Input
+                    type="tel"
+                    name="phone"
+                    icon={Phone}
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    error={errors.phone}
+                />
+            </FormField>
+
+            <FormField name="companyName" label="Uzņēmuma nosaukums" required error={errors.companyName}>
+                <Input
+                    type="text"
+                    name="companyName"
+                    icon={Building2}
+                    value={formData.companyName}
+                    onChange={(e) => handleInputChange('companyName', e.target.value)}
+                    error={errors.companyName}
+                />
+            </FormField>
+
+            <FormField name="registrationNumber" label="Reģistrācijas numurs" required error={errors.registrationNumber}>
+                <Input
+                    type="text"
+                    name="registrationNumber"
+                    icon={FileText}
+                    value={formData.registrationNumber}
+                    onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                    error={errors.registrationNumber}
+                />
+            </FormField>
+
+            <FormField name="companyAge" label="Uzņēmuma vecums">
+                <RadioInput
+                    options={COMPANY_AGE_OPTIONS}
+                    value={formData.companyAge}
+                    onChange={(value) => handleInputChange('companyAge', value)}
+                />
+            </FormField>
+
+            <FormField name="annualTurnover" label="Apgrozījums pēdējā gadā (EUR)">
+                <RadioInput
+                    options={TURNOVER_OPTIONS}
+                    value={formData.annualTurnover}
+                    onChange={(value) => handleInputChange('annualTurnover', value)}
+                />
+            </FormField>
+
+            <FormField name="profitLoss" label="Peļņa vai zaudējumi pēdējā gadā">
+                <RadioInput
+                    options={PROFIT_LOSS_OPTIONS}
+                    value={formData.profitLoss}
+                    onChange={(value) => handleInputChange('profitLoss', value)}
+                />
+            </FormField>
+
+            <FormField name="position" label="Jūsu pozīcija uzņēmumā">
+                <RadioInput
+                    options={POSITION_OPTIONS}
+                    value={formData.position}
+                    onChange={(value) => handleInputChange('position', value)}
+                />
+            </FormField>
+
+            <FormField name="mainActivity" label="Pamata darbība (īss apraksts)">
+                <TextArea
+                    name="mainActivity"
+                    icon={Briefcase}
+                    value={formData.mainActivity}
+                    onChange={(e) => handleInputChange('mainActivity', e.target.value)}
+                    placeholder="piemēram: būvniecība, tirdzniecība, ražošana utt."
+                />
+            </FormField>
+        </div>
+    );
+
+    const renderStep2 = () => (
+        <div className="space-y-6">
+            <h2 className="text-xl font-semibold mb-6">Finanses, Kredītsaistības, Aizdevuma vajadzības</h2>
+
+            <FormField name="currentLoanAmount" label="Tekošās kredītsaistības" required error={errors.currentLoanAmount}>
+                <div className="grid grid-cols-2 gap-4">
+                    <Input
+                        type="number"
+                        name="currentLoanAmount"
+                        icon={Euro}
+                        placeholder="Pamatsummas atlikums EUR"
+                        value={formData.currentLoanAmount}
+                        onChange={(e) => handleInputChange('currentLoanAmount', e.target.value)}
+                        error={errors.currentLoanAmount}
+                    />
+                    <Input
+                        type="text"
+                        name="currentLoanInstitution"
+                        icon={Building2}
+                        placeholder="Finanšu iestāde"
+                        value={formData.currentLoanInstitution}
+                        onChange={(e) => handleInputChange('currentLoanInstitution', e.target.value)}
+                    />
+                </div>
+            </FormField>
+
+            <FormField name="taxDebt" label="Vai uzņēmumam ir nodokļu parāds?">
+                <RadioInput
+                    options={TAX_DEBT_OPTIONS}
+                    value={formData.taxDebt}
+                    onChange={(value) => handleInputChange('taxDebt', value)}
+                />
+            </FormField>
+
+            {formData.taxDebt && formData.taxDebt !== 'none' && (
+                <FormField name="taxDebtAmount" label="Nodokļu parāda summa">
+                    <Input
+                        type="number"
+                        name="taxDebtAmount"
+                        icon={Euro}
+                        value={formData.taxDebtAmount}
+                        onChange={(e) => handleInputChange('taxDebtAmount', e.target.value)}
+                    />
+                </FormField>
+            )}
+
+            <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?">
+                <RadioInput
+                    options={DELAYED_PAYMENTS_OPTIONS}
+                    value={formData.delayedPayments}
+                    onChange={(value) => handleInputChange('delayedPayments', value)}
+                />
+            </FormField>
+
+            <FormField name="requiredAmount" label="Nepieciešamā summa (EUR)" required error={errors.requiredAmount}>
+                <Input
+                    type="number"
+                    name="requiredAmount"
+                    icon={Euro}
+                    value={formData.requiredAmount}
+                    onChange={(e) => handleInputChange('requiredAmount', e.target.value)}
+                    error={errors.requiredAmount}
+                />
+            </FormField>
+
+            <FormField name="desiredTerm" label="Vēlamais termiņš (mēneši/gadi)" required error={errors.desiredTerm}>
+                <Input
+                    type="text"
+                    name="desiredTerm"
+                    icon={Calendar}
+                    value={formData.desiredTerm}
+                    onChange={(e) => handleInputChange('desiredTerm', e.target.value)}
+                    error={errors.desiredTerm}
+                />
+            </FormField>
+
+            <FormField name="urgency" label="Cik ātri nepieciešams finansējums?">
+                <Input
+                    type="text"
+                    name="urgency"
+                    icon={Clock}
+                    value={formData.urgency}
+                    onChange={(e) => handleInputChange('urgency', e.target.value)}
+                />
+            </FormField>
+
+            <FormField name="purpose" label="Finansējuma mērķis (var būt vairāki)">
+                <div className="grid grid-cols-2 gap-4">
+                    {PURPOSE_OPTIONS.map((option) => (
+                        <CheckboxInput
+                            key={option.value}
+                            id={`purpose_${option.value}`}
+                            label={option.label}
+                            checked={formData.purpose.includes(option.value)}
+                            onChange={(checked) => {
+                                const newPurpose = checked
+                                    ? [...formData.purpose, option.value]
+                                    : formData.purpose.filter(p => p !== option.value);
+                                handleInputChange('purpose', newPurpose);
+                            }}
+                        />
+                    ))}
+                </div>
+            </FormField>
+
+            <FormField name="financialProduct" label="Nepieciešamais finanšu produkts">
+                <RadioInput
+                    options={FINANCIAL_PRODUCT_OPTIONS}
+                    value={formData.financialProduct}
+                    onChange={(value) => handleInputChange('financialProduct', value)}
+                />
+            </FormField>
+
+            <FormField name="collateral" label="Piedāvātais nodrošinājums">
+                <RadioInput
+                    options={COLLATERAL_OPTIONS}
+                    value={formData.collateral}
+                    onChange={(value) => handleInputChange('collateral', value)}
+                />
+            </FormField>
+
+            <FormField name="collateralDescription" label="Aprakstiet piedāvāto nodrošinājumu">
+                <TextArea
+                    name="collateralDescription"
+                    value={formData.collateralDescription}
+                    onChange={(e) => handleInputChange('collateralDescription', e.target.value)}
+                />
+            </FormField>
+
+            <FormField name="otherInstitutions" label="Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē?">
+                <RadioInput
+                    options={OTHER_INSTITUTIONS_OPTIONS}
+                    value={formData.otherInstitutions}
+                    onChange={(value) => handleInputChange('otherInstitutions', value)}
+                />
+            </FormField>
+
+            <div className="space-y-4 mt-8">
+                <CheckboxInput
+                    id="dataProcessing"
+                    label="Piekrītu datu apstrādei"
+                    checked={formData.dataProcessing}
+                    onChange={(checked) => handleInputChange('dataProcessing', checked)}
+                    error={errors.dataProcessing}
+                />
+
+                <CheckboxInput
+                    id="marketing"
+                    label="Vēlos saņemt mārketinga ziņas"
+                    checked={formData.marketing}
+                    onChange={(checked) => handleInputChange('marketing', checked)}
+                />
+            </div>
+        </div>
+    );
 
     return (
-        <div className="max-w-2xl mx-auto p-6 rounded-xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Aizpildi pieteikumu</h2>
-            <p className="text-gray-600 mb-8">Aizpildīšanas laiks var aizņemt līdz 5 minūtēm.</p>
-            
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
             <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
             
-            <form onSubmit={handleSubmit} className="space-y-8">
-                {renderStep()}
-                
-                <div className="flex justify-between pt-6">
-                    {currentStep > 1 && (
-                        <button
-                            type="button"
-                            onClick={prevStep}
-                            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Atpakaļ
-                        </button>
-                    )}
-                    
+            {currentStep === 1 && renderStep1()}
+            {currentStep === 2 && renderStep2()}
+
+            <div className="mt-8 flex justify-between">
+                {currentStep > 1 && (
                     <button
                         type="button"
-                        onClick={currentStep === TOTAL_STEPS ? handleSubmit : nextStep}
-                        className="ml-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={handleBack}
+                        className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     >
-                        {currentStep === TOTAL_STEPS ? 'Nosūtīt pieteikumu' : 'Tālāk'}
+                        Atpakaļ
                     </button>
-                </div>
-            </form>
-        </div>
+                )}
+                {currentStep < TOTAL_STEPS ? (
+                    <button
+                        type="button"
+                        onClick={handleNext}
+                        className="ml-auto px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Tālāk
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        className="ml-auto px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Iesniegt
+                    </button>
+                )}
+            </div>
+        </form>
     );
 }
 
