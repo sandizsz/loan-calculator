@@ -4,6 +4,7 @@ import { ChevronDown, User, Mail, Phone, Building2, FileText, Briefcase,
 import * as Progress from '@radix-ui/react-progress';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
+import * as Select from '@radix-ui/react-select';
 
 // Constants
 const TOTAL_STEPS = 2;
@@ -123,21 +124,39 @@ const Input = ({ icon: Icon, error, ...props }) => (
 const SelectInput = ({ icon: Icon, options, value, onChange, placeholder, error }) => (
     <div className="relative">
         {Icon && (
-            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
         )}
-        <select
-            value={value}
-            onChange={onChange}
-            className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'} bg-white appearance-none cursor-pointer`}
-        >
-            <option value="">{placeholder}</option>
-            {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+        <Select.Root value={value} onValueChange={onChange}>
+            <Select.Trigger
+                className={`inline-flex w-full items-center justify-between rounded-lg border ${error ? 'border-red-500' : 'border-gray-300'} ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white`}
+            >
+                <Select.Value placeholder={placeholder} />
+                <Select.Icon>
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                </Select.Icon>
+            </Select.Trigger>
+
+            <Select.Portal>
+                <Select.Content
+                    className="overflow-hidden bg-white rounded-lg border border-gray-200 shadow-lg animate-fadeIn z-50"
+                >
+                    <Select.Viewport className="p-1">
+                        {options.map((option) => (
+                            <Select.Item
+                                key={option.value}
+                                value={option.value}
+                                className="relative flex items-center px-8 py-2 text-sm text-gray-900 rounded-md hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none select-none"
+                            >
+                                <Select.ItemText>{option.label}</Select.ItemText>
+                                <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
+                                    <Check className="h-4 w-4 text-indigo-600" />
+                                </Select.ItemIndicator>
+                            </Select.Item>
+                        ))}
+                    </Select.Viewport>
+                </Select.Content>
+            </Select.Portal>
+        </Select.Root>
     </div>
 );
 
@@ -165,13 +184,13 @@ const RadioInput = ({ options, value, onChange }) => (
                 <RadioGroup.Item
                     id={option.value}
                     value={option.value}
-                    className="w-4 h-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="h-5 w-5 rounded-full border-2 border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:border-indigo-500"
                 >
-                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2 after:h-2 after:rounded-full after:bg-indigo-600" />
+                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-indigo-600" />
                 </RadioGroup.Item>
                 <label
                     htmlFor={option.value}
-                    className="ml-2 text-sm text-gray-700"
+                    className="ml-3 text-sm font-medium text-gray-700 cursor-pointer hover:text-gray-900"
                 >
                     {option.label}
                 </label>
@@ -186,13 +205,13 @@ const CheckboxInput = ({ id, label, checked, onChange, error }) => (
             id={id}
             checked={checked}
             onCheckedChange={onChange}
-            className={`w-4 h-4 mt-1 rounded border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+            className={`flex h-5 w-5 items-center justify-center rounded border ${error ? 'border-red-500' : 'border-gray-300'} bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
         >
             <Checkbox.Indicator>
-                <Check className="w-3 h-3 text-indigo-600" />
+                <Check className="h-4 w-4 text-indigo-600" />
             </Checkbox.Indicator>
         </Checkbox.Root>
-        <label htmlFor={id} className="ml-2 text-sm text-gray-700">
+        <label htmlFor={id} className="ml-3 text-sm text-gray-700">
             {label}
         </label>
     </div>
