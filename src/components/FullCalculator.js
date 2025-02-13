@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, User, Mail, Phone, Building2, FileText, Briefcase, 
          AlertCircle, Euro, Calendar, Clock, Target, Shield, Check } from 'lucide-react';
 import * as Progress from '@radix-ui/react-progress';
@@ -8,6 +8,304 @@ import * as Select from '@radix-ui/react-select';
 
 // Constants
 const TOTAL_STEPS = 2;
+
+// Add styles to document head
+const fullCalculatorStyles = `
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .full-calculator {
+        background: rgba(255, 255, 255, 0.90);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    .full-calculator button,
+    .full-calculator [type="button"],
+    .full-calculator [type="submit"] {
+        border: none;
+        background: #4F46E5;
+        color: white;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.25;
+    }
+
+    .full-calculator button.button-secondary {
+        background: white;
+        border: 2px solid #E5E7EB;
+        color: #374151;
+    }
+
+    .full-calculator button.button-secondary:hover {
+        background: #F9FAFB;
+        border-color: #D1D5DB;
+    }
+
+    .full-calculator button:hover {
+        background: #4338CA;
+    }
+
+    .full-calculator .form-field {
+        margin-bottom: 1.5rem;
+    }
+
+    .full-calculator .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .full-calculator .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #E5E7EB;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: white;
+        color: #1F2937;
+    }
+
+    .full-calculator .form-input:hover {
+        border-color: #D1D5DB;
+    }
+
+    .full-calculator .form-input:focus {
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+
+    .full-calculator .form-input.error {
+        border-color: #DC2626;
+    }
+
+    .full-calculator .form-input.error:focus {
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    .full-calculator .form-input:focus {
+        outline: none;
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
+
+    .full-calculator .form-input.has-icon {
+        padding-left: 2.5rem;
+    }
+
+    .full-calculator .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9CA3AF;
+    }
+
+    .full-calculator .radio-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .full-calculator .radio-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .full-calculator .radio-button {
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid #4F46E5;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+        position: relative;
+        cursor: pointer;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .full-calculator .radio-button:hover {
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .full-calculator .radio-button[data-state="checked"] {
+        border-color: #4F46E5;
+    }
+
+    .full-calculator .radio-button[data-state="checked"]:hover {
+        border-color: #4338CA;
+    }
+
+    .full-calculator .radio-button[data-state="checked"]::after {
+        background-color: #4F46E5;
+    }
+
+    .full-calculator .radio-button[data-state="checked"]:hover::after {
+        background-color: #4338CA;
+    }
+
+    .full-calculator .radio-button[data-state="checked"]::after {
+        content: '';
+        display: block;
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+        background: #4F46E5;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .full-calculator .checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid #4F46E5;
+        border-radius: 0.375rem;
+        margin-right: 0.75rem;
+        position: relative;
+        cursor: pointer;
+        background: white;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .full-calculator .checkbox:hover {
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .full-calculator .checkbox[data-state="checked"] {
+        background-color: #4F46E5;
+        border-color: #4F46E5;
+    }
+
+    .full-calculator .checkbox[data-state="checked"]:hover {
+        background-color: #4338CA;
+        border-color: #4338CA;
+    }
+
+    .full-calculator .checkbox[data-state="checked"] {
+        background: #4F46E5;
+    }
+
+    .full-calculator .checkbox-indicator {
+        color: white;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .full-calculator .select-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.5rem;
+        background: white;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .full-calculator .select-content {
+        background: white;
+        border-radius: 0.5rem;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        margin-top: 0.5rem;
+        max-height: 300px;
+        overflow-y: auto;
+        animation: slideDown 0.2s ease-out;
+        z-index: 50;
+    }
+
+    .full-calculator .select-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #E5E7EB;
+        border-radius: 0.5rem;
+        background: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .full-calculator .select-trigger:hover {
+        border-color: #D1D5DB;
+    }
+
+    .full-calculator .select-trigger[data-state="open"] {
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .full-calculator .select-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+    }
+
+    .full-calculator .select-item:hover {
+        background: #F3F4F6;
+    }
+
+    .full-calculator .select-item[data-highlighted] {
+        background: #EEF2FF;
+        outline: none;
+    }
+
+    .full-calculator .error-message {
+        color: #DC2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .full-calculator .progress-bar {
+        height: 0.5rem;
+        background: #E5E7EB;
+        border-radius: 0.25rem;
+        margin: 2rem 0;
+    }
+
+    .full-calculator .progress-indicator {
+        height: 100%;
+        background: #4F46E5;
+        border-radius: 0.25rem;
+        transition: width 0.3s ease;
+    }
+`;
 
 // Form field options
 const COMPANY_AGE_OPTIONS = [
@@ -101,18 +399,18 @@ const ProgressBar = ({ currentStep, totalSteps }) => {
 
 const FormField = ({ name, label, error, required = false, children }) => (
     <div className="mb-6">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor={name} className="form-label">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         {children}
-        {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
     </div>
 );
 
 const Input = ({ icon: Icon, error, ...props }) => (
     <div className="relative">
         {Icon && (
-            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Icon className="input-icon" />
         )}
         <input
             className={`w-full px-4 ${Icon ? 'pl-10' : ''} py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
@@ -175,7 +473,7 @@ const TextArea = ({ icon: Icon, error, ...props }) => (
 // Main Component
 const RadioInput = ({ options, value, onChange }) => (
     <RadioGroup.Root
-        className="flex gap-4 flex-wrap"
+        className="radio-group"
         value={value}
         onValueChange={onChange}
     >
@@ -184,7 +482,7 @@ const RadioInput = ({ options, value, onChange }) => (
                 <RadioGroup.Item
                     id={option.value}
                     value={option.value}
-                    className="w-6 h-6 rounded-full border-2 border-indigo-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-indigo-50"
+                    className="radio-button"
                 >
                     <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-3 after:h-3 after:rounded-full after:bg-indigo-600" />
                 </RadioGroup.Item>
@@ -208,7 +506,7 @@ const CheckboxInput = ({ id, label, checked, onChange, error }) => (
             className={`flex h-6 w-6 items-center justify-center rounded-md border-2 ${error ? 'border-red-500' : 'border-indigo-600'} bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
         >
             <Checkbox.Indicator>
-                <Check className="h-4 w-4 text-indigo-600 stroke-[3]" />
+                <Check className="checkbox-indicator" />
             </Checkbox.Indicator>
         </Checkbox.Root>
         <label htmlFor={id} className="ml-3 text-base text-gray-700 select-none">
@@ -218,6 +516,13 @@ const CheckboxInput = ({ id, label, checked, onChange, error }) => (
 );
 
 function FullCalculator() {
+    // Add styles to document head
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = fullCalculatorStyles;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         // Contact and Company Information
