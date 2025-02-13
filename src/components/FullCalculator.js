@@ -184,13 +184,13 @@ const RadioInput = ({ options, value, onChange }) => (
                 <RadioGroup.Item
                     id={option.value}
                     value={option.value}
-                    className="h-5 w-5 rounded-full border-2 border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:border-indigo-500"
+                    className="w-6 h-6 rounded-full border-2 border-indigo-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-indigo-50"
                 >
-                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-indigo-600" />
+                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-3 after:h-3 after:rounded-full after:bg-indigo-600" />
                 </RadioGroup.Item>
                 <label
                     htmlFor={option.value}
-                    className="ml-3 text-sm font-medium text-gray-700 cursor-pointer hover:text-gray-900"
+                    className="ml-3 text-base text-gray-700 cursor-pointer select-none"
                 >
                     {option.label}
                 </label>
@@ -205,13 +205,13 @@ const CheckboxInput = ({ id, label, checked, onChange, error }) => (
             id={id}
             checked={checked}
             onCheckedChange={onChange}
-            className={`flex h-5 w-5 items-center justify-center rounded border ${error ? 'border-red-500' : 'border-gray-300'} bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+            className={`flex h-6 w-6 items-center justify-center rounded-md border-2 ${error ? 'border-red-500' : 'border-indigo-600'} bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
         >
             <Checkbox.Indicator>
-                <Check className="h-4 w-4 text-indigo-600" />
+                <Check className="h-4 w-4 text-indigo-600 stroke-[3]" />
             </Checkbox.Indicator>
         </Checkbox.Root>
-        <label htmlFor={id} className="ml-3 text-sm text-gray-700">
+        <label htmlFor={id} className="ml-3 text-base text-gray-700 select-none">
             {label}
         </label>
     </div>
