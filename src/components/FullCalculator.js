@@ -458,7 +458,7 @@ function FullCalculator() {
                 </FormField>
             )}
 
-            <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?">
+            <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumua vai nodokļu maksājumu saistības?">
                 <RadioInput
                     options={DELAYED_PAYMENTS_OPTIONS}
                     value={formData.delayedPayments}
