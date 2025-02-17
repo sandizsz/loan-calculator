@@ -3,6 +3,19 @@
 @tailwind utilities;
 
 @layer components {
+    /* Findexo Form Namespace */
+    .findexo-form button,
+    .findexo-form input[type='button'],
+    .findexo-form input[type='submit'] {
+        all: unset;
+        box-sizing: border-box;
+    }
+
+    .findexo-form label {
+        all: unset;
+        box-sizing: border-box;
+    }
+
     .loan-calculator {
         @apply bg-white rounded-xl shadow-sm p-6 max-w-md mx-auto;
     }
