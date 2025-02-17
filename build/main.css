@@ -548,6 +548,9 @@ input[type="range"]::-webkit-slider-thumb {
 .left-1\/2 {
   left: 50%;
 }
+.left-2 {
+  left: 0.5rem;
+}
 .left-3 {
   left: 0.75rem;
 }
@@ -713,6 +716,9 @@ input[type="range"]::-webkit-slider-thumb {
      -moz-user-select: none;
           user-select: none;
 }
+.resize-none {
+  resize: none;
+}
 .appearance-none {
   -webkit-appearance: none;
      -moz-appearance: none;
@@ -825,6 +831,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .border-b {
   border-bottom-width: 1px;
+}
+.border-t {
+  border-top-width: 1px;
 }
 .border-none {
   border-style: none;
@@ -986,6 +995,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .pr-4 {
   padding-right: 1rem;
+}
+.pt-4 {
+  padding-top: 1rem;
 }
 .pt-6 {
   padding-top: 1.5rem;
@@ -1159,6 +1171,11 @@ input[type="range"]::-webkit-slider-thumb {
   color: rgba(156, 163, 175, 1);
   color: rgba(156, 163, 175, var(--tw-text-opacity, 1));
 }
+.hover\:bg-blue-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(239, 246, 255, 1);
+  background-color: rgba(239, 246, 255, var(--tw-bg-opacity, 1));
+}
 .hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(243, 244, 246, 1);
@@ -1197,6 +1214,11 @@ input[type="range"]::-webkit-slider-thumb {
   border-color: rgba(99, 102, 241, 1);
   border-color: rgba(99, 102, 241, var(--tw-border-opacity, 1));
 }
+.focus\:bg-blue-50:focus {
+  --tw-bg-opacity: 1;
+  background-color: rgba(239, 246, 255, 1);
+  background-color: rgba(239, 246, 255, var(--tw-bg-opacity, 1));
+}
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -1223,6 +1245,16 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .focus\:ring-offset-2:focus {
   --tw-ring-offset-width: 2px;
+}
+.data-\[highlighted\]\:bg-blue-50[data-highlighted] {
+  --tw-bg-opacity: 1;
+  background-color: rgba(239, 246, 255, 1);
+  background-color: rgba(239, 246, 255, var(--tw-bg-opacity, 1));
+}
+.data-\[highlighted\]\:text-blue-700[data-highlighted] {
+  --tw-text-opacity: 1;
+  color: rgba(29, 78, 216, 1);
+  color: rgba(29, 78, 216, var(--tw-text-opacity, 1));
 }
 @media (min-width: 768px) {
 
