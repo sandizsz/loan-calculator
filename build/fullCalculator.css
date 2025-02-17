@@ -874,6 +874,9 @@ input[type="range"]::-webkit-slider-thumb {
 .border-b {
   border-bottom-width: 1px;
 }
+.border-t {
+  border-top-width: 1px;
+}
 .border-none {
   border-style: none;
 }

@@ -172,7 +172,6 @@ const TextArea = ({ icon: Icon, error, ...props }) => (
     </div>
 );
 
-// Main Component
 const RadioInput = ({ options, value, onChange }) => (
     <div className="findexo-form">
         <RadioGroup.Root
@@ -220,7 +219,7 @@ const CheckboxInput = ({ id, label, checked, onChange, error }) => (
 function FullCalculator() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-        // Contact and Company Information
+        // Step 1: Contact and Company Information
         fullName: '',
         email: '',
         phone: '',
@@ -232,17 +231,17 @@ function FullCalculator() {
         position: '',
         mainActivity: '',
 
-        // Financial Information
+        // Step 2: Financial Information
         currentLoanAmount: '',
         currentLoanInstitution: '',
-        taxDebt: '',
+        taxDebt: 'none',
         taxDebtAmount: '',
         delayedPayments: 'no',
         requiredAmount: '',
         desiredTerm: '',
-        urgency: '',
+        urgencyPeriod: '',
         purpose: [],
-        financialProduct: '',
+        financialProduct: 'loan',
         collateral: '',
         collateralDescription: '',
         otherInstitutions: 'no',
@@ -270,21 +269,34 @@ function FullCalculator() {
     const validateForm = () => {
         const newErrors = {};
         
-        // Required fields for Step 1
         if (currentStep === 1) {
-            if (!formData.fullName) newErrors.fullName = 'Šis lauks ir obligāts';
-            if (!formData.email) newErrors.email = 'Šis lauks ir obligāts';
-            if (!formData.phone) newErrors.phone = 'Šis lauks ir obligāts';
-            if (!formData.companyName) newErrors.companyName = 'Šis lauks ir obligāts';
-            if (!formData.registrationNumber) newErrors.registrationNumber = 'Šis lauks ir obligāts';
+            if (!formData.fullName.trim()) newErrors.fullName = 'Šis lauks ir obligāts';
+            if (!formData.email.trim()) newErrors.email = 'Šis lauks ir obligāts';
+            if (!formData.phone.trim()) newErrors.phone = 'Šis lauks ir obligāts';
+            if (!formData.companyName.trim()) newErrors.companyName = 'Šis lauks ir obligāts';
+            if (!formData.registrationNumber.trim()) newErrors.registrationNumber = 'Šis lauks ir obligāts';
+            
+            if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+                newErrors.email = 'Lūdzu, ievadiet derīgu e-pasta adresi';
+            }
+            
+            if (formData.phone && !/^[+]?[0-9\s-]{8,}$/.test(formData.phone)) {
+                newErrors.phone = 'Lūdzu, ievadiet derīgu tālruņa numuru';
+            }
         }
         
-        // Required fields for Step 2
         if (currentStep === 2) {
-            if (!formData.currentLoanAmount) newErrors.currentLoanAmount = 'Šis lauks ir obligāts';
-            if (!formData.requiredAmount) newErrors.requiredAmount = 'Šis lauks ir obligāts';
-            if (!formData.desiredTerm) newErrors.desiredTerm = 'Šis lauks ir obligāts';
+            if (!formData.currentLoanAmount.toString().trim()) newErrors.currentLoanAmount = 'Šis lauks ir obligāts';
+            if (!formData.requiredAmount.toString().trim()) newErrors.requiredAmount = 'Šis lauks ir obligāts';
+            if (!formData.desiredTerm.trim()) newErrors.desiredTerm = 'Šis lauks ir obligāts';
             if (!formData.dataProcessing) newErrors.dataProcessing = 'Jums jāpiekrīt datu apstrādei';
+            
+            if (formData.requiredAmount && !/^\d+$/.test(formData.requiredAmount)) {
+                newErrors.requiredAmount = 'Lūdzu, ievadiet skaitli';
+            }
+            if (formData.currentLoanAmount && !/^\d+$/.test(formData.currentLoanAmount)) {
+                newErrors.currentLoanAmount = 'Lūdzu, ievadiet skaitli';
+            }
         }
 
         setErrors(newErrors);
@@ -304,8 +316,12 @@ function FullCalculator() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            // Handle form submission here
-            console.log('Form submitted:', formData);
+            if (currentStep < TOTAL_STEPS) {
+                setCurrentStep(prev => prev + 1);
+            } else {
+                // Handle form submission here
+                console.log('Form submitted:', formData);
+            }
         }
     };
 
@@ -400,13 +416,15 @@ function FullCalculator() {
                 />
             </FormField>
 
-            <FormField name="mainActivity" label="Pamata darbība (īss apraksts)">
+            <FormField 
+                name="mainActivity" 
+                label="Pamata darbība (īss apraksts)" 
+                hint="piemēram: būvniecība, tirdzniecība, ražošana utt."
+            >
                 <TextArea
                     name="mainActivity"
-                    icon={Briefcase}
                     value={formData.mainActivity}
                     onChange={(e) => handleInputChange('mainActivity', e.target.value)}
-                    placeholder="piemēram: būvniecība, tirdzniecība, ražošana utt."
                 />
             </FormField>
         </div>
@@ -458,7 +476,7 @@ function FullCalculator() {
                 </FormField>
             )}
 
-            <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumua vai nodokļu maksājumu saistības?">
+            <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?">
                 <RadioInput
                     options={DELAYED_PAYMENTS_OPTIONS}
                     value={formData.delayedPayments}
@@ -488,13 +506,14 @@ function FullCalculator() {
                 />
             </FormField>
 
-            <FormField name="urgency" label="Cik ātri nepieciešams finansējums?">
+            <FormField name="urgencyPeriod" label="Cik ātri nepieciešams finansējums?">
                 <Input
                     type="text"
-                    name="urgency"
+                    name="urgencyPeriod"
                     icon={Clock}
-                    value={formData.urgency}
-                    onChange={(e) => handleInputChange('urgency', e.target.value)}
+                    placeholder="Piemēram: 1 mēnesis, 2 nedēļas utt."
+                    value={formData.urgencyPeriod}
+                    onChange={(e) => handleInputChange('urgencyPeriod', e.target.value)}
                 />
             </FormField>
 
@@ -549,21 +568,25 @@ function FullCalculator() {
                 />
             </FormField>
 
-            <div className="space-y-4 mt-8">
-                <CheckboxInput
-                    id="dataProcessing"
-                    label="Piekrītu datu apstrādei"
-                    checked={formData.dataProcessing}
-                    onChange={(checked) => handleInputChange('dataProcessing', checked)}
-                    error={errors.dataProcessing}
-                />
+            <div className="space-y-4 pt-6 mt-6 border-t border-gray-200">
+                <FormField name="dataProcessing" error={errors.dataProcessing}>
+                    <CheckboxInput
+                        id="dataProcessing"
+                        label="Piekrītu datu apstrādei"
+                        checked={formData.dataProcessing}
+                        onChange={(checked) => handleInputChange('dataProcessing', checked)}
+                        error={errors.dataProcessing}
+                    />
+                </FormField>
 
-                <CheckboxInput
-                    id="marketing"
-                    label="Vēlos saņemt mārketinga ziņas"
-                    checked={formData.marketing}
-                    onChange={(checked) => handleInputChange('marketing', checked)}
-                />
+                <FormField name="marketing">
+                    <CheckboxInput
+                        id="marketing"
+                        label="Vēlos saņemt mārketinga ziņas"
+                        checked={formData.marketing}
+                        onChange={(checked) => handleInputChange('marketing', checked)}
+                    />
+                </FormField>
             </div>
         </div>
     );
