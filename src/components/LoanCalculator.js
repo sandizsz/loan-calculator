@@ -558,7 +558,7 @@ const LoanCalculator = () => {
                                         setPhone(digits);
                                     }
                                 }}
-                                style={{ textIndent: '2rem' }}
+                                style={{ textIndent: '2.5rem' }}
                                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500 mb-6' : 'border-[#ffc600]'}`}
                             />
                         </div>
