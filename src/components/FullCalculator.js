@@ -207,7 +207,12 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCustomInputChange = (name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -259,7 +264,8 @@ const LoanApplicationForm = () => {
           type="text"
           className="loan-form-input"
           value={formData.fullName}
-          onChange={(e) => handleInputChange('fullName', e.target.value)}
+          name="fullName"
+          onChange={handleInputChange}
           placeholder="Ievadiet vārdu un uzvārdu"
           required
         />
@@ -270,7 +276,8 @@ const LoanApplicationForm = () => {
           type="email"
           className="loan-form-input"
           value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
+          name="email"
+          onChange={handleInputChange}
           placeholder="jusu.epasts@example.com"
           required
         />
@@ -283,10 +290,16 @@ const LoanApplicationForm = () => {
             type="tel"
             className="loan-form-input phone"
             value={formData.phone}
+            name="phone"
             onChange={(e) => {
               const value = e.target.value.replace(/[^0-9]/g, '');
               if (value.length <= 8) {
-                handleInputChange('phone', value);
+                handleInputChange({
+                  target: {
+                    name: 'phone',
+                    value: value
+                  }
+                });
               }
             }}
             placeholder="12345678"
@@ -300,7 +313,8 @@ const LoanApplicationForm = () => {
           type="text"
           className="loan-form-input"
           value={formData.companyName}
-          onChange={(e) => handleInputChange('companyName', e.target.value)}
+          name="companyName"
+          onChange={handleInputChange}
           placeholder="Ievadiet uzņēmuma nosaukumu"
           required
         />
@@ -311,9 +325,15 @@ const LoanApplicationForm = () => {
           type="text"
           className="loan-form-input"
           value={formData.registrationNumber}
+          name="registrationNumber"
           onChange={(e) => {
             const value = e.target.value.replace(/[^0-9]/g, '');
-            handleInputChange('registrationNumber', value);
+            handleInputChange({
+              target: {
+                name: 'registrationNumber',
+                value: value
+              }
+            });
           }}
           placeholder="40001234567"
           required
@@ -324,7 +344,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="companyAge"
           value={formData.companyAge}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties uzņēmuma vecumu"
           options={[
             { value: '< 2 gads', label: '< 2 gads' },
@@ -338,7 +358,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="annualTurnover"
           value={formData.annualTurnover}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties apgrozījumu"
           options={[
             { value: '< 200 000', label: '< 200 000' },
@@ -353,7 +373,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="profitLoss"
           value={formData.profitLoss}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties rezultātu"
           options={[
             { value: 'Peļņa', label: 'Peļņa' },
@@ -367,7 +387,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="position"
           value={formData.position}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties pozīciju"
           options={[
             { value: 'Īpašnieks', label: 'Īpašnieks' },
@@ -412,7 +432,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="taxDebt"
           value={formData.taxDebt}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties"
           options={[
             { value: 'Nav', label: 'Nav' },
@@ -520,7 +540,7 @@ const LoanApplicationForm = () => {
         <CustomSelect
           name="financialProduct"
           value={formData.financialProduct}
-          onChange={handleInputChange}
+          onChange={handleCustomInputChange}
           placeholder="Izvēlieties produktu"
           options={[
             { value: 'Aizdevums', label: 'Aizdevums' },
