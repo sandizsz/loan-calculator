@@ -526,22 +526,22 @@ const LoanCalculator = () => {
             {/* Form */}
             <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="col-span-2 md:col-span-1">
-                    <div className={`relative ${errors.email ? 'pb-6' : ''}`}>
+                    <div className="relative">
                         <input
                             type="email"
                             name="email"
                             placeholder="Jūsu e-pasts"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.email ? 'border-red-500' : 'border-[#ffc600]'}`}
+                            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.email ? 'border-red-500 mb-6' : 'border-[#ffc600]'}`}
                         />
                         {errors.email && (
-                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.email}</div>
+                            <div className="absolute -bottom-5 left-0 text-red-500 text-sm">{errors.email}</div>
                         )}
                     </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">
-                    <div className={`relative ${errors.phone ? 'pb-6' : ''}`}>
+                    <div className="relative">
                         <div className="relative">
                             <div className="absolute top-0 left-0 h-[42px] flex items-center pl-3 pointer-events-none">
                                 <span className="text-gray-500 font-medium select-none">+371</span>
@@ -559,11 +559,11 @@ const LoanCalculator = () => {
                                     }
                                 }}
                                 style={{ textIndent: '1rem' }}
-                                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
+                                className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500 mb-6' : 'border-[#ffc600]'}`}
                             />
                         </div>
                         {errors.phone && (
-                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.phone}</div>
+                            <div className="absolute -bottom-5 left-0 text-red-500 text-sm">{errors.phone}</div>
                         )}
                     </div>
                 </div>
