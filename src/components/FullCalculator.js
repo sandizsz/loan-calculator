@@ -184,13 +184,14 @@ const RadioInput = ({ options, value, onChange }) => (
                 <RadioGroup.Item
                     id={option.value}
                     value={option.value}
-                    className="w-5 h-5 rounded-full border-2 border-gray-300 bg-white data-[state=checked]:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:border-indigo-500"
+                    className="!w-5 !h-5 !p-0 !m-0 !rounded-full !border-2 !border-gray-300 !bg-white ![outline:none] data-[state=checked]:!border-indigo-600 focus:!ring-2 focus:!ring-indigo-500 focus:!ring-offset-2 hover:!border-indigo-500"
+                    style={{ appearance: 'none' }}
                 >
-                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-indigo-600" />
+                    <RadioGroup.Indicator className="!flex !items-center !justify-center !w-full !h-full !relative after:!block after:!w-2.5 after:!h-2.5 after:!rounded-full after:!bg-indigo-600" />
                 </RadioGroup.Item>
                 <label
                     htmlFor={option.value}
-                    className="ml-3 text-sm font-medium text-gray-700 cursor-pointer hover:text-gray-900"
+                    className="!ml-3 !text-sm !font-medium !text-gray-700 !cursor-pointer hover:!text-gray-900"
                 >
                     {option.label}
                 </label>
