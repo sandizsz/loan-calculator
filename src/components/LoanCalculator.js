@@ -542,24 +542,25 @@ const LoanCalculator = () => {
                 </div>
                 <div className="col-span-2 md:col-span-1">
                     <div className="relative pb-6">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 bg-transparent pointer-events-none h-[42px]">
-                            <span className="text-gray-500 font-medium select-none">+371</span>
+                        <div className="relative">
+                            <div className="absolute top-0 left-0 h-[42px] flex items-center pl-3 pointer-events-none">
+                                <span className="text-gray-500 font-medium select-none">+371</span>
+                            </div>
+                            <input
+                                type="tel"
+                                name="phone"
+                                placeholder="Jūsu tālrunis"
+                                value={phone}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    const digits = value.replace(/\D/g, '');
+                                    if (digits.length <= 8) {
+                                        setPhone(digits);
+                                    }
+                                }}
+                                className={`w-full pl-14 pr-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
+                            />
                         </div>
-                        <input
-                            type="tel"
-                            name="phone"
-                            placeholder="Jūsu tālrunis"
-                            value={phone}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                const digits = value.replace(/\D/g, '');
-                                if (digits.length <= 8) {
-                                    setPhone(digits);
-                                }
-                            }}
-                            style={{ textIndent: '2.2rem' }}
-                            className={`w-full px-4 border-color-[#e5e5e5] py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
-                        />
                         {errors.phone && (
                             <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.phone}</div>
                         )}
