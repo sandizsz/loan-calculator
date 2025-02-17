@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -211,7 +211,9 @@ const LoanApplicationForm = () => {
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    requestAnimationFrame(() => {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    });
   }, []);
 
   const handleCustomInputChange = useCallback((name, value) => {
@@ -221,16 +223,20 @@ const LoanApplicationForm = () => {
   const handlePhoneChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      setFormData(prev => ({ ...prev, phone: value }));
+      requestAnimationFrame(() => {
+        setFormData(prev => ({ ...prev, phone: value }));
+      });
     }
   }, []);
 
   const handleRegistrationChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    setFormData(prev => ({ ...prev, registrationNumber: value }));
+    requestAnimationFrame(() => {
+      setFormData(prev => ({ ...prev, registrationNumber: value }));
+    });
   }, []);
 
-  const FormField = ({ label, required, children, hint }) => (
+  const FormField = memo(({ label, required, children, hint }) => (
     <div className="mb-4">
       <Label.Root className="loan-form-label">
         {label} {required && <span className="text-red-500">*</span>}
@@ -238,7 +244,7 @@ const LoanApplicationForm = () => {
       {children}
       {hint && <p className="loan-form-hint">{hint}</p>}
     </div>
-  );
+  ));    
 
   const CustomSelect = ({ name, value, onChange, options, placeholder }) => (
     <Select.Root value={value} onValueChange={(value) => onChange(name, value)}>
@@ -274,7 +280,7 @@ const LoanApplicationForm = () => {
   const renderStep1 = () => (
     <div className="space-y-4">
       <FormField label="Vārds, Uzvārds" required>
-        <input
+        <Input
           type="text"
           className="loan-form-input"
           value={formData.fullName}
@@ -286,7 +292,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="E-pasts" required>
-        <input
+        <Input
           type="email"
           className="loan-form-input"
           value={formData.email}
@@ -300,7 +306,7 @@ const LoanApplicationForm = () => {
       <FormField label="Tālrunis" required>
         <div className="phone-input-container">
           <span className="phone-prefix">+371</span>
-          <input
+          <Input
             type="tel"
             className="loan-form-input phone"
             value={formData.phone}
@@ -313,7 +319,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="Uzņēmuma nosaukums" required>
-        <input
+        <Input
           type="text"
           className="loan-form-input"
           value={formData.companyName}
@@ -325,7 +331,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="Reģistrācijas numurs" required>
-        <input
+        <Input
           type="text"
           className="loan-form-input"
           value={formData.registrationNumber}
