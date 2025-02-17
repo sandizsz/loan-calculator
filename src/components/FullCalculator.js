@@ -175,7 +175,7 @@ const TextArea = ({ icon: Icon, error, ...props }) => (
 // Main Component
 const RadioInput = ({ options, value, onChange }) => (
     <RadioGroup.Root
-        className="flex gap-4 flex-wrap"
+        className="RadioGroupRoot"
         value={value}
         onValueChange={onChange}
     >
@@ -184,9 +184,9 @@ const RadioInput = ({ options, value, onChange }) => (
                 <RadioGroup.Item
                     id={option.value}
                     value={option.value}
-                    className="h-5 w-5 rounded-full border-2 border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:border-indigo-500"
+                    className="RadioGroupItem"
                 >
-                    <RadioGroup.Indicator className="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-indigo-600" />
+                    <RadioGroup.Indicator className="RadioGroupIndicator" />
                 </RadioGroup.Item>
                 <label
                     htmlFor={option.value}
