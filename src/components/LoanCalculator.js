@@ -526,7 +526,7 @@ const LoanCalculator = () => {
             {/* Form */}
             <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative ">
+                    <div className={`relative ${errors.email ? 'pb-6' : ''}`}>
                         <input
                             type="email"
                             name="email"
@@ -541,7 +541,7 @@ const LoanCalculator = () => {
                     </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative">
+                    <div className={`relative ${errors.phone ? 'pb-6' : ''}`}>
                         <div className="relative">
                             <div className="absolute top-0 left-0 h-[42px] flex items-center pl-3 pointer-events-none">
                                 <span className="text-gray-500 font-medium select-none">+371</span>
@@ -558,7 +558,7 @@ const LoanCalculator = () => {
                                         setPhone(digits);
                                     }
                                 }}
-                                style={{ textIndent: '2rem' }}
+                                style={{ textIndent: '1rem' }}
                                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
                             />
                         </div>
