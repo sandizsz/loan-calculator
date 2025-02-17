@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -24,6 +24,8 @@ const LoanApplicationForm = () => {
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
+    .h2 {
+    font-size: 1.5rem !important;}
       .loan-form-container {
         background: rgba(255, 255, 255, 0.90) !important;
         backdrop-filter: blur(8px) !important;
@@ -207,14 +209,26 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleCustomInputChange = (name, value) => {
+  const handleCustomInputChange = useCallback((name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
+
+  const handlePhoneChange = useCallback((e) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length <= 8) {
+      setFormData(prev => ({ ...prev, phone: value }));
+    }
+  }, []);
+
+  const handleRegistrationChange = useCallback((e) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    setFormData(prev => ({ ...prev, registrationNumber: value }));
+  }, []);
 
   const FormField = ({ label, required, children, hint }) => (
     <div className="mb-4">
@@ -291,17 +305,7 @@ const LoanApplicationForm = () => {
             className="loan-form-input phone"
             value={formData.phone}
             name="phone"
-            onChange={(e) => {
-              const value = e.target.value.replace(/[^0-9]/g, '');
-              if (value.length <= 8) {
-                handleInputChange({
-                  target: {
-                    name: 'phone',
-                    value: value
-                  }
-                });
-              }
-            }}
+            onChange={handlePhoneChange}
             placeholder="12345678"
             required
           />
@@ -326,15 +330,7 @@ const LoanApplicationForm = () => {
           className="loan-form-input"
           value={formData.registrationNumber}
           name="registrationNumber"
-          onChange={(e) => {
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            handleInputChange({
-              target: {
-                name: 'registrationNumber',
-                value: value
-              }
-            });
-          }}
+          onChange={handleRegistrationChange}
           placeholder="40001234567"
           required
         />
@@ -652,8 +648,8 @@ const LoanApplicationForm = () => {
   return (
     <div className="loan-form-container">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Finanses, Kredītsaistības, Aizdevuma vajadzības'}
+        <h2 className="">
+          {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
         </h2>
         <div className="h-2 bg-gray-200 rounded-full">
           <div
