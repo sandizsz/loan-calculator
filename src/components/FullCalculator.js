@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -209,34 +209,44 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const handleInputChange = useCallback((e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    requestAnimationFrame(() => {
-      setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const newData = { ...prev };
+      newData[name] = value;
+      return newData;
     });
-  }, []);
+  };
 
-  const handleCustomInputChange = useCallback((name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  }, []);
+  const handleCustomInputChange = (name, value) => {
+    setFormData(prev => {
+      const newData = { ...prev };
+      newData[name] = value;
+      return newData;
+    });
+  };
 
-  const handlePhoneChange = useCallback((e) => {
+  const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      requestAnimationFrame(() => {
-        setFormData(prev => ({ ...prev, phone: value }));
+      setFormData(prev => {
+        const newData = { ...prev };
+        newData.phone = value;
+        return newData;
       });
     }
-  }, []);
+  };
 
-  const handleRegistrationChange = useCallback((e) => {
+  const handleRegistrationChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    requestAnimationFrame(() => {
-      setFormData(prev => ({ ...prev, registrationNumber: value }));
+    setFormData(prev => {
+      const newData = { ...prev };
+      newData.registrationNumber = value;
+      return newData;
     });
-  }, []);
+  };
 
-  const FormField = memo(({ label, required, children, hint }) => (
+  const FormField = ({ label, required, children, hint }) => (
     <div className="mb-4">
       <Label.Root className="loan-form-label">
         {label} {required && <span className="text-red-500">*</span>}
@@ -244,7 +254,7 @@ const LoanApplicationForm = () => {
       {children}
       {hint && <p className="loan-form-hint">{hint}</p>}
     </div>
-  ));    
+  );    
 
   const CustomSelect = ({ name, value, onChange, options, placeholder }) => (
     <Select.Root value={value} onValueChange={(value) => onChange(name, value)}>
