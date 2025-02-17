@@ -531,9 +531,6 @@ input[type="range"]::-webkit-slider-thumb {
 .relative {
   position: relative;
 }
-.-bottom-5 {
-  bottom: -1.25rem;
-}
 .-bottom-6 {
   bottom: -1.5rem;
 }
