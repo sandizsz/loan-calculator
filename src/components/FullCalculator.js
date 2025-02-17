@@ -43,7 +43,7 @@ const LoanApplicationForm = () => {
         border: none !important;
         background: #4F46E5 !important;
         color: white !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
         border-radius: 6px !important;
         transition: all 0.2s !important;
         padding: 12px 24px !important;
@@ -648,7 +648,7 @@ const LoanApplicationForm = () => {
   return (
     <div className="loan-form-container">
       <div className="mb-8">
-        <h2 className="">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
           {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
         </h2>
         <div className="h-2 bg-gray-200 rounded-full">
