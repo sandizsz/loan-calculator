@@ -3,7 +3,6 @@ import { ChevronDown, User, Mail, Phone, Building2, FileText, Briefcase,
          AlertCircle, Euro, Calendar, Clock, Target, Shield, Check } from 'lucide-react';
 import * as Progress from '@radix-ui/react-progress';
 import * as Checkbox from '@radix-ui/react-checkbox';
-import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Select from '@radix-ui/react-select';
 
 // Constants
@@ -121,44 +120,6 @@ const Input = ({ icon: Icon, error, ...props }) => (
     </div>
 );
 
-const SelectInput = ({ icon: Icon, options, value, onChange, placeholder, error }) => (
-    <div className="relative">
-        {Icon && (
-            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-        )}
-        <Select.Root value={value} onValueChange={onChange}>
-            <Select.Trigger
-                className={`inline-flex w-full items-center justify-between rounded-lg border ${error ? 'border-red-500' : 'border-gray-300'} ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white`}
-            >
-                <Select.Value placeholder={placeholder} />
-                <Select.Icon>
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                </Select.Icon>
-            </Select.Trigger>
-
-            <Select.Portal>
-                <Select.Content
-                    className="overflow-hidden bg-white rounded-lg border border-gray-200 shadow-lg animate-fadeIn z-50"
-                >
-                    <Select.Viewport className="p-1">
-                        {options.map((option) => (
-                            <Select.Item
-                                key={option.value}
-                                value={option.value}
-                                className="relative flex items-center px-8 py-2 text-sm text-gray-900 rounded-md hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none select-none"
-                            >
-                                <Select.ItemText>{option.label}</Select.ItemText>
-                                <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
-                                    <Check className="h-4 w-4 text-indigo-600" />
-                                </Select.ItemIndicator>
-                            </Select.Item>
-                        ))}
-                    </Select.Viewport>
-                </Select.Content>
-            </Select.Portal>
-        </Select.Root>
-    </div>
-);
 
 const TextArea = ({ icon: Icon, error, ...props }) => (
     <div className="relative">
@@ -172,47 +133,54 @@ const TextArea = ({ icon: Icon, error, ...props }) => (
     </div>
 );
 
-const RadioInput = ({ options, value, onChange }) => (
-    <div className="findexo-form">
-        <RadioGroup.Root
-            className="flex flex-wrap gap-4"
-            value={value}
-            onValueChange={onChange}
-        >
-            {options.map((option) => (
-                <div key={option.value} className="flex items-center">
-                    <RadioGroup.Item
-                        id={option.value}
-                        value={option.value}
-                        className="hover:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    />
-                    <label
-                        htmlFor={option.value}
-                        className="ml-3 text-sm font-medium text-gray-700 cursor-pointer hover:text-gray-900"
-                    >
-                        {option.label}
-                    </label>
-                </div>
-            ))}
-        </RadioGroup.Root>
-    </div>
+const SelectInput = ({ options, value, onChange, placeholder }) => (
+    <Select.Root value={value} onValueChange={onChange}>
+        <Select.Trigger className="findexo-select-trigger">
+            <Select.Value placeholder={placeholder} />
+            <Select.Icon>
+                <ChevronDown className="findexo-select-icon h-4 w-4" />
+            </Select.Icon>
+        </Select.Trigger>
+
+        <Select.Portal>
+            <Select.Content className="findexo-select-content">
+                <Select.Viewport className="findexo-select-viewport">
+                    {options.map((option) => (
+                        <Select.Item
+                            key={option.value}
+                            value={option.value}
+                            className="findexo-select-item"
+                        >
+                            <Select.ItemIndicator className="findexo-select-item-indicator">
+                                <Check className="h-4 w-4" />
+                            </Select.ItemIndicator>
+                            <Select.ItemText>{option.label}</Select.ItemText>
+                        </Select.Item>
+                    ))}
+                </Select.Viewport>
+            </Select.Content>
+        </Select.Portal>
+    </Select.Root>
 );
 
 const CheckboxInput = ({ id, label, checked, onChange, error }) => (
-    <div className="flex items-start">
+    <div className="findexo-checkbox">
         <Checkbox.Root
             id={id}
             checked={checked}
             onCheckedChange={onChange}
-            className={`flex h-5 w-5 items-center justify-center rounded border ${error ? 'border-red-500' : 'border-gray-300'} bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+            className={`findexo-checkbox-root ${error ? '!border-red-500' : ''}`}
         >
-            <Checkbox.Indicator>
-                <Check className="h-4 w-4 text-indigo-600" />
+            <Checkbox.Indicator className="findexo-checkbox-indicator">
+                <Check className="h-4 w-4" />
             </Checkbox.Indicator>
         </Checkbox.Root>
-        <label htmlFor={id} className="ml-3 text-sm text-gray-700">
-            {label}
-        </label>
+        <div className="flex flex-col">
+            <label htmlFor={id} className="text-sm text-gray-700 cursor-pointer">
+                {label}
+            </label>
+            {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
+        </div>
     </div>
 );
 
@@ -385,34 +353,38 @@ function FullCalculator() {
             </FormField>
 
             <FormField name="companyAge" label="Uzņēmuma vecums">
-                <RadioInput
+                <SelectInput
                     options={COMPANY_AGE_OPTIONS}
                     value={formData.companyAge}
                     onChange={(value) => handleInputChange('companyAge', value)}
+                    placeholder="Izvēlieties uzņēmuma vecumu"
                 />
             </FormField>
 
             <FormField name="annualTurnover" label="Apgrozījums pēdējā gadā (EUR)">
-                <RadioInput
+                <SelectInput
                     options={TURNOVER_OPTIONS}
                     value={formData.annualTurnover}
                     onChange={(value) => handleInputChange('annualTurnover', value)}
+                    placeholder="Izvēlieties apgrozījuma diapazonu"
                 />
             </FormField>
 
             <FormField name="profitLoss" label="Peļņa vai zaudējumi pēdējā gadā">
-                <RadioInput
+                <SelectInput
                     options={PROFIT_LOSS_OPTIONS}
                     value={formData.profitLoss}
                     onChange={(value) => handleInputChange('profitLoss', value)}
+                    placeholder="Izvēlieties peļņas/zaudējumu statusu"
                 />
             </FormField>
 
             <FormField name="position" label="Jūsu pozīcija uzņēmumā">
-                <RadioInput
+                <SelectInput
                     options={POSITION_OPTIONS}
                     value={formData.position}
                     onChange={(value) => handleInputChange('position', value)}
+                    placeholder="Izvēlieties savu pozīciju"
                 />
             </FormField>
 
@@ -457,10 +429,11 @@ function FullCalculator() {
             </FormField>
 
             <FormField name="taxDebt" label="Vai uzņēmumam ir nodokļu parāds?">
-                <RadioInput
+                <SelectInput
                     options={TAX_DEBT_OPTIONS}
                     value={formData.taxDebt}
                     onChange={(value) => handleInputChange('taxDebt', value)}
+                    placeholder="Izvēlieties nodokļu parāda statusu"
                 />
             </FormField>
 
@@ -477,10 +450,11 @@ function FullCalculator() {
             )}
 
             <FormField name="delayedPayments" label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?">
-                <RadioInput
+                <SelectInput
                     options={DELAYED_PAYMENTS_OPTIONS}
                     value={formData.delayedPayments}
                     onChange={(value) => handleInputChange('delayedPayments', value)}
+                    placeholder="Izvēlieties atbildi"
                 />
             </FormField>
 
@@ -537,18 +511,20 @@ function FullCalculator() {
             </FormField>
 
             <FormField name="financialProduct" label="Nepieciešamais finanšu produkts">
-                <RadioInput
+                <SelectInput
                     options={FINANCIAL_PRODUCT_OPTIONS}
                     value={formData.financialProduct}
                     onChange={(value) => handleInputChange('financialProduct', value)}
+                    placeholder="Izvēlieties finanšu produktu"
                 />
             </FormField>
 
             <FormField name="collateral" label="Piedāvātais nodrošinājums">
-                <RadioInput
+                <SelectInput
                     options={COLLATERAL_OPTIONS}
                     value={formData.collateral}
                     onChange={(value) => handleInputChange('collateral', value)}
+                    placeholder="Izvēlieties nodrošinājuma veidu"
                 />
             </FormField>
 

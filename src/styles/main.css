@@ -3,47 +3,42 @@
 @tailwind utilities;
 
 @layer components {
-    /* Findexo Form Namespace */
-    .findexo-form [role='radio'],
-    .findexo-form button[role='radio'] {
-        /* Reset Elementor button styles */
-        display: inline-flex !important;
-        font-weight: normal !important;
-        color: inherit !important;
-        text-align: center !important;
-        white-space: normal !important;
-        user-select: none !important;
-        background: white !important;
-        border: 2px solid #D1D5DB !important;
-        padding: 0 !important;
-        font-size: inherit !important;
-        border-radius: 9999px !important;
-        transition: all 0.15s !important;
-        
-        /* Our radio styles */
-        appearance: none !important;
-        margin: 0 !important;
-        width: 1.25rem !important;
-        height: 1.25rem !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-        outline: none !important;
+    /* Checkbox styles */
+    .findexo-checkbox {
+        @apply relative flex items-start gap-3;
     }
 
-    .findexo-form [role='radio'][data-state='checked'],
-    .findexo-form button[role='radio'][data-state='checked'] {
-        border-color: #4F46E5 !important;
-        background: white !important;
+    .findexo-checkbox-root {
+        @apply h-5 w-5 rounded border-2 border-gray-300 bg-white hover:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 data-[state=checked]:border-indigo-600 data-[state=checked]:bg-indigo-600;
     }
 
-    .findexo-form [role='radio'][data-state='checked']::after,
-    .findexo-form button[role='radio'][data-state='checked']::after {
-        content: '' !important;
-        width: 0.625rem !important;
-        height: 0.625rem !important;
-        border-radius: 50% !important;
-        background: #4F46E5 !important;
+    .findexo-checkbox-indicator {
+        @apply flex h-full w-full items-center justify-center text-white;
+    }
+
+    /* Dropdown styles */
+    .findexo-select-trigger {
+        @apply flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left text-sm leading-none hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 data-[placeholder]:text-gray-500;
+    }
+
+    .findexo-select-icon {
+        @apply text-gray-400;
+    }
+
+    .findexo-select-content {
+        @apply overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg;
+    }
+
+    .findexo-select-viewport {
+        @apply p-1;
+    }
+
+    .findexo-select-item {
+        @apply relative flex h-9 select-none items-center rounded-md px-8 pl-6 text-sm leading-none text-gray-700 outline-none data-[highlighted]:bg-indigo-50 data-[highlighted]:text-indigo-600;
+    }
+
+    .findexo-select-item-indicator {
+        @apply absolute left-2 inline-flex h-3.5 w-3.5 items-center justify-center text-indigo-600;
     }
 
     .loan-calculator {
