@@ -526,7 +526,7 @@ const LoanCalculator = () => {
             {/* Form */}
             <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative">
+                    <div className="relative pb-6">
                         <input
                             type="email"
                             name="email"
@@ -536,13 +536,13 @@ const LoanCalculator = () => {
                             className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.email ? 'border-red-500' : 'border-[#ffc600]'}`}
                         />
                         {errors.email && (
-                            <div className="text-red-500 text-sm mt-1">{errors.email}</div>
+                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.email}</div>
                         )}
                     </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 bg-transparent pointer-events-none">
+                    <div className="relative pb-6">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 bg-transparent pointer-events-none h-[42px]">
                             <span className="text-gray-500 font-medium select-none">+371</span>
                         </div>
                         <input
@@ -561,7 +561,7 @@ const LoanCalculator = () => {
                             className={`w-full px-4 border-color-[#e5e5e5] py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500' : 'border-[#ffc600]'}`}
                         />
                         {errors.phone && (
-                            <div className="text-red-500 text-sm mt-1">{errors.phone}</div>
+                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.phone}</div>
                         )}
                     </div>
                 </div>

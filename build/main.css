@@ -538,6 +538,9 @@ input[type="range"]::-webkit-slider-thumb {
 .-bottom-6 {
   bottom: -1.5rem;
 }
+.bottom-0 {
+  bottom: 0px;
+}
 .bottom-full {
   bottom: 100%;
 }
@@ -649,6 +652,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .h-6 {
   height: 1.5rem;
+}
+.h-\[42px\] {
+  height: 42px;
 }
 .h-full {
   height: 100%;
