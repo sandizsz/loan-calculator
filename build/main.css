@@ -534,6 +534,9 @@ input[type="range"]::-webkit-slider-thumb {
 .-bottom-6 {
   bottom: -1.5rem;
 }
+.bottom-0 {
+  bottom: 0px;
+}
 .bottom-full {
   bottom: 100%;
 }

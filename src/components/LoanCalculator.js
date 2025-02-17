@@ -536,7 +536,7 @@ const LoanCalculator = () => {
                             className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.email ? 'border-red-500 mb-6' : 'border-[#ffc600]'}`}
                         />
                         {errors.email && (
-                            <div className="absolute left-0 text-red-500 text-sm">{errors.email}</div>
+                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.email}</div>
                         )}
                     </div>
                 </div>
@@ -558,12 +558,12 @@ const LoanCalculator = () => {
                                         setPhone(digits);
                                     }
                                 }}
-                                style={{ textIndent: '1.5rem' }}
+                                style={{ textIndent: '2rem' }}
                                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600] ${errors.phone ? 'border-red-500 mb-6' : 'border-[#ffc600]'}`}
                             />
                         </div>
                         {errors.phone && (
-                            <div className="absolute left-0 text-red-500 text-sm">{errors.phone}</div>
+                            <div className="absolute bottom-0 left-0 text-red-500 text-sm">{errors.phone}</div>
                         )}
                     </div>
                 </div>
