@@ -526,7 +526,7 @@ const LoanCalculator = () => {
             {/* Form */}
             <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative pb-6">
+                    <div className="relative ">
                         <input
                             type="email"
                             name="email"
@@ -541,7 +541,7 @@ const LoanCalculator = () => {
                     </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">
-                    <div className="relative pb-6">
+                    <div className="relative">
                         <div className="relative">
                             <div className="absolute top-0 left-0 h-[42px] flex items-center pl-3 pointer-events-none">
                                 <span className="text-gray-500 font-medium select-none">+371</span>
