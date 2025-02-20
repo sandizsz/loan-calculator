@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -21,7 +21,6 @@ const SelectItem = React.forwardRef(({ children, className, ...props }, forwarde
 });
 
 const LoanApplicationForm = () => {
-  const formRef = useRef(null);
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -181,7 +180,6 @@ const LoanApplicationForm = () => {
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Step 1
     fullName: '',
     email: '',
     phone: '',
@@ -192,8 +190,6 @@ const LoanApplicationForm = () => {
     profitLoss: '',
     position: '',
     mainActivity: '',
-    
-    // Step 2
     currentLoans: '',
     taxDebt: 'Nav',
     taxDebtAmount: '',
@@ -210,26 +206,34 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  }, []);
-  
-  const handleCustomInputChange = useCallback((name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  }, []);
-  
-  const handlePhoneChange = useCallback((e) => {
+  const updateField = (field, value) => {
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      return newData;
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    updateField(field, value);
+  };
+
+  const handleCustomInputChange = (name, value) => {
+    updateField(name, value);
+  };
+
+  const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      setFormData(prev => ({ ...prev, phone: value }));
+      updateField('phone', value);
     }
-  }, []);
-  
-  const handleRegistrationChange = useCallback((e) => {
+  };
+
+  const handleRegistrationChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    setFormData(prev => ({ ...prev, registrationNumber: value }));
-  }, []);
+    updateField('registrationNumber', value);
+  };
 
   const FormField = ({ label, required, children, hint }) => (
     <div className="mb-4">
@@ -648,7 +652,7 @@ const LoanApplicationForm = () => {
   };
 
   return (
-    <div className="loan-form-container" ref={formRef}>
+    <div className="loan-form-container">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
