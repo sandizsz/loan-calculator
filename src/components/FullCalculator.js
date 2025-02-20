@@ -30,7 +30,9 @@ const FullCalculator = () => {
   const [error, setError] = useState(null);
 
   // Form setup with proper validation
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       // ... your default values remain the same
     },
@@ -254,26 +256,11 @@ const FullCalculator = () => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      setError(null);
       
-      // Form validation
-      const formErrors = {};
+      // Validate all fields
+      const isValid = await trigger();
       
-      // Phone validation
-      if (data.phone && !/^[0-9]{8}$/.test(data.phone)) {
-        formErrors.phone = 'Lūdzu, ievadiet 8 ciparu telefona numuru';
-      }
-      
-      // Email validation
-      if (data.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(data.email)) {
-        formErrors.email = 'Lūdzu, ievadiet derīgu e-pasta adresi';
-      }
-      
-      // If there are errors, update form state without losing focus
-      if (Object.keys(formErrors).length > 0) {
-        Object.entries(formErrors).forEach(([field, message]) => {
-          setError(field, { type: 'manual', message });
-        });
+      if (!isValid) {
         setIsSubmitting(false);
         return;
       }
@@ -368,17 +355,13 @@ const FullCalculator = () => {
                 value: /^[0-9]{8}$/,
                 message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
               },
-              setValueAs: (value) => {
-                // Sanitize: remove any non-digits
-                return value.replace(/[^0-9]/g, '');
+              onChange: (e) => {
+                // Only allow digits and limit to 8 characters
+                const sanitizedValue = e.target.value.replace(/[^0-9]/g, '').slice(0, 8);
+                e.target.value = sanitizedValue;
               }
             })}
-            onChange={(e) => {
-              // Only allow digits
-              const sanitizedValue = e.target.value.replace(/[^0-9]/g, '');
-              e.target.value = sanitizedValue;
-              register('phone').onChange(e);
-            }}
+            onBlur={() => trigger('phone')}
           />
         </div>
       </FormField>
@@ -398,12 +381,9 @@ const FullCalculator = () => {
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
               message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-            },
-            onChange: (e) => {
-              // Keep the form state updated without losing focus
-              register('email').onChange(e);
             }
           })}
+          onBlur={() => trigger('email')}
         />
       </FormField>
     </>
