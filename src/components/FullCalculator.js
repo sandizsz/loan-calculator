@@ -25,6 +25,10 @@ const SelectItem = React.forwardRef(({ children, className, ...props }, forwarde
 SelectItem.displayName = 'SelectItem';
 
 const FullCalculator = () => {
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
@@ -212,6 +216,40 @@ const FullCalculator = () => {
     return () => document.head.removeChild(style);
   }, []);
 
+  // Form submission function
+  const submitForm = async (data) => {
+    try {
+      // Add your API endpoint here
+      const response = await fetch('/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          action: 'submit_loan_application',
+          nonce: loanCalculatorData.nonce,
+          ...data,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Neizdevās nosūtīt pieteikumu. Lūdzu, mēģiniet vēlreiz.');
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Neizdevās nosūtīt pieteikumu. Lūdzu, mēģiniet vēlreiz.');
+      }
+
+      // Reset form and show success message
+      alert('Paldies! Jūsu pieteikums ir veiksmīgi nosūtīts.');
+      setStep(1);
+      reset();
+    } catch (error) {
+      throw new Error('Neizdevās nosūtīt pieteikumu: ' + error.message);
+    }
+  };
+
   // Form submission handler with proper error handling
   const onSubmit = async (data) => {
     try {
@@ -247,6 +285,189 @@ const FullCalculator = () => {
         </p>
       )}
     </div>
+  );
+
+  const renderStep1 = () => (
+    <>
+      <FormField
+        name="companyName"
+        label="Uzņēmuma nosaukums"
+        required
+      >
+        <input
+          type="text"
+          className="loan-form-input"
+          {...register('companyName', { required: 'Šis lauks ir obligāts' })}
+        />
+      </FormField>
+
+      <FormField
+        name="regNumber"
+        label="Reģistrācijas numurs"
+        required
+      >
+        <input
+          type="text"
+          className="loan-form-input"
+          {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
+        />
+      </FormField>
+
+      <FormField
+        name="contactName"
+        label="Kontaktpersonas vārds, uzvārds"
+        required
+      >
+        <input
+          type="text"
+          className="loan-form-input"
+          {...register('contactName', { required: 'Šis lauks ir obligāts' })}
+        />
+      </FormField>
+
+      <FormField
+        name="phone"
+        label="Telefona numurs"
+        required
+      >
+        <input
+          type="tel"
+          className="loan-form-input"
+          {...register('phone', { 
+            required: 'Šis lauks ir obligāts',
+            pattern: {
+              value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+              message: 'Lūdzu, ievadiet derīgu telefona numuru'
+            }
+          })}
+        />
+      </FormField>
+
+      <FormField
+        name="email"
+        label="E-pasta adrese"
+        required
+      >
+        <input
+          type="email"
+          className="loan-form-input"
+          {...register('email', {
+            required: 'Šis lauks ir obligāts',
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+            }
+          })}
+        />
+      </FormField>
+    </>
+  );
+
+  const renderStep2 = () => (
+    <>
+      <FormField
+        name="loanAmount"
+        label="Nepieciešamā aizdevuma summa"
+        required
+      >
+        <input
+          type="number"
+          className="loan-form-input"
+          min="1000"
+          max="1000000"
+          {...register('loanAmount', { 
+            required: 'Šis lauks ir obligāts',
+            min: {
+              value: 1000,
+              message: 'Minimālā summa ir €1,000'
+            },
+            max: {
+              value: 1000000,
+              message: 'Maksimālā summa ir €1,000,000'
+            }
+          })}
+        />
+      </FormField>
+
+      <FormField
+        name="loanPurpose"
+        label="Aizdevuma mērķis"
+        required
+      >
+        <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+          <Select.Trigger className="loan-form-select-trigger">
+            <Select.Value placeholder="Izvēlieties mērķi" />
+            <Select.Icon>
+              <ChevronDown className="w-4 h-4" />
+            </Select.Icon>
+          </Select.Trigger>
+
+          <Select.Portal>
+            <Select.Content className="loan-form-select-content">
+              <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                <ChevronUp className="w-4 h-4" />
+              </Select.ScrollUpButton>
+
+              <Select.Viewport className="p-2">
+                <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+                <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+                <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+                <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+                <SelectItem value="cits">Cits mērķis</SelectItem>
+              </Select.Viewport>
+
+              <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                <ChevronDown className="w-4 h-4" />
+              </Select.ScrollDownButton>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
+      </FormField>
+
+      <FormField
+        name="existingLoan"
+        label="Vai uzņēmumam ir esoši kredīti?"
+        required
+      >
+        <RadioGroup.Root 
+          className="flex gap-4"
+          onValueChange={(value) => setValue('existingLoan', value)}
+        >
+          <div className="flex items-center">
+            <RadioGroup.Item value="yes" className="loan-form-radio-root">
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2">Jā</label>
+          </div>
+          <div className="flex items-center">
+            <RadioGroup.Item value="no" className="loan-form-radio-root">
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2">Nē</label>
+          </div>
+        </RadioGroup.Root>
+      </FormField>
+
+      <FormField
+        name="gdprConsent"
+        label="Piekrītu personas datu apstrādei"
+        required
+      >
+        <div className="flex items-center">
+          <Checkbox.Root 
+            className="loan-form-checkbox-root"
+            onCheckedChange={(checked) => setValue('gdprConsent', checked)}
+          >
+            <Checkbox.Indicator className="loan-form-checkbox-indicator">
+              <Check className="w-4 h-4" />
+            </Checkbox.Indicator>
+          </Checkbox.Root>
+          <label className="pl-2 text-sm text-gray-600">
+            Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar privātuma politiku
+          </label>
+        </div>
+      </FormField>
+    </>
   );
 
   return (
