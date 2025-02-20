@@ -212,31 +212,23 @@ const LoanApplicationForm = () => {
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    requestAnimationFrame(() => {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
-
+  
   const handleCustomInputChange = useCallback((name, value) => {
-    requestAnimationFrame(() => {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
-
+  
   const handlePhoneChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      requestAnimationFrame(() => {
-        setFormData(prev => ({ ...prev, phone: value }));
-      });
+      setFormData(prev => ({ ...prev, phone: value }));
     }
   }, []);
-
+  
   const handleRegistrationChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    requestAnimationFrame(() => {
-      setFormData(prev => ({ ...prev, registrationNumber: value }));
-    });
+    setFormData(prev => ({ ...prev, registrationNumber: value }));
   }, []);
 
   const FormField = ({ label, required, children, hint }) => (
@@ -410,7 +402,8 @@ const LoanApplicationForm = () => {
         <textarea
           className="loan-form-input min-h-[100px] resize-none"
           value={formData.mainActivity}
-          onChange={(e) => handleInputChange('mainActivity', e.target.value)}
+          name="mainActivity"
+          onChange={handleInputChange}
           placeholder="Aprakstiet uzņēmuma pamata darbības veidu"
         />
       </FormField>
