@@ -255,11 +255,25 @@ const FullCalculator = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      console.log('Form data:', data);
       
-      // Validate phone number format
+      // Form validation
+      const formErrors = {};
+      
+      // Phone validation
       if (data.phone && !/^[0-9]{8}$/.test(data.phone)) {
-        setError('Lūdzu, ievadiet 8 ciparu telefona numuru');
+        formErrors.phone = 'Lūdzu, ievadiet 8 ciparu telefona numuru';
+      }
+      
+      // Email validation
+      if (data.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(data.email)) {
+        formErrors.email = 'Lūdzu, ievadiet derīgu e-pasta adresi';
+      }
+      
+      // If there are errors, update form state without losing focus
+      if (Object.keys(formErrors).length > 0) {
+        Object.entries(formErrors).forEach(([field, message]) => {
+          setError(field, { type: 'manual', message });
+        });
         setIsSubmitting(false);
         return;
       }
@@ -272,7 +286,7 @@ const FullCalculator = () => {
         await submitForm(data);
       }
     } catch (err) {
-      setError(err.message);
+      setError('submit', { type: 'manual', message: err.message });
     } finally {
       setIsSubmitting(false);
     }
@@ -376,12 +390,18 @@ const FullCalculator = () => {
       >
         <input
           type="email"
-          className="loan-form-input"
+          className={`w-full h-12 px-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'}`}
+          placeholder="example@domain.com"
+          aria-invalid={errors.email ? 'true' : 'false'}
           {...register('email', {
             required: 'Šis lauks ir obligāts',
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
               message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+            },
+            onChange: (e) => {
+              // Keep the form state updated without losing focus
+              register('email').onChange(e);
             }
           })}
         />
