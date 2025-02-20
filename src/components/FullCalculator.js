@@ -257,6 +257,13 @@ const FullCalculator = () => {
       setError(null);
       console.log('Form data:', data);
       
+      // Validate phone number format
+      if (data.phone && !/^[0-9]{8}$/.test(data.phone)) {
+        setError('Lūdzu, ievadiet 8 ciparu telefona numuru');
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Move to next step or submit
       if (step < 2) {
         setStep(step + 1);
@@ -329,18 +336,37 @@ const FullCalculator = () => {
         name="phone"
         label="Telefona numurs"
         required
+        hint="Ievadiet 8 ciparu telefona numuru"
       >
-        <input
-          type="tel"
-          className="loan-form-input"
-          {...register('phone', { 
-            required: 'Šis lauks ir obligāts',
-            pattern: {
-              value: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
-              message: 'Lūdzu, ievadiet derīgu telefona numuru'
-            }
-          })}
-        />
+        <div className="relative flex items-center w-full">
+          <div className="absolute left-3 flex items-center justify-center h-full pointer-events-none">
+            <span className="text-gray-500 text-sm font-medium">+371</span>
+          </div>
+          <input
+            type="tel"
+            className={`w-full h-12 pl-14 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'}`}
+            maxLength="8"
+            placeholder="12345678"
+            aria-invalid={errors.phone ? 'true' : 'false'}
+            {...register('phone', { 
+              required: 'Šis lauks ir obligāts',
+              pattern: {
+                value: /^[0-9]{8}$/,
+                message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+              },
+              setValueAs: (value) => {
+                // Sanitize: remove any non-digits
+                return value.replace(/[^0-9]/g, '');
+              }
+            })}
+            onChange={(e) => {
+              // Only allow digits
+              const sanitizedValue = e.target.value.replace(/[^0-9]/g, '');
+              e.target.value = sanitizedValue;
+              register('phone').onChange(e);
+            }}
+          />
+        </div>
       </FormField>
 
       <FormField

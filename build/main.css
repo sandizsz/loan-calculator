@@ -657,6 +657,9 @@ input[type="range"]::-webkit-slider-thumb {
 .hidden {
   display: none;
 }
+.h-12 {
+  height: 3rem;
+}
 .h-2 {
   height: 0.5rem;
 }
@@ -671,6 +674,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .h-\[42px\] {
   height: 42px;
+}
+.h-full {
+  height: 100%;
 }
 .w-4 {
   width: 1rem;
@@ -886,11 +892,17 @@ input[type="range"]::-webkit-slider-thumb {
 .pl-10 {
   padding-left: 2.5rem;
 }
+.pl-14 {
+  padding-left: 3.5rem;
+}
 .pl-2 {
   padding-left: 0.5rem;
 }
 .pl-3 {
   padding-left: 0.75rem;
+}
+.pr-4 {
+  padding-right: 1rem;
 }
 .pt-6 {
   padding-top: 1.5rem;
@@ -901,6 +913,10 @@ input[type="range"]::-webkit-slider-thumb {
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
+}
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 .text-sm {
   font-size: 0.875rem;
@@ -941,6 +957,11 @@ input[type="range"]::-webkit-slider-thumb {
   --tw-text-opacity: 1;
   color: rgba(31, 41, 55, 1);
   color: rgba(31, 41, 55, var(--tw-text-opacity, 1));
+}
+.text-gray-900 {
+  --tw-text-opacity: 1;
+  color: rgba(17, 24, 39, 1);
+  color: rgba(17, 24, 39, var(--tw-text-opacity, 1));
 }
 .text-red-500 {
   --tw-text-opacity: 1;
@@ -1051,13 +1072,27 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), 0 0 rgba(0,0,0,0);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 rgba(0,0,0,0));
 }
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), 0 0 rgba(0,0,0,0);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 rgba(0,0,0,0));
+}
 .focus\:ring-\[\#ffc600\]:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgba(255, 198, 0, var(--tw-ring-opacity, 1));
 }
+.focus\:ring-indigo-200:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgba(199, 210, 254, var(--tw-ring-opacity, 1));
+}
 .focus\:ring-indigo-500:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgba(99, 102, 241, var(--tw-ring-opacity, 1));
+}
+.focus\:ring-red-200:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgba(254, 202, 202, var(--tw-ring-opacity, 1));
 }
 .data-\[highlighted\]\:bg-blue-50[data-highlighted] {
   --tw-bg-opacity: 1;
