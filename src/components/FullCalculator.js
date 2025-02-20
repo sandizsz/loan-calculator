@@ -31,13 +31,14 @@ const FullCalculator = () => {
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    mode: 'onTouched',
+    mode: 'onTouched',  // This will show errors after first interaction
     criteriaMode: 'firstError',
     defaultValues: {
-      // ... your default values remain the same
+      // your default values...
     },
-    mode: 'onChange' // Enable real-time validation
+    reValidateMode: 'onChange'  // This will update validation on change
   });
+
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -254,13 +255,7 @@ const FullCalculator = () => {
 
   // Form submission handler with proper error handling
   // Handle phone input to only allow digits
-  const handlePhoneInput = (e) => {
-    const value = e.target.value;
-    const digits = value.replace(/[^0-9]/g, '');
-    if (digits !== value) {
-      e.target.value = digits;
-    }
-  };
+
 
   const onSubmit = async (data) => {
     try {
@@ -355,42 +350,47 @@ const FullCalculator = () => {
             <span className="text-gray-500 text-sm font-medium">+371</span>
           </div>
           <input
-            type="tel"
-            className={`w-full h-12 pl-14 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'}`}
-            maxLength="8"
-            placeholder="12345678"
-            aria-invalid={errors.phone ? 'true' : 'false'}
-            {...register('phone', { 
-              required: 'Šis lauks ir obligāts',
-              pattern: {
-                value: /^[0-9]{8}$/,
-                message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
-              }
-            })}
-            onInput={handlePhoneInput}
-          />
+    type="tel"
+    className={`w-full h-12 pl-14 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${
+      errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'
+    }`}
+    maxLength="8"
+    placeholder="12345678"
+    aria-invalid={errors.phone ? 'true' : 'false'}
+    {...register('phone', {
+      required: 'Šis lauks ir obligāts',
+      pattern: {
+        value: /^[0-9]{0,8}$/,
+        message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+      },
+      maxLength: {
+        value: 8,
+        message: 'Maksimālais garums ir 8 cipari'
+      }
+    })}
+  />
         </div>
       </FormField>
 
       <FormField
-        name="email"
-        label="E-pasta adrese"
-        required
-      >
-        <input
-          type="email"
-          className={`w-full h-12 px-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'}`}
-          placeholder="example@domain.com"
-          aria-invalid={errors.email ? 'true' : 'false'}
-          {...register('email', {
-            required: 'Šis lauks ir obligāts',
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-            }
-          })}
-        />
-      </FormField>
+  name="email"
+  label="E-pasta adrese"
+  required
+>
+  <input
+    type="email"  // Using type="email" for native validation
+    className="loan-form-input"
+    placeholder="example@domain.com"
+    {...register('email', {
+      required: 'Šis lauks ir obligāts',
+      validate: (value) => {
+        // Only validate on submit or blur, not during typing
+        if (!value) return true;
+        return value.includes('@') || 'Lūdzu, ievadiet derīgu e-pasta adresi';
+      }
+    })}
+  />
+</FormField>
     </>
   );
 
