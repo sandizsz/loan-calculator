@@ -30,9 +30,9 @@ const FullCalculator = () => {
   const [error, setError] = useState(null);
 
   // Form setup with proper validation
-  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+    mode: 'onTouched',
+    criteriaMode: 'firstError',
     defaultValues: {
       // ... your default values remain the same
     },
@@ -253,16 +253,27 @@ const FullCalculator = () => {
   };
 
   // Form submission handler with proper error handling
+  // Handle phone input to only allow digits
+  const handlePhoneInput = (e) => {
+    const value = e.target.value;
+    const digits = value.replace(/[^0-9]/g, '');
+    if (digits !== value) {
+      e.target.value = digits;
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
+      setError(null);
       
-      // Validate all fields
-      const isValid = await trigger();
-      
-      if (!isValid) {
-        setIsSubmitting(false);
-        return;
+      // Validate the data format
+      if (step === 1) {
+        if (data.phone && data.phone.length !== 8) {
+          setError('phone', { message: 'Lūdzu, ievadiet 8 ciparu telefona numuru' });
+          setIsSubmitting(false);
+          return;
+        }
       }
       
       // Move to next step or submit
@@ -354,14 +365,9 @@ const FullCalculator = () => {
               pattern: {
                 value: /^[0-9]{8}$/,
                 message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
-              },
-              onChange: (e) => {
-                // Only allow digits and limit to 8 characters
-                const sanitizedValue = e.target.value.replace(/[^0-9]/g, '').slice(0, 8);
-                e.target.value = sanitizedValue;
               }
             })}
-            onBlur={() => trigger('phone')}
+            onInput={handlePhoneInput}
           />
         </div>
       </FormField>
@@ -383,7 +389,6 @@ const FullCalculator = () => {
               message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
             }
           })}
-          onBlur={() => trigger('email')}
         />
       </FormField>
     </>
