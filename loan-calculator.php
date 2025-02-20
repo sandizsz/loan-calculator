@@ -64,10 +64,14 @@ function loan_calculator_enqueue_scripts() {
     }, 10, 2);
 
     // Register full calculator script
+    // Register React and ReactDOM
+    wp_register_script('react', 'https://unpkg.com/react@18/umd/react.production.min.js', [], '18.0.0', true);
+    wp_register_script('react-dom', 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js', ['react'], '18.0.0', true);
+
     wp_register_script(
         'full-calculator', 
         plugins_url('build/fullCalculator.js', __FILE__),
-        ['wp-element', 'wp-components', 'loan-calculator'],
+        ['react', 'react-dom', 'wp-element', 'wp-components', 'loan-calculator'],
         filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
         true
     );
@@ -158,6 +162,16 @@ function loan_calculator_enqueue_scripts() {
         [],
         filemtime(plugin_dir_path(__FILE__) . 'build/main.css')
     );
+
+    // Enqueue full calculator styles if needed
+    if ($should_load_full_calculator) {
+        wp_enqueue_style(
+            'full-calculator-style',
+            plugins_url('build/fullCalculator.css', __FILE__),
+            [],
+            filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.css')
+        );
+    }
 
     // Debug output if needed
     if (defined('WP_DEBUG') && WP_DEBUG) {
