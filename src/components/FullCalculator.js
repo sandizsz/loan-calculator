@@ -298,4 +298,4 @@ const LoanApplicationForm = () => {
   );
 };
 
-export default LoanApplicationForm;
+export default LoanCalculator;
