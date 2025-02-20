@@ -24,7 +24,7 @@ const SelectItem = React.forwardRef(({ children, className, ...props }, forwarde
 
 SelectItem.displayName = 'SelectItem';
 
-const LoanApplicationForm = () => {
+const FullCalculator = () => {
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
