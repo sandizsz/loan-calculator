@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -21,6 +22,35 @@ const SelectItem = React.forwardRef(({ children, className, ...props }, forwarde
 });
 
 const LoanApplicationForm = () => {
+  const { register, handleSubmit: handleFormSubmit, watch, setValue } = useForm({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phone: '',
+      companyName: '',
+      registrationNumber: '',
+      companyAge: '',
+      annualTurnover: '',
+      profitLoss: '',
+      position: '',
+      mainActivity: '',
+      currentLoans: '',
+      taxDebt: 'Nav',
+      taxDebtAmount: '',
+      delayedPayments: 'Nē',
+      requiredAmount: '',
+      desiredTerm: '',
+      urgency: '',
+      purpose: [],
+      financialProduct: '',
+      collateral: [],
+      collateralDescription: '',
+      otherApplications: 'Nē',
+      dataProcessing: false,
+      marketing: false
+    }
+  });
+
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -206,33 +236,13 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const updateField = (field, value) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      return newData;
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const field = e.target.name;
-    const value = e.target.value;
-    updateField(field, value);
-  };
-
   const handleCustomInputChange = (name, value) => {
-    updateField(name, value);
+    setValue(name, value);
   };
 
-  const handlePhoneChange = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 8) {
-      updateField('phone', value);
-    }
-  };
-
-  const handleRegistrationChange = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    updateField('registrationNumber', value);
+  const onSubmit = (data) => {
+    console.log(data);
+    // Handle form submission
   };
 
   const FormField = ({ label, required, children, hint }) => (
@@ -282,11 +292,8 @@ const LoanApplicationForm = () => {
         <input
           type="text"
           className="loan-form-input"
-          value={formData.fullName}
-          name="fullName"
-          onChange={handleInputChange}
           placeholder="Ievadiet vārdu un uzvārdu"
-          required
+          {...register('fullName', { required: true })}
         />
       </FormField>
   
@@ -294,11 +301,8 @@ const LoanApplicationForm = () => {
         <input
           type="email"
           className="loan-form-input"
-          value={formData.email}
-          name="email"
-          onChange={handleInputChange}
           placeholder="jusu.epasts@example.com"
-          required
+          {...register('email', { required: true })}
         />
       </FormField>
   
@@ -308,11 +312,17 @@ const LoanApplicationForm = () => {
           <input
             type="tel"
             className="loan-form-input phone"
-            value={formData.phone}
-            name="phone"
-            onChange={handlePhoneChange}
             placeholder="12345678"
-            required
+            {...register('phone', {
+              required: true,
+              onChange: (e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                if (value.length <= 8) {
+                  e.target.value = value;
+                  setValue('phone', value);
+                }
+              }
+            })}
           />
         </div>
       </FormField>
@@ -321,11 +331,8 @@ const LoanApplicationForm = () => {
         <input
           type="text"
           className="loan-form-input"
-          value={formData.companyName}
-          name="companyName"
-          onChange={handleInputChange}
           placeholder="Ievadiet uzņēmuma nosaukumu"
-          required
+          {...register('companyName', { required: true })}
         />
       </FormField>
   
@@ -333,11 +340,15 @@ const LoanApplicationForm = () => {
         <input
           type="text"
           className="loan-form-input"
-          value={formData.registrationNumber}
-          name="registrationNumber"
-          onChange={handleRegistrationChange}
           placeholder="40001234567"
-          required
+          {...register('registrationNumber', {
+            required: true,
+            onChange: (e) => {
+              const value = e.target.value.replace(/[^0-9]/g, '');
+              e.target.value = value;
+              setValue('registrationNumber', value);
+            }
+          })}
         />
       </FormField>
   
@@ -405,10 +416,8 @@ const LoanApplicationForm = () => {
       >
         <textarea
           className="loan-form-input min-h-[100px] resize-none"
-          value={formData.mainActivity}
-          name="mainActivity"
-          onChange={handleInputChange}
           placeholder="Aprakstiet uzņēmuma pamata darbības veidu"
+          {...register('mainActivity')}
         />
       </FormField>
     </div>
