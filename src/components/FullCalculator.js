@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -21,6 +21,7 @@ const SelectItem = React.forwardRef(({ children, className, ...props }, forwarde
 });
 
 const LoanApplicationForm = () => {
+  const formRef = useRef(null);
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -211,23 +212,31 @@ const LoanApplicationForm = () => {
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    requestAnimationFrame(() => {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    });
   }, []);
 
   const handleCustomInputChange = useCallback((name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    requestAnimationFrame(() => {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    });
   }, []);
 
   const handlePhoneChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      setFormData(prev => ({ ...prev, phone: value }));
+      requestAnimationFrame(() => {
+        setFormData(prev => ({ ...prev, phone: value }));
+      });
     }
   }, []);
 
   const handleRegistrationChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    setFormData(prev => ({ ...prev, registrationNumber: value }));
+    requestAnimationFrame(() => {
+      setFormData(prev => ({ ...prev, registrationNumber: value }));
+    });
   }, []);
 
   const FormField = ({ label, required, children, hint }) => (
@@ -646,7 +655,7 @@ const LoanApplicationForm = () => {
   };
 
   return (
-    <div className="loan-form-container">
+    <div className="loan-form-container" ref={formRef}>
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
