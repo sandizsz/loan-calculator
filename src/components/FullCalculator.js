@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -209,42 +209,26 @@ const LoanApplicationForm = () => {
     marketing: false
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => {
-      const newData = { ...prev };
-      newData[name] = value;
-      return newData;
-    });
-  };
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleCustomInputChange = (name, value) => {
-    setFormData(prev => {
-      const newData = { ...prev };
-      newData[name] = value;
-      return newData;
-    });
-  };
+  const handleCustomInputChange = useCallback((name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
-      setFormData(prev => {
-        const newData = { ...prev };
-        newData.phone = value;
-        return newData;
-      });
+      setFormData(prev => ({ ...prev, phone: value }));
     }
-  };
+  }, []);
 
-  const handleRegistrationChange = (e) => {
+  const handleRegistrationChange = useCallback((e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    setFormData(prev => {
-      const newData = { ...prev };
-      newData.registrationNumber = value;
-      return newData;
-    });
-  };
+    setFormData(prev => ({ ...prev, registrationNumber: value }));
+  }, []);
 
   const FormField = ({ label, required, children, hint }) => (
     <div className="mb-4">
@@ -254,7 +238,7 @@ const LoanApplicationForm = () => {
       {children}
       {hint && <p className="loan-form-hint">{hint}</p>}
     </div>
-  );    
+  );
 
   const CustomSelect = ({ name, value, onChange, options, placeholder }) => (
     <Select.Root value={value} onValueChange={(value) => onChange(name, value)}>
@@ -290,7 +274,7 @@ const LoanApplicationForm = () => {
   const renderStep1 = () => (
     <div className="space-y-4">
       <FormField label="Vārds, Uzvārds" required>
-        <Input
+        <input
           type="text"
           className="loan-form-input"
           value={formData.fullName}
@@ -302,7 +286,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="E-pasts" required>
-        <Input
+        <input
           type="email"
           className="loan-form-input"
           value={formData.email}
@@ -316,7 +300,7 @@ const LoanApplicationForm = () => {
       <FormField label="Tālrunis" required>
         <div className="phone-input-container">
           <span className="phone-prefix">+371</span>
-          <Input
+          <input
             type="tel"
             className="loan-form-input phone"
             value={formData.phone}
@@ -329,7 +313,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="Uzņēmuma nosaukums" required>
-        <Input
+        <input
           type="text"
           className="loan-form-input"
           value={formData.companyName}
@@ -341,7 +325,7 @@ const LoanApplicationForm = () => {
       </FormField>
   
       <FormField label="Reģistrācijas numurs" required>
-        <Input
+        <input
           type="text"
           className="loan-form-input"
           value={formData.registrationNumber}
