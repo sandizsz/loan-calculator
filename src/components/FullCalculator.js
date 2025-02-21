@@ -30,12 +30,13 @@ const FullCalculator = () => {
   const [error, setError] = useState(null);
 
   // Form setup with proper validation
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    mode: 'onTouched',  // This will show errors after first interaction
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
+    mode: 'all',  // This enables real-time validation
     criteriaMode: 'firstError',
     defaultValues: {
       // your default values...
     },
+    shouldFocusError: false, // Prevent automatic focus on error fields
     reValidateMode: 'onChange'  // This will update validation on change
   });
 
@@ -363,21 +364,22 @@ const FullCalculator = () => {
           </div>
           <input
             type="tel"
-            className="loan-form-input pl-[2.5rem]"
-    maxLength="8"
-    placeholder="12345678"
-    aria-invalid={errors.phone ? 'true' : 'false'}
-    {...register('phone', {
-      required: 'Šis lauks ir obligāts',
-      pattern: {
-        value: /^[0-9]{0,8}$/,
-        message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
-      },
-      maxLength: {
-        value: 8,
-        message: 'Maksimālais garums ir 8 cipari'
-      }
-    })}
+            className={`loan-form-input pl-[2.5rem] ${errors.phone ? 'border-red-500' : ''}`}
+            maxLength="8"
+            placeholder="12345678"
+            aria-invalid={errors.phone ? 'true' : 'false'}
+            {...register('phone', {
+              required: 'Šis lauks ir obligāts',
+              pattern: {
+                value: /^[0-9]{0,8}$/,
+                message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+              },
+              maxLength: {
+                value: 8,
+                message: 'Maksimālais garums ir 8 cipari'
+              },
+              onChange: () => trigger('phone')
+            })}
   />
         </div>
       </FormField>
