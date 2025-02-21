@@ -31,12 +31,12 @@ const FullCalculator = () => {
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    mode: 'onTouched',  // This will show errors after first interaction
+    mode: 'onSubmit',  // Only validate on form submission
     criteriaMode: 'firstError',
     defaultValues: {
       // your default values...
     },
-    reValidateMode: 'onChange'  // This will update validation on change
+    reValidateMode: 'onSubmit'  // Only revalidate on form submission
   });
 
 
@@ -274,8 +274,9 @@ const FullCalculator = () => {
       setIsSubmitting(true);
       setError(null);
       
-      // Validate the data format
+      // Custom validation for step 1
       if (step === 1) {
+        // Phone validation only if a value is provided
         if (data.phone && data.phone.length !== 8) {
           setError('phone', { message: 'Lūdzu, ievadiet 8 ciparu telefona numuru' });
           setIsSubmitting(false);
@@ -363,7 +364,7 @@ const FullCalculator = () => {
           </div>
           <input
             type="tel"
-            className="loan-form-input pl-16"
+            className="loan-form-input pl-[2.5rem]"
     maxLength="8"
     placeholder="12345678"
     aria-invalid={errors.phone ? 'true' : 'false'}
