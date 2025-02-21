@@ -32,7 +32,7 @@ const FullCalculator = () => {
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
     mode: 'onSubmit',        // Only validate when leaving a field, not during typing
-    reValidateMode: 'onSubmit', // Only re-validate on submit
+    reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
       // your default values...
