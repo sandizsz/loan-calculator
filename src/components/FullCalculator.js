@@ -43,6 +43,13 @@ const FullCalculator = () => {
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1F2937;
+        margin-bottom: 1.5rem;
+        line-height: 1.75rem;
+      }
       /* Base form container */
       .loan-form-container {
         background: #ffffff !important;
@@ -347,12 +354,12 @@ const FullCalculator = () => {
       >
         <div className="relative flex items-center w-full">
           <div className="absolute left-3 flex items-center justify-center h-full pointer-events-none">
-            <span className="text-gray-500 text-sm font-medium">+371</span>
+            <span className="text-gray-500 text-sm font-medium pl-1">+371</span>
           </div>
           <input
     type="tel"
-    className={`w-full h-12 pl-14 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${
-      errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-200 focus:border-indigo-500'
+    className={`w-full h-12 pl-10 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${
+      errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
     }`}
     maxLength="8"
     placeholder="12345678"
