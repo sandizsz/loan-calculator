@@ -44,11 +44,13 @@ const FullCalculator = () => {
     const style = document.createElement('style');
     style.textContent = `
       h2 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1F2937;
-        margin-bottom: 1.5rem;
-        line-height: 1.75rem;
+        font-family: inherit !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        color: #1F2937 !important;
+        margin-bottom: 1.5rem !important;
+        line-height: 1.75rem !important;
+        letter-spacing: normal !important;
       }
       /* Base form container */
       .loan-form-container {
@@ -77,8 +79,8 @@ const FullCalculator = () => {
 
       .loan-form-input:focus {
         outline: none !important;
-        border-color: #4f46e5 !important;
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
       }
 
       .loan-form-input:disabled {
@@ -106,8 +108,8 @@ const FullCalculator = () => {
 
       .loan-form-select-trigger:focus {
         outline: none !important;
-        border-color: #4f46e5 !important;
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
       }
 
       .loan-form-select-content {
@@ -132,8 +134,8 @@ const FullCalculator = () => {
       }
 
       .loan-form-checkbox-root[data-state="checked"] {
-        background-color: #4f46e5 !important;
-        border-color: #4f46e5 !important;
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
       }
 
       .loan-form-checkbox-indicator {
@@ -154,7 +156,7 @@ const FullCalculator = () => {
       }
 
       .loan-form-radio-root[data-state="checked"] {
-        border-color: #4f46e5 !important;
+        border-color: #2563eb !important;
       }
 
       .loan-form-radio-indicator {
@@ -164,7 +166,7 @@ const FullCalculator = () => {
         width: 12px !important;
         height: 12px !important;
         border-radius: 50% !important;
-        background-color: #4f46e5 !important;
+        background-color: #2563eb !important;
       }
 
       /* Labels */
@@ -192,7 +194,7 @@ const FullCalculator = () => {
         font-size: 1rem !important;
         font-weight: 500 !important;
         color: white !important;
-        background-color: #4f46e5 !important;
+        background-color: #2563eb !important;
         border: none !important;
         border-radius: 0.5rem !important;
         cursor: pointer !important;
@@ -217,7 +219,7 @@ const FullCalculator = () => {
 
       .loan-form-progress-bar {
         height: 100% !important;
-        background-color: #4f46e5 !important;
+        background-color: #2563eb !important;
         border-radius: 9999px !important;
         transition: width 0.3s ease-in-out !important;
       }
