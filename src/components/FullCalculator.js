@@ -109,7 +109,7 @@ const FullCalculator = () => {
 
 
       
-     /* Custom Select styling */
+   /* Custom Select styling */
 /* RESET the select styling completely */
 .loan-form-select-trigger {
   all: unset !important;
@@ -148,13 +148,10 @@ const FullCalculator = () => {
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Fix any absolute positioned wrapper */
-[data-radix-popper-content-wrapper] {
-  position: absolute !important;
-  left: auto !important;
-  top: auto !important;
-  z-index: 1000 !important;
-  min-width: var(--radix-select-trigger-width) !important;
+/* Ensure the portal content is positioned correctly */
+.SelectPortal {
+  position: fixed; /* Ensure the portal is fixed in the viewport */
+  z-index: 1000; /* Ensure it appears above other content */
 }
 
 /* Select item styling */
@@ -517,8 +514,9 @@ const FullCalculator = () => {
         <Select.Content 
           className="loan-form-select-content" 
           position="popper" 
-          sideOffset={8} // Adjust this value for margin between trigger and dropdown
-          align="start" // Ensure the dropdown aligns with the trigger
+          sideOffset={8} // Margin between trigger and dropdown
+          align="start" // Align dropdown with the trigger
+          style={{ width: 'var(--radix-select-trigger-width)' }} // Match trigger width
         >
           <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
             <ChevronUp className="w-4 h-4" />
@@ -546,6 +544,9 @@ const FullCalculator = () => {
     )}
   </div>
 </FormField>
+
+
+
     </>
 
     

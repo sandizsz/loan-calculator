@@ -560,6 +560,9 @@ input[type="range"]::-webkit-slider-thumb {
 .static {
   position: static;
 }
+.fixed {
+  position: fixed;
+}
 .absolute {
   position: absolute;
 }
