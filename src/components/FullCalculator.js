@@ -76,6 +76,9 @@ const FullCalculator = () => {
         border-radius: 0.5rem !important;
         transition: all 0.2s ease-in-out !important;
       }
+      .loan-form-input.pl-16 {
+        padding-left: 4rem !important;
+      }
 
       .loan-form-input:focus {
         outline: none !important;
@@ -354,15 +357,13 @@ const FullCalculator = () => {
         required
         hint="Ievadiet 8 ciparu telefona numuru"
       >
-        <div className="relative flex items-center w-full">
-          <div className="absolute left-3 flex items-center justify-center h-full pointer-events-none">
-            <span className="text-gray-500 text-sm font-medium pl-1">+371</span>
+        <div className="relative w-full">
+          <div className="absolute left-0 flex items-center justify-center h-full pointer-events-none pl-4">
+            <span className="text-gray-500 text-sm font-medium">+371</span>
           </div>
           <input
-    type="tel"
-    className={`w-full h-12 pl-10 pr-4 text-base text-gray-900 bg-white border rounded-md focus:outline-none focus:ring-2 transition-colors ${
-      errors.phone ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
-    }`}
+            type="tel"
+            className="loan-form-input pl-16"
     maxLength="8"
     placeholder="12345678"
     aria-invalid={errors.phone ? 'true' : 'false'}
