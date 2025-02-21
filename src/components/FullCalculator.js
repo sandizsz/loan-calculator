@@ -112,11 +112,11 @@ const FullCalculator = () => {
         align-items: center !important;
         justify-content: space-between !important;
         width: 100% !important;
-        height: 48px !important;
+        height: 56px !important;
         padding: 0 1rem !important;
         background-color: white !important;
-        border: 2px solid #e5e7eb !important;
-        border-radius: 0.5rem !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
         font-size: 1rem !important;
         line-height: 1.5 !important;
         color: #1f2937 !important;
@@ -126,15 +126,17 @@ const FullCalculator = () => {
       .loan-form-select-trigger:focus {
         outline: none !important;
         border-color: #2563eb !important;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
       }
 
       .loan-form-select-content {
         overflow: hidden !important;
         background-color: white !important;
-        border-radius: 0.5rem !important;
+        border-radius: 8px !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
         z-index: 1000 !important;
+        width: var(--radix-select-trigger-width) !important;
+        max-height: var(--radix-select-content-available-height) !important;
       }
 
       /* Checkbox styling */
@@ -390,7 +392,7 @@ const FullCalculator = () => {
           </div>
           <input
   type="tel"
-  className="loan-form-input pl-8"
+  className="loan-form-input pl-16"
   maxLength="8"
   placeholder="12345678"
   aria-invalid={errors.phone ? 'true' : 'false'}
@@ -400,7 +402,6 @@ const FullCalculator = () => {
       value: /^[0-9]{8}$/,
       message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
     }
-    // Remove the onChange: () => trigger('phone') that was here
   })}
 />
         </div>
