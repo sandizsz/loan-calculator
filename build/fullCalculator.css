@@ -636,6 +636,9 @@ input[type="range"]::-webkit-slider-thumb {
 .mt-1 {
   margin-top: 0.25rem;
 }
+.mt-2 {
+  margin-top: 0.5rem;
+}
 .mt-4 {
   margin-top: 1rem;
 }
@@ -708,9 +711,6 @@ input[type="range"]::-webkit-slider-thumb {
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
-.cursor-default {
-  cursor: default;
-}
 .cursor-help {
   cursor: help;
 }
@@ -744,6 +744,15 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .gap-4 {
   gap: 1rem;
+}
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * (1 - 0));
+  margin-top: calc(0.5rem * (1 - var(--tw-space-y-reverse)));
+  margin-top: calc(0.5rem * calc(1 - 0));
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * 0);
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 .space-y-6 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
