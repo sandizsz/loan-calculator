@@ -418,11 +418,9 @@ const FullCalculator = () => {
   aria-invalid={errors.email ? 'true' : 'false'}
   {...register('email', {
     required: 'Šis lauks ir obligāts',
-    validate: {
-      hasAtSign: {
-        value: (value) => !value || value.includes('@') || 'Lūdzu, ievadiet derīgu e-pasta adresi',
-        message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-      }
+    pattern: {
+      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+      message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
     }
   })}
 />
