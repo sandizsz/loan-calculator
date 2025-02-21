@@ -46,45 +46,54 @@ const FullCalculator = () => {
     style.textContent = `
       h2 {
         font-family: inherit !important;
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
+        font-size: 2.25rem !important;
+        font-weight: 700 !important;
         color: #1F2937 !important;
-        margin-bottom: 1.5rem !important;
-        line-height: 1.75rem !important;
-        letter-spacing: normal !important;
+        margin-bottom: 0.5rem !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
       }
+
+      h3 {
+        font-size: 1.125rem !important;
+        color: #6B7280 !important;
+        text-align: center !important;
+        margin-bottom: 2.5rem !important;
+      }
+
       /* Base form container */
       .loan-form-container {
         background: #ffffff !important;
-        border-radius: 12px !important;
+        border-radius: 16px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-        padding: 2rem !important;
-        max-width: 800px !important;
-        margin: 0 auto !important;
+        padding: 2.5rem !important;
+        max-width: 600px !important;
+        margin: 2rem auto !important;
       }
 
       /* Form inputs */
       .loan-form-input {
         display: block !important;
         width: 100% !important;
-        height: 48px !important;
-        padding: 0.75rem 1rem !important;
+        height: 56px !important;
+        padding: 1rem !important;
         font-size: 1rem !important;
         line-height: 1.5 !important;
         color: #1f2937 !important;
         background-color: #ffffff !important;
-        border: 2px solid #e5e7eb !important;
-        border-radius: 0.5rem !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
         transition: all 0.2s ease-in-out !important;
       }
-      .loan-form-input.pl-16 {
-        padding-left: 4rem !important;
+
+      .loan-form-input::placeholder {
+        color: #9CA3AF !important;
       }
 
       .loan-form-input:focus {
         outline: none !important;
         border-color: #2563eb !important;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
       }
 
       .loan-form-input:disabled {
@@ -176,10 +185,15 @@ const FullCalculator = () => {
       /* Labels */
       .loan-form-label {
         display: block !important;
-        margin-bottom: 0.5rem !important;
-        font-size: 0.875rem !important;
+        margin-bottom: 0.75rem !important;
+        font-size: 1rem !important;
         font-weight: 500 !important;
         color: #374151 !important;
+      }
+
+      /* Form field container */
+      .form-field {
+        margin-bottom: 1.5rem !important;
       }
 
       /* Error messages */
@@ -187,6 +201,14 @@ const FullCalculator = () => {
         margin-top: 0.5rem !important;
         font-size: 0.875rem !important;
         color: #dc2626 !important;
+        font-weight: 500 !important;
+      }
+
+      /* Helper text */
+      .form-helper-text {
+        margin-top: 0.375rem !important;
+        font-size: 0.875rem !important;
+        color: #6B7280 !important;
       }
 
       /* Buttons */
@@ -291,12 +313,12 @@ const FullCalculator = () => {
 
   // Custom field component with error handling
   const FormField = ({ name, label, required, children, hint }) => (
-    <div className="mb-4">
+    <div className="form-field">
       <Label.Root className="loan-form-label">
         {label} {required && <span className="text-red-500">*</span>}
       </Label.Root>
       {children}
-      {hint && <p className="text-sm text-gray-500 mt-1">{hint}</p>}
+      {hint && <p className="form-helper-text">{hint}</p>}
       {errors[name] && (
         <p className="loan-form-error">
           {errors[name].message}
@@ -307,6 +329,8 @@ const FullCalculator = () => {
 
   const renderStep1 = () => (
     <>
+      <h2>Aizpildiet pieteikumu,</h2>
+      <h3>saņemiet aizdevumu!</h3>
       <FormField
         name="companyName"
         label="Uzņēmuma nosaukums"
