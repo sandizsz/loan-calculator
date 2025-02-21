@@ -547,6 +547,8 @@ const FullCalculator = () => {
         align="start"
         avoidCollisions={false}
         side="bottom"
+        position="popper"
+        sideOffset={5}
       >
         <Select.Viewport className="p-1">
           <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
