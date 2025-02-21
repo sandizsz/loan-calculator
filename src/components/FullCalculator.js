@@ -105,14 +105,18 @@ const FullCalculator = () => {
         cursor: not-allowed !important;
       }
 
+
+
+
+
       /* Custom Select styling */
-      /* Updated Select Trigger and Content styling */
+   /* RESET the select styling completely */
 .loan-form-select-trigger {
   all: unset !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;  /* Changed from 95% to 100% */
+  width: 100% !important;
   height: 56px !important;
   padding: 0 1rem !important;
   background-color: white !important;
@@ -131,23 +135,80 @@ const FullCalculator = () => {
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
 }
 
+/* Fix dropdown positioning and styling */
 .loan-form-select-content {
-  overflow: hidden !important;
   background-color: white !important;
   border-radius: 8px !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
   z-index: 1000 !important;
-  margin-top: 8px !important;  /* Added margin-top */
+  overflow: hidden !important;
   width: var(--radix-select-trigger-width) !important;
-  max-height: var(--radix-select-content-available-height) !important;
-  position: relative !important;  /* Changed from absolute */
+  max-height: 300px !important;
+  animation-duration: 0.6s !important;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Fix for Select.Portal positioning */
+/* Fix any absolute positioned wrapper */
 [data-radix-popper-content-wrapper] {
-  width: var(--radix-select-trigger-width) !important;
-  transform: translateY(8px) !important;  /* Add space below trigger */
+  position: absolute !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 1000 !important;
+  min-width: var(--radix-select-trigger-width) !important;
 }
+
+/* Select item styling */
+.select-item {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0.5rem 1rem !important;
+  position: relative !important;
+  user-select: none !important;
+  color: #1f2937 !important;
+}
+
+.select-item:hover {
+  background-color: #f3f4f6 !important;
+  cursor: pointer !important;
+}
+
+/* Simple dropdown animations */
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loan-form-select-content[data-side="bottom"] {
+  animation-name: slideDownAndFade !important;
+}
+
+.loan-form-select-content[data-side="top"] {
+  animation-name: slideUpAndFade !important;
+}
+
+
+
+
+
 
       /* Checkbox styling */
       .loan-form-checkbox-root {
@@ -465,51 +526,38 @@ const FullCalculator = () => {
         />
       </FormField>
 
-      <FormField
+   <FormField
   name="loanPurpose"
   label="Aizdevuma mērķis"
   required
 >
-  <div className="w-full relative">
-    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
-      <Select.Trigger className="loan-form-select-trigger">
-        <Select.Value placeholder="Izvēlieties mērķi" />
-        <Select.Icon>
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        </Select.Icon>
-      </Select.Trigger>
-      
-      <Select.Portal>
-        <Select.Content 
-          className="loan-form-select-content" 
-          position="popper" 
-          sideOffset={8}
-        >
-          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-            <ChevronUp className="w-4 h-4" />
-          </Select.ScrollUpButton>
-          
-          <Select.Viewport className="p-2">
-            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-            <SelectItem value="cits">Cits mērķis</SelectItem>
-          </Select.Viewport>
-          
-          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-            <ChevronDown className="w-4 h-4" />
-          </Select.ScrollDownButton>
-        </Select.Content>
-      </Select.Portal>
-    </Select.Root>
+  <Select.Root 
+    onValueChange={(value) => setValue('loanPurpose', value)}
+  >
+    <Select.Trigger className="loan-form-select-trigger">
+      <Select.Value placeholder="Izvēlieties mērķi" />
+      <Select.Icon>
+        <ChevronDown className="w-4 h-4 text-gray-500" />
+      </Select.Icon>
+    </Select.Trigger>
     
-    {errors.loanPurpose && (
-      <p className="loan-form-error mt-1">
-        {errors.loanPurpose.message}
-      </p>
-    )}
-  </div>
+    <Select.Portal>
+      <Select.Content 
+        className="loan-form-select-content"
+        align="start"
+        avoidCollisions={false}
+        side="bottom"
+      >
+        <Select.Viewport className="p-1">
+          <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+          <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+          <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+          <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+          <SelectItem value="cits">Cits mērķis</SelectItem>
+        </Select.Viewport>
+      </Select.Content>
+    </Select.Portal>
+  </Select.Root>
 </FormField>
 
       <FormField
