@@ -86,6 +86,10 @@ const FullCalculator = () => {
         transition: all 0.2s ease-in-out !important;
       }
 
+      .loan-form-input[aria-invalid="true"] {
+        border-color: #dc2626 !important;
+      }
+
       .loan-form-input::placeholder {
         color: #9CA3AF !important;
       }
@@ -343,6 +347,7 @@ const FullCalculator = () => {
         <input
           type="text"
           className="loan-form-input"
+          aria-invalid={errors.companyName ? 'true' : 'false'}
           {...register('companyName', { required: 'Šis lauks ir obligāts' })}
         />
       </FormField>
@@ -355,6 +360,7 @@ const FullCalculator = () => {
         <input
           type="text"
           className="loan-form-input"
+          aria-invalid={errors.regNumber ? 'true' : 'false'}
           {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
         />
       </FormField>
@@ -367,6 +373,7 @@ const FullCalculator = () => {
         <input
           type="text"
           className="loan-form-input"
+          aria-invalid={errors.contactName ? 'true' : 'false'}
           {...register('contactName', { required: 'Šis lauks ir obligāts' })}
         />
       </FormField>
@@ -383,7 +390,7 @@ const FullCalculator = () => {
           </div>
           <input
   type="tel"
-  className={`loan-form-input pl-8 ${errors.phone ? 'border-red-500' : ''}`}
+  className="loan-form-input pl-8"
   maxLength="8"
   placeholder="12345678"
   aria-invalid={errors.phone ? 'true' : 'false'}
@@ -406,8 +413,9 @@ const FullCalculator = () => {
 >
 <input
   type="email"
-  className={`loan-form-input ${errors.email ? 'border-red-500' : ''}`}
+  className="loan-form-input"
   placeholder="example@domain.com"
+  aria-invalid={errors.email ? 'true' : 'false'}
   {...register('email', {
     required: 'Šis lauks ir obligāts',
     validate: {
