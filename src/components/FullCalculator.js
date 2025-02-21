@@ -242,7 +242,7 @@ const FullCalculator = () => {
         background-color: #e5e7eb !important;
         border-radius: 9999px !important;
         margin: 1rem 0 2rem !important;
-        width: 200px !important;
+        width: 300px !important;
         margin-left: auto !important;
         margin-right: auto !important;
       }
@@ -334,8 +334,7 @@ const FullCalculator = () => {
 
   const renderStep1 = () => (
     <>
-      <h2>Aizpildiet pieteikumu,</h2>
-      <h3>saņemiet aizdevumu!</h3>
+   
       <FormField
         name="companyName"
         label="Uzņēmuma nosaukums"
@@ -533,15 +532,16 @@ const FullCalculator = () => {
   return (
     <div className="loan-form-container">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
-        </h2>
-        <div className="loan-form-progress">
+      <div className="loan-form-progress">
           <div
             className="loan-form-progress-bar"
             style={{ width: `${(step / 2) * 100}%` }}
           />
         </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
+        </h2>
+     
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
