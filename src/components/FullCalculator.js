@@ -67,7 +67,7 @@ const FullCalculator = () => {
         border-radius: 16px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
         padding: 2.5rem !important;
-        max-width: 600px !important;
+        max-width: 800px !important;
         margin: 2rem auto !important;
       }
 
@@ -238,9 +238,13 @@ const FullCalculator = () => {
 
       /* Progress bar */
       .loan-form-progress {
-        height: 0.5rem !important;
+        height: 0.25rem !important;
         background-color: #e5e7eb !important;
         border-radius: 9999px !important;
+        margin: 1rem 0 2rem !important;
+        width: 200px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
       }
 
       .loan-form-progress-bar {
@@ -248,6 +252,7 @@ const FullCalculator = () => {
         background-color: #2563eb !important;
         border-radius: 9999px !important;
         transition: width 0.3s ease-in-out !important;
+        opacity: 0.8 !important;
       }
     `;
     document.head.appendChild(style);
