@@ -106,38 +106,48 @@ const FullCalculator = () => {
       }
 
       /* Custom Select styling */
-      .loan-form-select-trigger {
-        all: unset !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        width: 95% !important;
-        height: 56px !important;
-        padding: 0 1rem !important;
-        background-color: white !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 8px !important;
-        font-size: 1rem !important;
-        line-height: 1.5 !important;
-        color: #1f2937 !important;
-        cursor: pointer !important;
-      }
+      /* Updated Select Trigger and Content styling */
+.loan-form-select-trigger {
+  all: unset !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;  /* Changed from 95% to 100% */
+  height: 56px !important;
+  padding: 0 1rem !important;
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: #1f2937 !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
 
-      .loan-form-select-trigger:focus {
-        outline: none !important;
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
-      }
+.loan-form-select-trigger:focus {
+  outline: none !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
 
-      .loan-form-select-content {
-        overflow: hidden !important;
-        background-color: white !important;
-        border-radius: 8px !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        z-index: 1000 !important;
-        width: var(--radix-select-trigger-width) !important;
-        max-height: var(--radix-select-content-available-height) !important;
-      }
+.loan-form-select-content {
+  overflow: hidden !important;
+  background-color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  z-index: 1000 !important;
+  margin-top: 8px !important;  /* Added margin-top */
+  width: var(--radix-select-trigger-width) !important;
+  max-height: var(--radix-select-content-available-height) !important;
+  position: relative !important;  /* Changed from absolute */
+}
+
+/* Fix for Select.Portal positioning */
+[data-radix-popper-content-wrapper] {
+  width: var(--radix-select-trigger-width) !important;
+  transform: translateY(8px) !important;  /* Add space below trigger */
+}
 
       /* Checkbox styling */
       .loan-form-checkbox-root {
@@ -456,39 +466,51 @@ const FullCalculator = () => {
       </FormField>
 
       <FormField
-        name="loanPurpose"
-        label="Aizdevuma mērķis"
-        required
-      >
-        <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
-          <Select.Trigger className="loan-form-select-trigger">
-            <Select.Value placeholder="Izvēlieties mērķi" />
-            <Select.Icon>
-              <ChevronDown className="w-4 h-4" />
-            </Select.Icon>
-          </Select.Trigger>
-
-          <Select.Portal>
-            <Select.Content className="loan-form-select-content absolute left-0 right-0 mt-2">
-              <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                <ChevronUp className="w-4 h-4" />
-              </Select.ScrollUpButton>
-
-              <Select.Viewport className="p-2">
-                <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-                <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-                <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-                <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-                <SelectItem value="cits">Cits mērķis</SelectItem>
-              </Select.Viewport>
-
-              <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                <ChevronDown className="w-4 h-4" />
-              </Select.ScrollDownButton>
-            </Select.Content>
-          </Select.Portal>
-        </Select.Root>
-      </FormField>
+  name="loanPurpose"
+  label="Aizdevuma mērķis"
+  required
+>
+  <div className="w-full relative">
+    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+      <Select.Trigger className="loan-form-select-trigger">
+        <Select.Value placeholder="Izvēlieties mērķi" />
+        <Select.Icon>
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        </Select.Icon>
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content 
+          className="loan-form-select-content" 
+          position="popper" 
+          sideOffset={8}
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+          
+          <Select.Viewport className="p-2">
+            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+            <SelectItem value="cits">Cits mērķis</SelectItem>
+          </Select.Viewport>
+          
+          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+    
+    {errors.loanPurpose && (
+      <p className="loan-form-error mt-1">
+        {errors.loanPurpose.message}
+      </p>
+    )}
+  </div>
+</FormField>
 
       <FormField
         name="existingLoan"
