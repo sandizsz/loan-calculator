@@ -108,9 +108,9 @@ const FullCalculator = () => {
 
 
 
-
-      /* Custom Select styling */
-   /* RESET the select styling completely */
+      
+     /* Custom Select styling */
+/* RESET the select styling completely */
 .loan-form-select-trigger {
   all: unset !important;
   display: inline-flex !important;
@@ -497,7 +497,58 @@ const FullCalculator = () => {
   })}
 />
 </FormField>
+
+
+<FormField
+  name="loanPurpose"
+  label="Aizdevuma mērķis"
+  required
+>
+  <div className="w-full relative">
+    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+      <Select.Trigger className="loan-form-select-trigger">
+        <Select.Value placeholder="Izvēlieties mērķi" />
+        <Select.Icon>
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        </Select.Icon>
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content 
+          className="loan-form-select-content" 
+          position="popper" 
+          sideOffset={8} // Adjust this value for margin between trigger and dropdown
+          align="start" // Ensure the dropdown aligns with the trigger
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+          
+          <Select.Viewport className="p-2">
+            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+            <SelectItem value="cits">Cits mērķis</SelectItem>
+          </Select.Viewport>
+          
+          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+    
+    {errors.loanPurpose && (
+      <p className="loan-form-error mt-1">
+        {errors.loanPurpose.message}
+      </p>
+    )}
+  </div>
+</FormField>
     </>
+
+    
   );
 
   const renderStep2 = () => (
@@ -526,40 +577,51 @@ const FullCalculator = () => {
         />
       </FormField>
 
-   <FormField
+      <FormField
   name="loanPurpose"
   label="Aizdevuma mērķis"
   required
 >
-  <Select.Root 
-    onValueChange={(value) => setValue('loanPurpose', value)}
-  >
-    <Select.Trigger className="loan-form-select-trigger">
-      <Select.Value placeholder="Izvēlieties mērķi" />
-      <Select.Icon>
-        <ChevronDown className="w-4 h-4 text-gray-500" />
-      </Select.Icon>
-    </Select.Trigger>
+  <div className="w-full relative">
+    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+      <Select.Trigger className="loan-form-select-trigger">
+        <Select.Value placeholder="Izvēlieties mērķi" />
+        <Select.Icon>
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        </Select.Icon>
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content 
+          className="loan-form-select-content" 
+          position="popper" 
+          sideOffset={8}
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+          
+          <Select.Viewport className="p-2">
+            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+            <SelectItem value="cits">Cits mērķis</SelectItem>
+          </Select.Viewport>
+          
+          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
     
-    <Select.Portal>
-      <Select.Content 
-        className="loan-form-select-content"
-        align="start"
-        avoidCollisions={false}
-        side="bottom"
-        position="popper"
-        sideOffset={5}
-      >
-        <Select.Viewport className="p-1">
-          <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-          <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-          <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-          <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-          <SelectItem value="cits">Cits mērķis</SelectItem>
-        </Select.Viewport>
-      </Select.Content>
-    </Select.Portal>
-  </Select.Root>
+    {errors.loanPurpose && (
+      <p className="loan-form-error mt-1">
+        {errors.loanPurpose.message}
+      </p>
+    )}
+  </div>
 </FormField>
 
       <FormField
