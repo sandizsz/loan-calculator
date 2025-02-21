@@ -460,39 +460,34 @@ const FullCalculator = () => {
         label="Aizdevuma mērķis"
         required
       >
-        <div className="relative">
-          <div className="loan-form-select-trigger">
-            <span>Izvēlieties mērķi</span>
-            <ChevronDown className="w-4 h-4" />
-          </div>
-          
-          <div className="loan-form-select-content absolute left-0 right-0 mt-2">
-            <div className="p-2 bg-white rounded-lg shadow-lg border border-gray-200">
-              <div className="space-y-2">
-                <button type="button" className="relative flex items-center px-8 py-2 text-sm text-gray-700 hover:bg-blue-50 focus:bg-blue-50 rounded-md focus:outline-none select-none w-full">
-                  <Check className="absolute left-2 w-4 h-4" />
-                  <span>Aprozāmie līdzekļi</span>
-                </button>
-                <button type="button" className="relative flex items-center px-8 py-2 text-sm text-gray-700 hover:bg-blue-50 focus:bg-blue-50 rounded-md focus:outline-none select-none w-full">
-                  <Check className="absolute left-2 w-4 h-4" />
-                  <span>Pamatlīdzekļu iegāde</span>
-                </button>
-                <button type="button" className="relative flex items-center px-8 py-2 text-sm text-gray-700 hover:bg-blue-50 focus:bg-blue-50 rounded-md focus:outline-none select-none w-full">
-                  <Check className="absolute left-2 w-4 h-4" />
-                  <span>Kredītu refinansēšana</span>
-                </button>
-                <button type="button" className="relative flex items-center px-8 py-2 text-sm text-gray-700 hover:bg-blue-50 focus:bg-blue-50 rounded-md focus:outline-none select-none w-full">
-                  <Check className="absolute left-2 w-4 h-4" />
-                  <span>Projektu finansēšana</span>
-                </button>
-                <button type="button" className="relative flex items-center px-8 py-2 text-sm text-gray-700 hover:bg-blue-50 focus:bg-blue-50 rounded-md focus:outline-none select-none w-full">
-                  <Check className="absolute left-2 w-4 h-4" />
-                  <span>Cits mērķis</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+          <Select.Trigger className="loan-form-select-trigger">
+            <Select.Value placeholder="Izvēlieties mērķi" />
+            <Select.Icon>
+              <ChevronDown className="w-4 h-4" />
+            </Select.Icon>
+          </Select.Trigger>
+
+          <Select.Portal>
+            <Select.Content className="loan-form-select-content absolute left-0 right-0 mt-2">
+              <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                <ChevronUp className="w-4 h-4" />
+              </Select.ScrollUpButton>
+
+              <Select.Viewport className="p-2">
+                <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+                <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+                <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+                <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+                <SelectItem value="cits">Cits mērķis</SelectItem>
+              </Select.Viewport>
+
+              <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                <ChevronDown className="w-4 h-4" />
+              </Select.ScrollDownButton>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </FormField>
 
       <FormField
