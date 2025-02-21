@@ -901,8 +901,8 @@ input[type="range"]::-webkit-slider-thumb {
 .pl-4 {
   padding-left: 1rem;
 }
-.pl-\[2\.5rem\] {
-  padding-left: 2.5rem;
+.pl-8 {
+  padding-left: 2rem;
 }
 .pt-6 {
   padding-top: 1.5rem;

@@ -30,14 +30,22 @@ const FullCalculator = () => {
   const [error, setError] = useState(null);
 
   // Form setup with proper validation
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
-    mode: 'onSubmit',  // Only validate on form submission
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm({
+    mode: 'onChange',  // Validate on change for format errors
     criteriaMode: 'firstError',
     defaultValues: {
       // your default values...
     },
-    reValidateMode: 'onSubmit'  // Only revalidate on form submission
+    reValidateMode: 'onChange'  // Revalidate on change for format errors
   });
+
+  // Separate validation for required fields
+  const validateField = async (name, value) => {
+    if (value) {
+      // If there's a value, trigger validation immediately
+      await trigger(name);
+    }
+  };
 
 
   useEffect(() => {
@@ -364,19 +372,22 @@ const FullCalculator = () => {
           </div>
           <input
             type="tel"
-            className="loan-form-input pl-[2.5rem]"
+            className="loan-form-input pl-8"
     maxLength="8"
     placeholder="12345678"
     aria-invalid={errors.phone ? 'true' : 'false'}
     {...register('phone', {
       required: 'Šis lauks ir obligāts',
-      pattern: {
-        value: /^[0-9]{0,8}$/,
-        message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+      validate: (value) => {
+        if (!value) return true; // Skip validation if empty (handled by required)
+        if (!/^[0-9]+$/.test(value)) return 'Lūdzu, ievadiet tikai ciparus';
+        if (value.length !== 8) return 'Lūdzu, ievadiet 8 ciparu telefona numuru';
+        return true;
       },
-      maxLength: {
-        value: 8,
-        message: 'Maksimālais garums ir 8 cipari'
+      onChange: (e) => {
+        // Only allow digits
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        if (e.target.value) validateField('phone', e.target.value);
       }
     })}
   />
@@ -394,11 +405,11 @@ const FullCalculator = () => {
     placeholder="example@domain.com"
     {...register('email', {
       required: 'Šis lauks ir obligāts',
-      validate: (value) => {
-        // Only validate on submit or blur, not during typing
-        if (!value) return true;
-        return value.includes('@') || 'Lūdzu, ievadiet derīgu e-pasta adresi';
-      }
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+      },
+      onChange: (e) => validateField('email', e.target.value)
     })}
   />
 </FormField>
