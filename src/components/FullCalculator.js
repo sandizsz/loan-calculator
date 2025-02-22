@@ -35,12 +35,7 @@ const FullCalculator = () => {
     const wpData = window.loanCalculatorData || {};
     
     if (wpData.kredits && Array.isArray(wpData.kredits)) {
-      // Filter kredits by category ID 10
-      const filteredKredits = wpData.kredits.filter(kredit => 
-        kredit.categories && kredit.categories.includes(10)
-      );
-
-      const secureKredits = filteredKredits.map(kredit => ({
+      const secureKredits = wpData.kredits.map(kredit => ({
         ...kredit,
         icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
       }));
