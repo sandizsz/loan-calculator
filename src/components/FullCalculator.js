@@ -35,14 +35,15 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
+      financialProduct: '',
       financingPurposes: [],
       contactName: 'John Doe',
       email: 'test@example.com',
       phone: '20000000',
       companyName: 'Test Company SIA',
       regNumber: '40000000000',
-      companyAge: 'two-five',
-      annualTurnover: 'hundred-twofifty',
+      companyAge: '6-12',
+      annualTurnover: '200k-500k',
       profitLossStatus: 'profit',
       companyPosition: 'owner',
       coreActivity: 'Tirdzniecība ar būvmateriāliem',
@@ -1055,6 +1056,54 @@ const FullCalculator = () => {
       </FormField>
 
       
+      <FormField
+        name="financialProduct"
+        label="Nepieciešamais finanšu produkts *"
+        required
+      >
+        <div className="w-full relative">
+          <Select.Root 
+            value={watch('financialProduct')} 
+            onValueChange={(value) => setValue('financialProduct', value, { shouldValidate: true })}
+          >
+            <Select.Trigger 
+              className="loan-form-select-trigger"
+              aria-invalid={errors.financialProduct ? 'true' : 'false'}
+              {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
+            >
+              <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
+              <Select.Icon>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </Select.Icon>
+            </Select.Trigger>
+            
+            <Select.Portal>
+              <Select.Content 
+                className="loan-form-select-content" 
+                position="popper" 
+                sideOffset={8}
+              >
+                <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronUp className="w-4 h-4" />
+                </Select.ScrollUpButton>
+                
+                <Select.Viewport className="p-2">
+                  <SelectItem value="loan">Aizdevums</SelectItem>
+                  <SelectItem value="credit-line">Kredītlīnija</SelectItem>
+                  <SelectItem value="leasing">Līzings</SelectItem>
+                  <SelectItem value="factoring">Faktorings</SelectItem>
+                  <SelectItem value="other">Cits</SelectItem>
+                </Select.Viewport>
+                
+                <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronDown className="w-4 h-4" />
+                </Select.ScrollDownButton>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+      </FormField>
+
       <FormField
         name="financingPurposes"
         label="Finansējuma mērķis (var būt vairāki) *"
