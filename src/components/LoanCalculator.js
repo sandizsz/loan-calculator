@@ -101,22 +101,17 @@ const LoanCalculator = () => {
         console.log('WordPress Data:', wpData);
         
         if (wpData.kredits && Array.isArray(wpData.kredits)) {
-            // Ensure all icon URLs are HTTPS
-            const secureKredits = wpData.kredits.map(kredit => ({
+            // Filter kredits by category ID 10
+            const filteredKredits = wpData.kredits.filter(kredit => 
+                kredit.categories && kredit.categories.includes(10)
+            );
+            
+            const secureKredits = filteredKredits.map(kredit => ({
                 ...kredit,
                 icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
             }));
-            
             setKredits(secureKredits);
-            
-            // Set initial selected kredit
-            const currentUrl = window.location.href;
-            const matchingKredit = secureKredits.find(kredit => 
-                currentUrl.includes(kredit.slug) || currentUrl.includes(kredit.url)
-            );
-            setSelectedKredit(matchingKredit || secureKredits[0]);
         }
-        
         setIsLoading(false);
     }, []);
 
