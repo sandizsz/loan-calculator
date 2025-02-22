@@ -43,16 +43,15 @@ const FullCalculator = () => {
     }
   }, []);
 
-  // Get URL parameters and ensure kredit_id is a string
+  // Get URL parameters
   const getUrlParams = () => {
     const params = new URLSearchParams(window.location.search);
-    const kreditId = params.get('kredit_id');
     return {
       amount: params.get('amount') || '',
       term: params.get('term') || '',
       email: params.get('email') || '',
       phone: params.get('phone') || '',
-      kredit_id: kreditId ? String(kreditId) : ''
+      kredit_id: params.get('kredit_id') || ''
     };
   };
 
@@ -444,7 +443,7 @@ const FullCalculator = () => {
         height: 0.25rem !important;
         background-color: #e5e7eb !important;
         border-radius: 9999px !important;
-        margin: 1rem 0 2rem !important;
+        margin: 1rem 0 1rem !important;
         width: 300px !important;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -1105,14 +1104,17 @@ const FullCalculator = () => {
         required
       >
         <div className="w-full relative">
+          <input 
+            type="hidden" 
+            {...register('financialProduct', { required: 'Šis lauks ir obligāts' })} 
+          />
           <Select.Root 
-            defaultValue={urlParams.kredit_id}
-            onValueChange={(value) => setValue('financialProduct', value, { shouldValidate: true })}
+            value={watch('financialProduct')}
+            onValueChange={(value) => setValue('financialProduct', value)}
           >
             <Select.Trigger 
               className="loan-form-select-trigger"
               aria-invalid={errors.financialProduct ? 'true' : 'false'}
-              {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
             >
               <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
               <Select.Icon>
