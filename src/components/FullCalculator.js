@@ -30,7 +30,7 @@ const FullCalculator = () => {
   const [error, setError] = useState(null);
   const [kredits, setKredits] = useState([]);
 
-  // Load WordPress data for kredits
+  // Load WordPress data for kredits and set initial selection
   useEffect(() => {
     const wpData = window.loanCalculatorData || {};
     
@@ -40,8 +40,19 @@ const FullCalculator = () => {
         icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
       }));
       setKredits(secureKredits);
+
+      // Set initial kredit selection if URL parameter exists
+      const urlParams = new URLSearchParams(window.location.search);
+      const kreditId = urlParams.get('kredit_id');
+      
+      if (kreditId) {
+        const matchingKredit = secureKredits.find(k => String(k.id) === String(kreditId));
+        if (matchingKredit) {
+          setValue('financialProduct', String(kreditId));
+        }
+      }
     }
-  }, []);
+  }, [setValue]);
 
   // Get URL parameters
   const getUrlParams = () => {
@@ -71,7 +82,7 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
-      financialProduct: urlParams.kredit_id || '',
+      financialProduct: '',
       loanAmount: urlParams.amount,
       loanTerm: urlParams.term,
       email: urlParams.email,
@@ -1109,8 +1120,11 @@ const FullCalculator = () => {
             {...register('financialProduct', { required: 'Šis lauks ir obligāts' })} 
           />
           <Select.Root 
-            value={watch('financialProduct')}
-            onValueChange={(value) => setValue('financialProduct', value)}
+            value={watch('financialProduct') || ''}
+            onValueChange={(value) => {
+              setValue('financialProduct', value);
+              console.log('Selected kredit:', value); // Debug log
+            }}
           >
             <Select.Trigger 
               className="loan-form-select-trigger"
