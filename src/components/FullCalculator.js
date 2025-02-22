@@ -60,8 +60,6 @@ const FullCalculator = () => {
       financialProduct: '',
       financingPurposes: [],
       contactName: 'John Doe',
-      email: 'test@example.com',
-      phone: '20000000',
       companyName: 'Test Company SIA',
       regNumber: '40000000000',
       companyAge: '6-12',
