@@ -35,7 +35,17 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
-      // your default values...
+      financingPurposes: [],
+      contactName: 'John Doe',
+      email: 'test@example.com',
+      phone: '20000000',
+      companyName: 'Test Company SIA',
+      regNumber: '40000000000',
+      companyAge: 'two-five',
+      annualTurnover: 'hundred-twofifty',
+      profitLossStatus: 'profit',
+      companyPosition: 'owner',
+      coreActivity: 'Tirdzniecība ar būvmateriāliem',
     },
     shouldFocusError: false, // Prevent automatic focus on error fields
   });
@@ -98,6 +108,49 @@ const FullCalculator = () => {
         outline: none !important;
         border-color: #2563eb !important;
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+      }
+
+      /* Multi-select checkbox styling */
+      .loan-form-checkbox-group {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+        gap: 0.75rem !important;
+      }
+
+      .loan-form-checkbox-wrapper {
+        display: flex !important;
+        align-items: center !important;
+        padding: 0.5rem !important;
+        border-radius: 0.375rem !important;
+        transition: background-color 0.2s !important;
+      }
+
+      .loan-form-checkbox-wrapper:hover {
+        background-color: #f3f4f6 !important;
+      }
+
+      .loan-form-checkbox-root {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+        border-radius: 0.25rem !important;
+        border: 2px solid #d1d5db !important;
+        background-color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+      }
+
+      .loan-form-checkbox-root[data-state='checked'] {
+        border-color: #2563eb !important;
+        background-color: #2563eb !important;
+      }
+
+      .loan-form-checkbox-indicator {
+        color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       .loan-form-input:disabled {
@@ -782,21 +835,25 @@ const FullCalculator = () => {
         <div className="flex space-x-4">
           <div className="flex-1">
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="loan-form-input"
               placeholder="Ievadiet termiņu"
-              min={watch('loanTermUnit') === 'years' ? '1' : '1'}
-              max={watch('loanTermUnit') === 'years' ? '10' : '120'}
               aria-invalid={errors.loanTerm ? 'true' : 'false'}
               {...register('loanTerm', { 
                 required: 'Šis lauks ir obligāts',
-                min: {
-                  value: watch('loanTermUnit') === 'years' ? 1 : 1,
-                  message: watch('loanTermUnit') === 'years' ? 'Minimālais termiņš ir 1 gads' : 'Minimālais termiņš ir 1 mēnesis'
-                },
-                max: {
-                  value: watch('loanTermUnit') === 'years' ? 10 : 120,
-                  message: watch('loanTermUnit') === 'years' ? 'Maksimālais termiņš ir 10 gadi' : 'Maksimālais termiņš ir 120 mēneši'
+                validate: (value) => {
+                  const num = parseFloat(value);
+                  if (isNaN(num)) return 'Lūdzu, ievadiet skaitli';
+                  
+                  const isYears = watch('loanTermUnit') === 'years';
+                  const min = 1;
+                  const max = isYears ? 10 : 120;
+                  
+                  if (num < min) return isYears ? 'Minimālais termiņš ir 1 gads' : 'Minimālais termiņš ir 1 mēnesis';
+                  if (num > max) return isYears ? 'Maksimālais termiņš ir 10 gadi' : 'Maksimālais termiņš ir 120 mēneši';
+                  return true;
                 }
               })}
             />
@@ -806,14 +863,19 @@ const FullCalculator = () => {
               className="flex"
               value={watch('loanTermUnit') || 'months'}
               onValueChange={(value) => {
-                setValue('loanTermUnit', value);
-                // Convert the current value when switching units
                 const currentTerm = watch('loanTerm');
-                if (currentTerm) {
-                  if (value === 'years') {
-                    setValue('loanTerm', Math.round(currentTerm / 12));
-                  } else {
-                    setValue('loanTerm', currentTerm * 12);
+                const oldUnit = watch('loanTermUnit');
+                setValue('loanTermUnit', value);
+                
+                // Only convert if there's a value and we're actually changing units
+                if (currentTerm && oldUnit && oldUnit !== value) {
+                  const numericTerm = parseFloat(currentTerm);
+                  if (!isNaN(numericTerm)) {
+                    if (value === 'years' && oldUnit === 'months') {
+                      setValue('loanTerm', Math.round(numericTerm / 12));
+                    } else if (value === 'months' && oldUnit === 'years') {
+                      setValue('loanTerm', numericTerm * 12);
+                    }
                   }
                 }
               }}
@@ -992,28 +1054,62 @@ const FullCalculator = () => {
         </RadioGroup.Root>
       </FormField>
 
+      
       <FormField
-        name="existingLoan"
-        label="Vai uzņēmumam ir esoši kredīti?"
+        name="financingPurposes"
+        label="Finansējuma mērķis (var būt vairāki) *"
         required
+        {...register('financingPurposes', { 
+          required: 'Lūdzu, izvēlieties vismaz vienu mērķi',
+          validate: value => {
+            if (!Array.isArray(value) || value.length === 0) {
+              return 'Lūdzu, izvēlieties vismaz vienu mērķi';
+            }
+            return true;
+          }
+        })}
       >
-        <RadioGroup.Root 
-          className="flex gap-4"
-          onValueChange={(value) => setValue('existingLoan', value)}
-        >
-          <div className="flex items-center">
-            <RadioGroup.Item value="yes" className="loan-form-radio-root">
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2">Jā</label>
+        <div className="loan-form-checkbox-group border border-gray-200 rounded-lg p-4">
+          {[
+            { id: 'working-capital', label: 'Apgrozāmie līdzekļi' },
+            { id: 'equipment', label: 'Iekārtu iegāde' },
+            { id: 'real-estate', label: 'Nekustamais īpašums' },
+            { id: 'vehicles', label: 'Transportlīdzekļi' },
+            { id: 'refinancing', label: 'Refinansēšana' },
+            { id: 'other', label: 'Cits' }
+          ].map((purpose) => (
+            <div key={purpose.id} className="loan-form-checkbox-wrapper">
+              <Checkbox.Root
+                className="loan-form-checkbox-root"
+                id={`purpose-${purpose.id}`}
+                onCheckedChange={(checked) => {
+                  const currentPurposes = watch('financingPurposes') || [];
+                  if (checked) {
+                    setValue('financingPurposes', [...currentPurposes, purpose.id]);
+                  } else {
+                    setValue('financingPurposes', currentPurposes.filter(p => p !== purpose.id));
+                  }
+                }}
+                checked={(watch('financingPurposes') || []).includes(purpose.id)}
+              >
+                <Checkbox.Indicator className="loan-form-checkbox-indicator">
+                  <Check className="w-4 h-4" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+              <label 
+                className="pl-2 text-sm text-gray-700" 
+                htmlFor={`purpose-${purpose.id}`}
+              >
+                {purpose.label}
+              </label>
+            </div>
+          ))}
+        </div>
+        {errors.financingPurposes && (
+          <div className="text-red-500 text-sm mt-1">
+            Lūdzu, izvēlieties vismaz vienu mērķi
           </div>
-          <div className="flex items-center">
-            <RadioGroup.Item value="no" className="loan-form-radio-root">
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2">Nē</label>
-          </div>
-        </RadioGroup.Root>
+        )}
       </FormField>
 
       <FormField
