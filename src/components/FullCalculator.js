@@ -35,6 +35,8 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
+      collateralType: '',
+      collateralDescription: '',
       financialProduct: '',
       financingPurposes: [],
       contactName: 'John Doe',
@@ -1160,6 +1162,75 @@ const FullCalculator = () => {
           </div>
         )}
       </FormField>
+
+      <FormField
+        name="collateralType"
+        label="Piedāvātais nodrošinājums *"
+        required
+      >
+        <div className="w-full relative">
+          <Select.Root 
+            value={watch('collateralType')} 
+            onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true })}
+          >
+            <Select.Trigger 
+              className="loan-form-select-trigger"
+              aria-invalid={errors.collateralType ? 'true' : 'false'}
+              {...register('collateralType', { required: 'Šis lauks ir obligāts' })}
+            >
+              <Select.Value placeholder="Izvēlieties nodrošinājuma veidu" className="text-gray-400" />
+              <Select.Icon>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </Select.Icon>
+            </Select.Trigger>
+            
+            <Select.Portal>
+              <Select.Content 
+                className="loan-form-select-content" 
+                position="popper" 
+                sideOffset={8}
+              >
+                <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronUp className="w-4 h-4" />
+                </Select.ScrollUpButton>
+                
+                <Select.Viewport className="p-2">
+                  <SelectItem value="real-estate">Nekustamais īpašums</SelectItem>
+                  <SelectItem value="vehicles">Transportlīdzekļi</SelectItem>
+                  <SelectItem value="commercial-pledge">Komercķīla</SelectItem>
+                  <SelectItem value="none">Nav nodrošinājuma</SelectItem>
+                  <SelectItem value="other">Cits</SelectItem>
+                </Select.Viewport>
+                
+                <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronDown className="w-4 h-4" />
+                </Select.ScrollDownButton>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+      </FormField>
+
+      {watch('collateralType') && watch('collateralType') !== 'none' && (
+        <FormField
+          name="collateralDescription"
+          label="Aprakstiet piedāvāto nodrošinājumu *"
+          required
+        >
+          <textarea
+            className="loan-form-input min-h-[100px] resize-none"
+            placeholder="Lūdzu, sniedziet detalizētu informāciju par piedāvāto nodrošinājumu"
+            aria-invalid={errors.collateralDescription ? 'true' : 'false'}
+            {...register('collateralDescription', { 
+              required: 'Šis lauks ir obligāts',
+              minLength: {
+                value: 10,
+                message: 'Lūdzu, sniedziet detalizētāku aprakstu'
+              }
+            })}
+          />
+        </FormField>
+      )}
 
       <FormField
         name="gdprConsent"
