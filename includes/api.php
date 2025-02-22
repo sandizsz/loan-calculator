@@ -86,38 +86,13 @@ function handle_loan_submission($request) {
             'amount' => floatval($data['loan_amount']),
             'currency' => 'EUR'
         ),
-        'expected_close_date' => date('Y-m-d', strtotime('+30 days')),
-        'note' => sprintf(
-            "Loan Application Details:\n\n" .
-            "Registration Number: %s\n" .
-            "Contact Position: %s\n" .
-            "Company Age: %s\n" .
-            "Annual Turnover: %s\n" .
-            "Profit/Loss Status: %s\n" .
-            "Core Activity: %s\n" .
-            "Loan Term: %s\n" .
-            "Loan Purpose: %s\n" .
-            "Collateral Type: %s\n" .
-            "Collateral Description: %s\n" .
-            "Applied Elsewhere: %s",
-            $data['reg_number'],
-            $data['company_position'],
-            $data['company_age'],
-            $data['annual_turnover'],
-            $data['profit_loss_status'],
-            $data['core_activity'],
-            $data['loan_term'],
-            $data['loan_purpose'],
-            $data['collateral_type'],
-            $data['collateral_description'],
-            $data['has_applied_elsewhere']
-        )
+        'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
 
     error_log('Sending lead data to Pipedrive: ' . print_r($lead_data, true));
 
     // Create lead in Pipedrive
-    $response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+    $lead_response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
         'headers' => array(
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
@@ -126,47 +101,73 @@ function handle_loan_submission($request) {
         'timeout' => 30
     ));
 
-    if (is_wp_error($response)) {
-        error_log('Pipedrive API Error (WP Error): ' . $response->get_error_message());
-        return new WP_Error('pipedrive_error', $response->get_error_message(), array('status' => 500));
+    if (is_wp_error($lead_response)) {
+        error_log('Pipedrive Lead API Error: ' . $lead_response->get_error_message());
+        return new WP_Error('pipedrive_error', $lead_response->get_error_message(), array('status' => 500));
     }
 
-    $status_code = wp_remote_retrieve_response_code($response);
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-
-    error_log('Pipedrive API Response: ' . print_r($body, true));
-
-    if ($status_code !== 201 && $status_code !== 200) {
-        error_log('Pipedrive API Error (Status ' . $status_code . '): ' . print_r($body, true));
-        return new WP_Error(
-            'pipedrive_error',
-            isset($body['error']) ? $body['error'] : 'Failed to create lead in Pipedrive',
-            array('status' => $status_code)
-        );
-    }
-
-    if (empty($body['data'])) {
-        error_log('Pipedrive API Error: Empty response data - ' . print_r($body, true));
-        return new WP_Error('pipedrive_error', 'Invalid response from Pipedrive', array('status' => 500));
-    }
-
-    // Send notification email to admin
-    $admin_email = get_option('admin_email');
-    $subject = 'New Loan Application Received - ' . $data['company_name'];
-    $message = sprintf(
-        "New loan application received:\n\nCompany: %s\nContact: %s\nAmount: €%s\nTerm: %s\n\nView in Pipedrive: %s",
-        $data['company_name'],
-        $data['contact_name'],
-        number_format($data['loan_amount'], 2),
-        $data['loan_term'],
-        'https://app.pipedrive.com/leads/details/' . $body['data']['id']
-    );
+    $lead_body = json_decode(wp_remote_retrieve_body($lead_response), true);
     
-    wp_mail($admin_email, $subject, $message);
+    if (empty($lead_body['data']['id'])) {
+        error_log('Pipedrive Lead API Error: ' . print_r($lead_body, true));
+        return new WP_Error('pipedrive_error', 'Failed to create lead', array('status' => 500));
+    }
+
+    $lead_id = $lead_body['data']['id'];
+
+    // Create note for the lead
+    $note_content = sprintf(
+        "Loan Application Details:\n\n" .
+        "Registration Number: %s\n" .
+        "Contact Position: %s\n" .
+        "Company Age: %s\n" .
+        "Annual Turnover: %s\n" .
+        "Profit/Loss Status: %s\n" .
+        "Core Activity: %s\n" .
+        "Loan Term: %s\n" .
+        "Loan Purpose: %s\n" .
+        "Collateral Type: %s\n" .
+        "Collateral Description: %s\n" .
+        "Applied Elsewhere: %s",
+        $data['reg_number'],
+        $data['company_position'],
+        $data['company_age'],
+        $data['annual_turnover'],
+        $data['profit_loss_status'],
+        $data['core_activity'],
+        $data['loan_term'],
+        $data['loan_purpose'],
+        $data['collateral_type'],
+        $data['collateral_description'],
+        $data['has_applied_elsewhere']
+    );
+
+    $note_data = array(
+        'content' => $note_content,
+        'lead_id' => $lead_id
+    );
+
+    // Add note to the lead
+    $note_response = wp_remote_post('https://api.pipedrive.com/v1/notes?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+        'headers' => array(
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ),
+        'body' => json_encode($note_data),
+        'timeout' => 30
+    ));
+
+    if (is_wp_error($note_response)) {
+        error_log('Pipedrive Note API Error: ' . $note_response->get_error_message());
+        // Don't return error here as the lead was created successfully
+    }
 
     return array(
         'success' => true,
-        'message' => 'Application submitted successfully'
+        'message' => 'Application submitted successfully',
+        'data' => array(
+            'lead_id' => $lead_id
+        )
     );
 }
 
