@@ -499,24 +499,23 @@ const FullCalculator = () => {
 />
 </FormField>
 
-
 <FormField
-  name="loanPurpose"
-  label="Aizdevuma mērķis"
+  name="companyAge"
+  label="Uzņēmuma vecums"
   required
 >
   <div className="w-full relative">
     <Select.Root 
-      value={watch('loanPurpose')} 
+      value={watch('companyAge')} 
       onValueChange={(value) => {
-        setValue('loanPurpose', value, { shouldValidate: true });
+        setValue('companyAge', value, { shouldValidate: true });
       }}
     >
       <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
-        {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+        className={`loan-form-select-trigger ${errors.companyAge ? 'border-red-500' : ''}`}
+        {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
       >
-        <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
+        <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
         <Select.Icon>
           <ChevronDown className="w-4 h-4 text-gray-500" />
         </Select.Icon>
@@ -526,20 +525,18 @@ const FullCalculator = () => {
         <Select.Content 
           className="loan-form-select-content" 
           position="popper" 
-          sideOffset={8} // Margin between trigger and dropdown
-          align="start" // Align dropdown with the trigger
-          style={{ width: 'var(--radix-select-trigger-width)' }} // Match trigger width
+          sideOffset={8}
         >
           <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
             <ChevronUp className="w-4 h-4" />
           </Select.ScrollUpButton>
           
           <Select.Viewport className="p-2">
-            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-            <SelectItem value="cits">Cits mērķis</SelectItem>
+            <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
+            <SelectItem value="6-12">6-12 mēneši</SelectItem>
+            <SelectItem value="1-2">1-2 gadi</SelectItem>
+            <SelectItem value="2-3">2-3 gadi</SelectItem>
+            <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
           </Select.Viewport>
           
           <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -548,9 +545,10 @@ const FullCalculator = () => {
         </Select.Content>
       </Select.Portal>
     </Select.Root>
-    
   </div>
 </FormField>
+
+
 
 
 
