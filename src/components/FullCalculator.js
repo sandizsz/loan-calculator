@@ -696,9 +696,8 @@ const FullCalculator = () => {
   label="Pamata darbība (īss apraksts)"
   required
 >
-  <input
-    type="text"
-    className="loan-form-input"
+  <textarea
+    className="loan-form-input min-h-[100px] resize-none"
     placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
     aria-invalid={errors.coreActivity ? 'true' : 'false'}
     {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
