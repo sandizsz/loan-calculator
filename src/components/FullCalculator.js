@@ -129,6 +129,10 @@ const FullCalculator = () => {
   box-sizing: border-box !important;
 }
 
+.loan-form-select-trigger[data-placeholder] {
+  color: #9CA3AF !important;
+}
+
 .loan-form-select-trigger:focus {
   outline: none !important;
   border-color: #2563eb !important;
@@ -502,9 +506,13 @@ const FullCalculator = () => {
   required
 >
   <div className="w-full relative">
-    <Select.Root value={watch('loanPurpose')} onValueChange={(value) => setValue('loanPurpose', value)}>
+    <Select.Root 
+      value={watch('loanPurpose')} 
+      onValueChange={(value) => setValue('loanPurpose', value)}
+      {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+    >
       <Select.Trigger className="loan-form-select-trigger">
-        <Select.Value placeholder="Izvēlieties mērķi" />
+        <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
           <ChevronDown className="w-4 h-4 text-gray-500" />
         </Select.Icon>
@@ -584,9 +592,13 @@ const FullCalculator = () => {
   required
 >
   <div className="w-full relative">
-    <Select.Root value={watch('loanPurpose')} onValueChange={(value) => setValue('loanPurpose', value)}>
+    <Select.Root 
+      value={watch('loanPurpose')} 
+      onValueChange={(value) => setValue('loanPurpose', value)}
+      {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+    >
       <Select.Trigger className="loan-form-select-trigger">
-        <Select.Value placeholder="Izvēlieties mērķi" />
+        <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
           <ChevronDown className="w-4 h-4 text-gray-500" />
         </Select.Icon>
