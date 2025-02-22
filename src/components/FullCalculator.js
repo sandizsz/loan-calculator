@@ -56,7 +56,7 @@ const FullCalculator = () => {
     setError(null);
 
     try {
-      // Prepare data for Pipedrive
+      // Prepare basic data for Pipedrive
       const pipedriveData = {
         title: `Aizdevuma pieteikums - ${data.companyName}`,
         company_name: data.companyName,
@@ -69,21 +69,23 @@ const FullCalculator = () => {
         annual_turnover: data.annualTurnover,
         profit_loss_status: data.profitLossStatus,
         core_activity: data.coreActivity,
-        loan_amount: data.loanAmount,
+        loan_amount: parseFloat(data.loanAmount.replace(/[^0-9.]/g, '')), // Clean and convert to number
         loan_term: `${data.loanTerm} ${data.loanTermUnit || 'months'}`,
         loan_purpose: data.loanPurpose,
         collateral_type: data.collateralType,
         collateral_description: data.collateralDescription,
-        has_applied_elsewhere: data.hasAppliedElsewhere,
-        gdpr_consent: data.gdprConsent
+        has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē'
       };
 
-      // Send data to WordPress backend
+      console.log('Sending data to backend:', pipedriveData);
+      
       const response = await axios.post('/wp-json/loan-calculator/v1/submit', pipedriveData);
 
       if (response.data.success) {
         setIsSuccess(true);
         reset();
+        // Show success message
+        setError(null);
       } else {
         throw new Error(response.data.message || 'Failed to submit application');
       }
@@ -100,7 +102,8 @@ const FullCalculator = () => {
       console.error('Form submission error:', {
         message: err.message,
         response: err.response?.data,
-        status: err.response?.status
+        status: err.response?.status,
+        data: err.response?.data
       });
     } finally {
       setIsSubmitting(false);
