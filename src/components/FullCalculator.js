@@ -31,9 +31,6 @@ const FullCalculator = () => {
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
-    defaultValues: {
-      loanPurpose: ''
-    },
     mode: 'onSubmit',        // Only validate when leaving a field, not during typing
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
@@ -512,15 +509,12 @@ const FullCalculator = () => {
     <Select.Root 
       value={watch('loanPurpose')} 
       onValueChange={(value) => {
-        setValue('loanPurpose', value, { 
-          shouldValidate: true,
-          shouldDirty: true
-        });
+        setValue('loanPurpose', value, { shouldValidate: true });
       }}
     >
-    {register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
       <Select.Trigger 
         className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
+        {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
@@ -600,15 +594,12 @@ const FullCalculator = () => {
     <Select.Root 
       value={watch('loanPurpose')} 
       onValueChange={(value) => {
-        setValue('loanPurpose', value, { 
-          shouldValidate: true,
-          shouldDirty: true
-        });
+        setValue('loanPurpose', value, { shouldValidate: true });
       }}
     >
-    {register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
       <Select.Trigger 
         className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
+        {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
