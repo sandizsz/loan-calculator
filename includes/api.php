@@ -41,26 +41,35 @@ function handle_loan_submission($request) {
     );
 
     // Create lead in Pipedrive
-    $response = wp_remote_post('https://api.pipedrive.com/v1/leads', array(
+    $response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
         'headers' => array(
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ),
         'body' => json_encode($lead_data),
-        'timeout' => 30,
-        'query' => array(
-            'api_token' => $pipedrive_api_key
-        )
+        'timeout' => 30
     ));
 
     if (is_wp_error($response)) {
+        error_log('Pipedrive API Error: ' . $response->get_error_message());
         return new WP_Error('pipedrive_error', $response->get_error_message(), array('status' => 500));
     }
 
     $body = json_decode(wp_remote_retrieve_body($response), true);
+    $status_code = wp_remote_retrieve_response_code($response);
 
-    if (!$body['success']) {
-        return new WP_Error('pipedrive_error', 'Failed to create lead in Pipedrive', array('status' => 500));
+    if ($status_code !== 201 && $status_code !== 200) {
+        error_log('Pipedrive API Error: ' . print_r($body, true));
+        return new WP_Error(
+            'pipedrive_error',
+            isset($body['error']) ? $body['error'] : 'Failed to create lead in Pipedrive',
+            array('status' => $status_code)
+        );
+    }
+
+    if (empty($body['data'])) {
+        error_log('Pipedrive API Error: Empty response data - ' . print_r($body, true));
+        return new WP_Error('pipedrive_error', 'Invalid response from Pipedrive', array('status' => 500));
     }
 
     // Send notification email to admin

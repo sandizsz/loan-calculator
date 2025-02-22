@@ -88,8 +88,20 @@ const FullCalculator = () => {
         throw new Error(response.data.message || 'Failed to submit application');
       }
     } catch (err) {
-      setError('Kļūda iesniedzot formu. Lūdzu, mēģiniet vēlreiz.');
-      console.error('Form submission error:', err);
+      let errorMessage = 'Kļūda iesniedzot formu. Lūdzu, mēģiniet vēlreiz.';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      console.error('Form submission error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
     } finally {
       setIsSubmitting(false);
     }
