@@ -502,7 +502,7 @@ const FullCalculator = () => {
   required
 >
   <div className="w-full relative">
-    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+    <Select.Root value={watch('loanPurpose')} onValueChange={(value) => setValue('loanPurpose', value)}>
       <Select.Trigger className="loan-form-select-trigger">
         <Select.Value placeholder="Izvēlieties mērķi" />
         <Select.Icon>
@@ -584,7 +584,7 @@ const FullCalculator = () => {
   required
 >
   <div className="w-full relative">
-    <Select.Root onValueChange={(value) => setValue('loanPurpose', value)}>
+    <Select.Root value={watch('loanPurpose')} onValueChange={(value) => setValue('loanPurpose', value)}>
       <Select.Trigger className="loan-form-select-trigger">
         <Select.Value placeholder="Izvēlieties mērķi" />
         <Select.Icon>
