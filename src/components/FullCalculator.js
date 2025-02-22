@@ -548,8 +548,53 @@ const FullCalculator = () => {
   </div>
 </FormField>
 
-
-
+<FormField
+  name="annualTurnover"
+  label="Apgrozījums pēdējā gadā (EUR)"
+  required
+>
+  <div className="w-full relative">
+    <Select.Root 
+      value={watch('annualTurnover')} 
+      onValueChange={(value) => {
+        setValue('annualTurnover', value, { shouldValidate: true });
+      }}
+    >
+      <Select.Trigger 
+        className={`loan-form-select-trigger ${errors.annualTurnover ? 'border-red-500' : ''}`}
+        {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
+      >
+        <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
+        <Select.Icon>
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        </Select.Icon>
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content 
+          className="loan-form-select-content" 
+          position="popper" 
+          sideOffset={8}
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+          
+          <Select.Viewport className="p-2">
+            <SelectItem value="lt200k">&lt; 200 000</SelectItem>
+            <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
+            <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
+            <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
+          </Select.Viewport>
+          
+          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  </div>
+</FormField>
 
 
     </>
