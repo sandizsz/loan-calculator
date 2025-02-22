@@ -35,6 +35,7 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
+      hasAppliedElsewhere: '',
       collateralType: '',
       collateralDescription: '',
       financialProduct: '',
@@ -1231,6 +1232,39 @@ const FullCalculator = () => {
           />
         </FormField>
       )}
+
+      <FormField
+        name="hasAppliedElsewhere"
+        label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē? *"
+        required
+      >
+        <RadioGroup.Root 
+          className="flex gap-4"
+          defaultValue={watch('hasAppliedElsewhere')}
+          onValueChange={(value) => setValue('hasAppliedElsewhere', value)}
+        >
+          <div className="flex items-center">
+            <RadioGroup.Item 
+              value="yes" 
+              className="loan-form-radio-root"
+              id="hasAppliedElsewhere-yes"
+            >
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2" htmlFor="hasAppliedElsewhere-yes">Jā</label>
+          </div>
+          <div className="flex items-center">
+            <RadioGroup.Item 
+              value="no" 
+              className="loan-form-radio-root"
+              id="hasAppliedElsewhere-no"
+            >
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2" htmlFor="hasAppliedElsewhere-no">Nē</label>
+          </div>
+        </RadioGroup.Root>
+      </FormField>
 
       <FormField
         name="gdprConsent"
