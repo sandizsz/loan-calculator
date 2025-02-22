@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
@@ -29,30 +29,34 @@ const FullCalculator = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [kredits, setKredits] = useState([]);
-  // Get URL parameters
-  const params = new URLSearchParams(window.location.search);
-  const kreditId = params.get('kredit_id');
 
   // Load WordPress data for kredits
   useEffect(() => {
     const wpData = window.loanCalculatorData || {};
+    
     if (wpData.kredits && Array.isArray(wpData.kredits)) {
       const secureKredits = wpData.kredits.map(kredit => ({
         ...kredit,
         icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
       }));
       setKredits(secureKredits);
-
-      // Set initial financial product if we have a kredit_id
-      if (kreditId) {
-        const matchingKredit = secureKredits.find(k => String(k.id) === String(kreditId));
-        if (matchingKredit) {
-          console.log('Setting initial kredit:', matchingKredit.title);
-          setValue('financialProduct', String(kreditId));
-        }
-      }
     }
-  }, [kreditId, setValue]);
+  }, []);
+
+  // Get URL parameters
+  const getUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      amount: params.get('amount') || '',
+      term: params.get('term') || '',
+      email: params.get('email') || '',
+      phone: params.get('phone') || '',
+      kredit_id: params.get('kredit_id') || ''
+    };
+  };
+
+  // Get initial values from URL or defaults
+  const urlParams = getUrlParams();
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
@@ -60,15 +64,14 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
-      financialProduct: kreditId || '',
-      loanAmount: params.get('amount') || '',
-      loanTerm: params.get('term') || '',
-      email: params.get('email') || '',
-      phone: params.get('phone') || '',
+      financialProduct: urlParams.kredit_id || '',
+      loanAmount: urlParams.amount,
+      loanTerm: urlParams.term,
+      email: urlParams.email,
+      phone: urlParams.phone,
       hasAppliedElsewhere: '',
       collateralType: '',
       collateralDescription: '',
-      financialProduct: '',
       financingPurposes: [],
       contactName: 'John Doe',
       companyName: 'Test Company SIA',
@@ -432,7 +435,7 @@ const FullCalculator = () => {
         height: 0.25rem !important;
         background-color: #e5e7eb !important;
         border-radius: 9999px !important;
-        margin: 1rem 0 1rem !important;
+        margin: 1rem 0 2rem !important;
         width: 300px !important;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -1093,17 +1096,14 @@ const FullCalculator = () => {
         required
       >
         <div className="w-full relative">
-          <input 
-            type="hidden" 
-            {...register('financialProduct', { required: 'Šis lauks ir obligāts' })} 
-          />
           <Select.Root 
-            value={watch('financialProduct')}
-            onValueChange={(value) => setValue('financialProduct', value)}
+            value={watch('financialProduct')} 
+            onValueChange={(value) => setValue('financialProduct', value, { shouldValidate: true })}
           >
             <Select.Trigger 
               className="loan-form-select-trigger"
               aria-invalid={errors.financialProduct ? 'true' : 'false'}
+              {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
             >
               <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
               <Select.Icon>
