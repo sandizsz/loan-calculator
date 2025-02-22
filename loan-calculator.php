@@ -82,7 +82,14 @@ function loan_calculator_enqueue_scripts() {
         'posts_per_page' => -1,
         'orderby' => 'menu_order',
         'order' => 'ASC',
-        'post_status' => 'publish'
+        'post_status' => 'publish',
+        'tax_query' => [
+            [
+                'taxonomy' => 'category',
+                'field' => 'term_id',
+                'terms' => 10
+            ]
+        ]
     ]);
 
     // Transform kredits data
