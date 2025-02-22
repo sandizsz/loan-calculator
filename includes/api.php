@@ -39,26 +39,57 @@ function handle_loan_submission($request) {
 
     $owner_id = $users_body['data'][0]['id'];
 
+    // Create organization first
+    $org_data = array(
+        'name' => $data['company_name'],
+        'owner_id' => $owner_id
+    );
+
+    $org_response = wp_remote_post('https://api.pipedrive.com/v1/organizations?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+        'headers' => array(
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ),
+        'body' => json_encode($org_data)
+    ));
+
+    $org_body = json_decode(wp_remote_retrieve_body($org_response), true);
+    $org_id = !empty($org_body['data']['id']) ? $org_body['data']['id'] : null;
+
+    // Create person
+    $person_data = array(
+        'name' => $data['contact_name'],
+        'email' => array($data['email']),
+        'phone' => array($data['phone']),
+        'org_id' => $org_id,
+        'owner_id' => $owner_id
+    );
+
+    $person_response = wp_remote_post('https://api.pipedrive.com/v1/persons?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+        'headers' => array(
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ),
+        'body' => json_encode($person_data)
+    ));
+
+    $person_body = json_decode(wp_remote_retrieve_body($person_response), true);
+    $person_id = !empty($person_body['data']['id']) ? $person_body['data']['id'] : null;
+
     // Prepare minimal Pipedrive lead data
     $lead_data = array(
         'title' => $data['title'],
-        'owner_id' => $owner_id, // Using the first user's ID
-        'person_name' => $data['contact_name'],
-        'organization_name' => $data['company_name'],
+        'owner_id' => $owner_id,
+        'person_id' => $person_id,
+        'organization_id' => $org_id,
         'value' => array(
             'amount' => floatval($data['loan_amount']),
             'currency' => 'EUR'
         ),
-        'add_time' => date('Y-m-d'),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days')),
-        'label_ids' => array(), // No labels for now
-        'was_seen' => false,
-        'content' => sprintf(
+        'note' => sprintf(
             "Loan Application Details:\n\n" .
-            "Company: %s\n" .
             "Registration Number: %s\n" .
-            "Email: %s\n" .
-            "Phone: %s\n" .
             "Contact Position: %s\n" .
             "Company Age: %s\n" .
             "Annual Turnover: %s\n" .
@@ -69,10 +100,7 @@ function handle_loan_submission($request) {
             "Collateral Type: %s\n" .
             "Collateral Description: %s\n" .
             "Applied Elsewhere: %s",
-            $data['company_name'],
             $data['reg_number'],
-            $data['email'],
-            $data['phone'],
             $data['company_position'],
             $data['company_age'],
             $data['annual_turnover'],
