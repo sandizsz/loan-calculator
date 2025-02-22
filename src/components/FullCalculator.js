@@ -643,6 +643,68 @@ const FullCalculator = () => {
   </div>
 </FormField>
 
+<FormField
+  name="companyPosition"
+  label="Jūsu pozīcija uzņēmumā"
+  required
+>
+  <div className="w-full relative">
+    <Select.Root 
+      value={watch('companyPosition')} 
+      onValueChange={(value) => {
+        setValue('companyPosition', value, { shouldValidate: true });
+      }}
+    >
+      <Select.Trigger 
+        className={`loan-form-select-trigger ${errors.companyPosition ? 'border-red-500' : ''}`}
+        {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
+      >
+        <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
+        <Select.Icon>
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        </Select.Icon>
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content 
+          className="loan-form-select-content" 
+          position="popper" 
+          sideOffset={8}
+        >
+          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronUp className="w-4 h-4" />
+          </Select.ScrollUpButton>
+          
+          <Select.Viewport className="p-2">
+            <SelectItem value="owner">Īpašnieks</SelectItem>
+            <SelectItem value="board">Valdes loceklis</SelectItem>
+            <SelectItem value="finance">Finanšu direktors</SelectItem>
+            <SelectItem value="other">Cits</SelectItem>
+          </Select.Viewport>
+          
+          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+            <ChevronDown className="w-4 h-4" />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  </div>
+</FormField>
+
+<FormField
+  name="coreActivity"
+  label="Pamata darbība (īss apraksts)"
+  required
+>
+  <input
+    type="text"
+    className="loan-form-input"
+    placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
+    aria-invalid={errors.coreActivity ? 'true' : 'false'}
+    {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
+  />
+</FormField>
+
     </>
 
     
