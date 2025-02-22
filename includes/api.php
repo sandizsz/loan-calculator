@@ -22,23 +22,42 @@ function handle_loan_submission($request) {
     // Prepare Pipedrive lead data
     $lead_data = array(
         'title' => $data['title'],
-        'person_id' => create_pipedrive_person($data, $pipedrive_api_key),
-        'organization_id' => create_pipedrive_organization($data, $pipedrive_api_key),
-        'value' => floatval($data['loan_amount']),
-        'currency' => 'EUR',
-        'visible_to' => 3, // Shared with entire company
-        'custom_fields' => array(
-            'loan_term' => $data['loan_term'],
-            'loan_purpose' => $data['loan_purpose'],
-            'collateral_type' => $data['collateral_type'],
-            'collateral_description' => $data['collateral_description'],
-            'has_applied_elsewhere' => $data['has_applied_elsewhere'],
-            'company_age' => $data['company_age'],
-            'annual_turnover' => $data['annual_turnover'],
-            'profit_loss_status' => $data['profit_loss_status'],
-            'core_activity' => $data['core_activity']
+        'value' => array(
+            'amount' => floatval($data['loan_amount']),
+            'currency' => 'EUR'
+        ),
+        'expected_close_date' => date('Y-m-d', strtotime('+30 days')),
+        'visible_to' => '3', // Shared with entire company
+        'note' => sprintf(
+            "Loan Application Details:\n\n" .
+            "Company: %s\n" .
+            "Registration Number: %s\n" .
+            "Contact Position: %s\n" .
+            "Company Age: %s\n" .
+            "Annual Turnover: %s\n" .
+            "Profit/Loss Status: %s\n" .
+            "Core Activity: %s\n" .
+            "Loan Term: %s\n" .
+            "Loan Purpose: %s\n" .
+            "Collateral Type: %s\n" .
+            "Collateral Description: %s\n" .
+            "Applied Elsewhere: %s",
+            $data['company_name'],
+            $data['reg_number'],
+            $data['company_position'],
+            $data['company_age'],
+            $data['annual_turnover'],
+            $data['profit_loss_status'],
+            $data['core_activity'],
+            $data['loan_term'],
+            $data['loan_purpose'],
+            $data['collateral_type'],
+            $data['collateral_description'],
+            $data['has_applied_elsewhere']
         )
     );
+
+    error_log('Sending lead data to Pipedrive: ' . print_r($lead_data, true));
 
     // Create lead in Pipedrive
     $response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
