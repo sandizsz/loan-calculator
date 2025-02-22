@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
@@ -29,8 +29,21 @@ const FullCalculator = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [kredits, setKredits] = useState([]);
+  const [selectedKredit, setSelectedKredit] = useState('');
 
-  // Load WordPress data for kredits and set initial selection
+  // Get URL parameters once on mount
+  const urlParams = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      amount: params.get('amount') || '',
+      term: params.get('term') || '',
+      email: params.get('email') || '',
+      phone: params.get('phone') || '',
+      kredit_id: params.get('kredit_id') || ''
+    };
+  }, []);
+
+  // Load WordPress data for kredits
   useEffect(() => {
     const wpData = window.loanCalculatorData || {};
     
@@ -40,41 +53,28 @@ const FullCalculator = () => {
         icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
       }));
       setKredits(secureKredits);
+    }
+  }, []);
 
-      // Set initial kredit selection if URL parameter exists
-      const urlParams = new URLSearchParams(window.location.search);
-      const kreditId = urlParams.get('kredit_id');
-      
-      if (kreditId) {
-        const matchingKredit = secureKredits.find(k => String(k.id) === String(kreditId));
-        if (matchingKredit) {
-          setValue('financialProduct', String(kreditId));
-        }
+  // Set initial kredit selection when kredits load
+  useEffect(() => {
+    if (kredits.length > 0 && urlParams.kredit_id) {
+      const matchingKredit = kredits.find(k => String(k.id) === String(urlParams.kredit_id));
+      if (matchingKredit) {
+        console.log('Found matching kredit:', matchingKredit); // Debug log
+        setSelectedKredit(String(urlParams.kredit_id));
+        setValue('financialProduct', String(urlParams.kredit_id));
       }
     }
-  }, [setValue]);
-
-  // Get URL parameters
-  const getUrlParams = () => {
-    const params = new URLSearchParams(window.location.search);
-    return {
-      amount: params.get('amount') || '',
-      term: params.get('term') || '',
-      email: params.get('email') || '',
-      phone: params.get('phone') || '',
-      kredit_id: params.get('kredit_id') || ''
-    };
-  };
-
-  // Get initial values from URL or defaults
-  const urlParams = getUrlParams();
+  }, [kredits, urlParams.kredit_id, setValue]);
   
   // Debug log to check values
   useEffect(() => {
     console.log('URL Params:', urlParams);
     console.log('Kredits:', kredits);
     console.log('Selected Kredit ID:', urlParams.kredit_id);
-  }, [kredits, urlParams]);
+    console.log('Selected Kredit State:', selectedKredit);
+  }, [kredits, urlParams, selectedKredit]);
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
@@ -1120,10 +1120,10 @@ const FullCalculator = () => {
             {...register('financialProduct', { required: 'Šis lauks ir obligāts' })} 
           />
           <Select.Root 
-            value={watch('financialProduct') || ''}
+            value={selectedKredit}
             onValueChange={(value) => {
+              setSelectedKredit(value);
               setValue('financialProduct', value);
-              console.log('Selected kredit:', value); // Debug log
             }}
           >
             <Select.Trigger 
