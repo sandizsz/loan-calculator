@@ -10,6 +10,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Include API functions
+require_once plugin_dir_path(__FILE__) . 'includes/api.php';
+
 // Register Kredits Custom Post Type
 
 

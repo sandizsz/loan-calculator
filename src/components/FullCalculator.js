@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
 import * as Label from '@radix-ui/react-label';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -29,6 +30,7 @@ const FullCalculator = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [kredits, setKredits] = useState([]);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Load WordPress data for kredits
   useEffect(() => {
@@ -42,6 +44,56 @@ const FullCalculator = () => {
       setKredits(secureKredits);
     }
   }, []);
+
+  const onSubmit = async (data) => {
+    if (step === 1) {
+      setStep(2);
+      return;
+    }
+
+    // Final submission
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Prepare data for Pipedrive
+      const pipedriveData = {
+        title: `Aizdevuma pieteikums - ${data.companyName}`,
+        company_name: data.companyName,
+        reg_number: data.regNumber,
+        contact_name: data.contactName,
+        email: data.email,
+        phone: data.phone,
+        company_position: data.companyPosition,
+        company_age: data.companyAge,
+        annual_turnover: data.annualTurnover,
+        profit_loss_status: data.profitLossStatus,
+        core_activity: data.coreActivity,
+        loan_amount: data.loanAmount,
+        loan_term: `${data.loanTerm} ${data.loanTermUnit || 'months'}`,
+        loan_purpose: data.loanPurpose,
+        collateral_type: data.collateralType,
+        collateral_description: data.collateralDescription,
+        has_applied_elsewhere: data.hasAppliedElsewhere,
+        gdpr_consent: data.gdprConsent
+      };
+
+      // Send data to WordPress backend
+      const response = await axios.post('/wp-json/loan-calculator/v1/submit', pipedriveData);
+
+      if (response.data.success) {
+        setIsSuccess(true);
+        reset();
+      } else {
+        throw new Error(response.data.message || 'Failed to submit application');
+      }
+    } catch (err) {
+      setError('Kļūda iesniedzot formu. Lūdzu, mēģiniet vēlreiz.');
+      console.error('Form submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Get URL parameters and match kredit title
   const getUrlParams = () => {
@@ -498,28 +550,8 @@ const FullCalculator = () => {
     }
   };
 
-  // Form submission handler with proper error handling
   // Handle phone input to only allow digits
 
-
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-      
-      // Move to next step or submit
-      if (step < 2) {
-        setStep(step + 1);
-      } else {
-        // Add your API call here
-        await submitForm(data);
-      }
-    } catch (err) {
-      setError(err.message || 'Kļūda, lūdzu mēģiniet vēlāk');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Custom field component with error handling
   const FormField = ({ name, label, required, children, hint }) => (
@@ -1340,6 +1372,32 @@ const FullCalculator = () => {
       </FormField>
     </>
   );
+
+  if (isSuccess) {
+    return (
+      <div className="loan-form-container">
+        <div className="text-center py-8">
+          <div className="mb-6">
+            <svg className="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Paldies! Pieteikums pieņemts</h2>
+          <p className="text-gray-600 mb-8">Mēs izskatīsim Jūsu pieteikumu un sazināsimies ar Jums tuvākajā laikā.</p>
+          <button
+            onClick={() => {
+              setIsSuccess(false);
+              setStep(1);
+              reset();
+            }}
+            className="loan-form-button bg-green-500 hover:bg-green-600"
+          >
+            Iesniegt jaunu pieteikumu
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="loan-form-container">
