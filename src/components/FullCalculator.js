@@ -801,6 +801,76 @@ const FullCalculator = () => {
 </FormField>
 
       <FormField
+        name="taxDebtStatus"
+        label="Vai uzņēmumam ir nodokļu parāds?"
+        required
+      >
+        <div className="w-full relative">
+          <Select.Root 
+            value={watch('taxDebtStatus')} 
+            onValueChange={(value) => {
+              setValue('taxDebtStatus', value, { shouldValidate: true });
+            }}
+          >
+            <Select.Trigger 
+              className="loan-form-select-trigger"
+              aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
+              {...register('taxDebtStatus', { required: 'Šis lauks ir obligāts' })}
+            >
+              <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
+              <Select.Icon>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </Select.Icon>
+            </Select.Trigger>
+            
+            <Select.Portal>
+              <Select.Content 
+                className="loan-form-select-content" 
+                position="popper" 
+                sideOffset={8}
+              >
+                <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronUp className="w-4 h-4" />
+                </Select.ScrollUpButton>
+                
+                <Select.Viewport className="p-2">
+                  <SelectItem value="no">Nav</SelectItem>
+                  <SelectItem value="withSchedule">Ir, ar VID grafiku</SelectItem>
+                  <SelectItem value="withoutSchedule">Ir, bez VID grafika</SelectItem>
+                </Select.Viewport>
+                
+                <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                  <ChevronDown className="w-4 h-4" />
+                </Select.ScrollDownButton>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+      </FormField>
+
+      {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
+        <FormField
+          name="taxDebtAmount"
+          label="Nodokļu parāda summa"
+          required
+        >
+          <input
+            type="number"
+            className="loan-form-input"
+            placeholder="Ievadiet summu"
+            aria-invalid={errors.taxDebtAmount ? 'true' : 'false'}
+            {...register('taxDebtAmount', { 
+              required: 'Šis lauks ir obligāts',
+              min: {
+                value: 0,
+                message: 'Summai jābūt lielākai par 0'
+              }
+            })}
+          />
+        </FormField>
+      )}
+
+      <FormField
         name="existingLoan"
         label="Vai uzņēmumam ir esoši kredīti?"
         required
