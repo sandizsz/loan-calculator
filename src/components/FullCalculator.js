@@ -416,6 +416,67 @@ const FullCalculator = () => {
 
   const renderStep1 = () => (
     <>
+
+<FormField
+        name="contactName"
+        label="Kontaktpersonas vārds, uzvārds"
+        required
+      >
+        <input
+          type="text"
+          className="loan-form-input"
+          aria-invalid={errors.contactName ? 'true' : 'false'}
+          {...register('contactName', { required: 'Šis lauks ir obligāts' })}
+        />
+      </FormField>
+
+      <FormField
+  name="email"
+  label="E-pasta adrese"
+  required
+>
+<input
+  type="email"
+  className="loan-form-input"
+  placeholder="example@domain.com"
+  aria-invalid={errors.email ? 'true' : 'false'}
+  {...register('email', {
+    required: 'Šis lauks ir obligāts',
+    pattern: {
+      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+      message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+    }
+  })}
+/>
+</FormField>
+
+
+<FormField
+        name="phone"
+        label="Telefona numurs"
+        required
+        hint="Ievadiet 8 ciparu telefona numuru"
+      >
+        <div className="relative w-full">
+          <div className="absolute left-0 flex items-center justify-center h-full pointer-events-none pl-4">
+
+          </div>
+          <input
+  type="tel"
+  className="loan-form-input pl-16"
+  maxLength="8"
+  placeholder="12345678"
+  aria-invalid={errors.phone ? 'true' : 'false'}
+  {...register('phone', {
+    required: 'Šis lauks ir obligāts',
+    pattern: {
+      value: /^[0-9]{8}$/,
+      message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+    }
+  })}
+/>
+        </div>
+      </FormField>
    
       <FormField
         name="companyName"
@@ -443,65 +504,11 @@ const FullCalculator = () => {
         />
       </FormField>
 
-      <FormField
-        name="contactName"
-        label="Kontaktpersonas vārds, uzvārds"
-        required
-      >
-        <input
-          type="text"
-          className="loan-form-input"
-          aria-invalid={errors.contactName ? 'true' : 'false'}
-          {...register('contactName', { required: 'Šis lauks ir obligāts' })}
-        />
-      </FormField>
+    
 
-      <FormField
-        name="phone"
-        label="Telefona numurs"
-        required
-        hint="Ievadiet 8 ciparu telefona numuru"
-      >
-        <div className="relative w-full">
-          <div className="absolute left-0 flex items-center justify-center h-full pointer-events-none pl-4">
-            <span className="text-gray-500 text-sm font-medium">+371</span>
-          </div>
-          <input
-  type="tel"
-  className="loan-form-input pl-16"
-  maxLength="8"
-  placeholder="12345678"
-  aria-invalid={errors.phone ? 'true' : 'false'}
-  {...register('phone', {
-    required: 'Šis lauks ir obligāts',
-    pattern: {
-      value: /^[0-9]{8}$/,
-      message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
-    }
-  })}
-/>
-        </div>
-      </FormField>
+    
 
-      <FormField
-  name="email"
-  label="E-pasta adrese"
-  required
->
-<input
-  type="email"
-  className="loan-form-input"
-  placeholder="example@domain.com"
-  aria-invalid={errors.email ? 'true' : 'false'}
-  {...register('email', {
-    required: 'Šis lauks ir obligāts',
-    pattern: {
-      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-      message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-    }
-  })}
-/>
-</FormField>
+    
 
 <FormField
   name="companyAge"
