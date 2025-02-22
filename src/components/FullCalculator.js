@@ -202,6 +202,30 @@ const FullCalculator = () => {
   }
 }
 
+/* Override Elementor button styles for loan term unit toggle */
+.loan-term-unit-toggle [type=button] {
+  display: block !important;
+  font-weight: normal !important;
+  color: #4B5563 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  user-select: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.loan-term-unit-toggle [type=button][data-state=checked] {
+  background-color: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+}
+
 .loan-form-select-content[data-side="bottom"] {
   animation-name: slideDownAndFade !important;
 }
@@ -777,7 +801,7 @@ const FullCalculator = () => {
               })}
             />
           </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center bg-gray-100 rounded-lg p-1 loan-term-unit-toggle">
             <RadioGroup.Root 
               className="flex"
               value={watch('loanTermUnit') || 'months'}
@@ -937,26 +961,33 @@ const FullCalculator = () => {
 
       <FormField
         name="hadPaymentDelays"
-        label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
+        label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības? *"
         required
       >
         <RadioGroup.Root 
           className="flex gap-4"
-          onValueChange={(value) => setValue('hadPaymentDelays', value, { shouldValidate: true })}
-          aria-invalid={errors.hadPaymentDelays ? 'true' : 'false'}
-          {...register('hadPaymentDelays', { required: 'Šis lauks ir obligāts' })}
+          defaultValue={watch('hadPaymentDelays')}
+          onValueChange={(value) => setValue('hadPaymentDelays', value)}
         >
           <div className="flex items-center">
-            <RadioGroup.Item value="yes" className="loan-form-radio-root">
+            <RadioGroup.Item 
+              value="yes" 
+              className="loan-form-radio-root"
+              id="hadPaymentDelays-yes"
+            >
               <RadioGroup.Indicator className="loan-form-radio-indicator" />
             </RadioGroup.Item>
-            <label className="pl-2">Jā</label>
+            <label className="pl-2" htmlFor="hadPaymentDelays-yes">Jā</label>
           </div>
           <div className="flex items-center">
-            <RadioGroup.Item value="no" className="loan-form-radio-root">
+            <RadioGroup.Item 
+              value="no" 
+              className="loan-form-radio-root"
+              id="hadPaymentDelays-no"
+            >
               <RadioGroup.Indicator className="loan-form-radio-indicator" />
             </RadioGroup.Item>
-            <label className="pl-2">Nē</label>
+            <label className="pl-2" htmlFor="hadPaymentDelays-no">Nē</label>
           </div>
         </RadioGroup.Root>
       </FormField>
