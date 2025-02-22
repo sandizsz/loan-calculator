@@ -43,15 +43,26 @@ const FullCalculator = () => {
     }
   }, []);
 
-  // Get URL parameters
+  // Get URL parameters and match kredit title
   const getUrlParams = () => {
     const params = new URLSearchParams(window.location.search);
+    const wpData = window.loanCalculatorData || {};
+    const kreditId = params.get('kredit_id');
+    let matchedKreditTitle = '';
+
+    if (kreditId && wpData.kredits && Array.isArray(wpData.kredits)) {
+      const matchingKredit = wpData.kredits.find(k => k.id.toString() === kreditId);
+      if (matchingKredit) {
+        matchedKreditTitle = matchingKredit.title;
+      }
+    }
+    
     return {
       amount: params.get('amount') || '',
       term: params.get('term') || '',
       email: params.get('email') || '',
       phone: params.get('phone') || '',
-      kredit_id: params.get('kredit_id') || ''
+      kredit_id: matchedKreditTitle
     };
   };
 
@@ -64,7 +75,7 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
-      financialProduct: urlParams.kredit_id || '',
+      financialProduct: urlParams.kredit_id,
       loanAmount: urlParams.amount,
       loanTerm: urlParams.term,
       email: urlParams.email,
@@ -1122,8 +1133,8 @@ const FullCalculator = () => {
                 </Select.ScrollUpButton>
                 
                 <Select.Viewport className="p-2">
-                {kredits.map((kredit) => (
-                  <SelectItem key={kredit.id} value={kredit.id}>
+                {window.loanCalculatorData?.kredits?.map((kredit) => (
+                  <SelectItem key={kredit.id} value={kredit.title}>
                     <div className="flex items-center gap-2">
                       {kredit.icon && (
                         <img 
@@ -1137,7 +1148,7 @@ const FullCalculator = () => {
                     </div>
                   </SelectItem>
                 ))}
-                <SelectItem value="other">Cits</SelectItem>
+                <SelectItem value="Cits finanšu produkts">Cits finanšu produkts</SelectItem>
               </Select.Viewport>
                 
                 <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
