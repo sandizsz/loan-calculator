@@ -31,6 +31,9 @@ const FullCalculator = () => {
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
+    defaultValues: {
+      loanPurpose: ''
+    },
     mode: 'onSubmit',        // Only validate when leaving a field, not during typing
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
@@ -508,10 +511,17 @@ const FullCalculator = () => {
   <div className="w-full relative">
     <Select.Root 
       value={watch('loanPurpose')} 
-      onValueChange={(value) => setValue('loanPurpose', value)}
-      {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+      onValueChange={(value) => {
+        setValue('loanPurpose', value, { 
+          shouldValidate: true,
+          shouldDirty: true
+        });
+      }}
     >
-      <Select.Trigger className="loan-form-select-trigger">
+    {register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+      <Select.Trigger 
+        className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
+      >
         <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
           <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -545,11 +555,6 @@ const FullCalculator = () => {
       </Select.Portal>
     </Select.Root>
     
-    {errors.loanPurpose && (
-      <p className="loan-form-error mt-1">
-        {errors.loanPurpose.message}
-      </p>
-    )}
   </div>
 </FormField>
 
@@ -594,10 +599,17 @@ const FullCalculator = () => {
   <div className="w-full relative">
     <Select.Root 
       value={watch('loanPurpose')} 
-      onValueChange={(value) => setValue('loanPurpose', value)}
-      {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+      onValueChange={(value) => {
+        setValue('loanPurpose', value, { 
+          shouldValidate: true,
+          shouldDirty: true
+        });
+      }}
     >
-      <Select.Trigger className="loan-form-select-trigger">
+    {register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+      <Select.Trigger 
+        className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
+      >
         <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
         <Select.Icon>
           <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -629,11 +641,6 @@ const FullCalculator = () => {
       </Select.Portal>
     </Select.Root>
     
-    {errors.loanPurpose && (
-      <p className="loan-form-error mt-1">
-        {errors.loanPurpose.message}
-      </p>
-    )}
   </div>
 </FormField>
 
