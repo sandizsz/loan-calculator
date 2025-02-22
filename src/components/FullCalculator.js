@@ -28,6 +28,20 @@ const FullCalculator = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [kredits, setKredits] = useState([]);
+
+  // Load WordPress data for kredits
+  useEffect(() => {
+    const wpData = window.loanCalculatorData || {};
+    
+    if (wpData.kredits && Array.isArray(wpData.kredits)) {
+      const secureKredits = wpData.kredits.map(kredit => ({
+        ...kredit,
+        icon: kredit.icon ? kredit.icon.replace('http://', 'https://') : null
+      }));
+      setKredits(secureKredits);
+    }
+  }, []);
 
   // Get URL parameters
   const getUrlParams = () => {
@@ -50,6 +64,7 @@ const FullCalculator = () => {
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
+      financialProduct: urlParams.kredit_id || '',
       loanAmount: urlParams.amount,
       loanTerm: urlParams.term,
       email: urlParams.email,
@@ -1108,12 +1123,23 @@ const FullCalculator = () => {
                 </Select.ScrollUpButton>
                 
                 <Select.Viewport className="p-2">
-                  <SelectItem value="loan">Aizdevums</SelectItem>
-                  <SelectItem value="credit-line">Kredītlīnija</SelectItem>
-                  <SelectItem value="leasing">Līzings</SelectItem>
-                  <SelectItem value="factoring">Faktorings</SelectItem>
-                  <SelectItem value="other">Cits</SelectItem>
-                </Select.Viewport>
+                {kredits.map((kredit) => (
+                  <SelectItem key={kredit.id} value={kredit.id}>
+                    <div className="flex items-center gap-2">
+                      {kredit.icon && (
+                        <img 
+                          src={kredit.icon} 
+                          alt=""
+                          className="w-4 h-4 object-contain"
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                      )}
+                      {kredit.title}
+                    </div>
+                  </SelectItem>
+                ))}
+                <SelectItem value="other">Cits</SelectItem>
+              </Select.Viewport>
                 
                 <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
                   <ChevronDown className="w-4 h-4" />
