@@ -19,10 +19,30 @@ function handle_loan_submission($request) {
     
     $pipedrive_api_key = PIPEDRIVE_API_KEY;
 
+    // Get the first user from Pipedrive to use as owner
+    $users_response = wp_remote_get('https://api.pipedrive.com/v1/users?' . http_build_query([
+        'api_token' => $pipedrive_api_key,
+        'limit' => 1
+    ]));
+
+    if (is_wp_error($users_response)) {
+        error_log('Pipedrive Users API Error: ' . $users_response->get_error_message());
+        return new WP_Error('pipedrive_error', $users_response->get_error_message(), array('status' => 500));
+    }
+
+    $users_body = json_decode(wp_remote_retrieve_body($users_response), true);
+    
+    if (empty($users_body['data'][0]['id'])) {
+        error_log('Pipedrive Users API Error: No users found');
+        return new WP_Error('pipedrive_error', 'No Pipedrive users found', array('status' => 500));
+    }
+
+    $owner_id = $users_body['data'][0]['id'];
+
     // Prepare minimal Pipedrive lead data
     $lead_data = array(
         'title' => $data['title'],
-        'owner_id' => null, // Will be assigned automatically
+        'owner_id' => $owner_id, // Using the first user's ID
         'person_name' => $data['contact_name'],
         'organization_name' => $data['company_name'],
         'value' => array(
