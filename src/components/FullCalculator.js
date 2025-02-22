@@ -133,6 +133,10 @@ const FullCalculator = () => {
   color: #9CA3AF !important;
 }
 
+.loan-form-select-trigger[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+}
+
 .loan-form-select-trigger:focus {
   outline: none !important;
   border-color: #2563eb !important;
@@ -512,7 +516,8 @@ const FullCalculator = () => {
       }}
     >
       <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.companyAge ? 'border-red-500' : ''}`}
+        className="loan-form-select-trigger"
+        aria-invalid={errors.companyAge ? 'true' : 'false'}
         {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
@@ -561,7 +566,8 @@ const FullCalculator = () => {
       }}
     >
       <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.annualTurnover ? 'border-red-500' : ''}`}
+        className="loan-form-select-trigger"
+        aria-invalid={errors.annualTurnover ? 'true' : 'false'}
         {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
@@ -609,7 +615,8 @@ const FullCalculator = () => {
       }}
     >
       <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.profitLossStatus ? 'border-red-500' : ''}`}
+        className="loan-form-select-trigger"
+        aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
         {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
@@ -656,7 +663,8 @@ const FullCalculator = () => {
       }}
     >
       <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.companyPosition ? 'border-red-500' : ''}`}
+        className="loan-form-select-trigger"
+        aria-invalid={errors.companyPosition ? 'true' : 'false'}
         {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
       >
         <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
