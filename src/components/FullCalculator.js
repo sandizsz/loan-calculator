@@ -728,7 +728,7 @@ const FullCalculator = () => {
     <>
       <FormField
         name="loanAmount"
-        label="Nepieciešamā aizdevuma summa"
+        label="Nepieciešamā aizdevuma summa (EUR)"
         required
       >
         <input
@@ -748,6 +748,71 @@ const FullCalculator = () => {
             }
           })}
         />
+      </FormField>
+
+      <FormField
+        name="loanTerm"
+        label="Vēlamais aizdevuma termiņš"
+        required
+      >
+        <div className="flex space-x-4">
+          <div className="flex-1">
+            <input
+              type="number"
+              className="loan-form-input"
+              placeholder="Ievadiet termiņu"
+              min={watch('loanTermUnit') === 'years' ? '1' : '1'}
+              max={watch('loanTermUnit') === 'years' ? '10' : '120'}
+              aria-invalid={errors.loanTerm ? 'true' : 'false'}
+              {...register('loanTerm', { 
+                required: 'Šis lauks ir obligāts',
+                min: {
+                  value: watch('loanTermUnit') === 'years' ? 1 : 1,
+                  message: watch('loanTermUnit') === 'years' ? 'Minimālais termiņš ir 1 gads' : 'Minimālais termiņš ir 1 mēnesis'
+                },
+                max: {
+                  value: watch('loanTermUnit') === 'years' ? 10 : 120,
+                  message: watch('loanTermUnit') === 'years' ? 'Maksimālais termiņš ir 10 gadi' : 'Maksimālais termiņš ir 120 mēneši'
+                }
+              })}
+            />
+          </div>
+          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <RadioGroup.Root 
+              className="flex"
+              value={watch('loanTermUnit') || 'months'}
+              onValueChange={(value) => {
+                setValue('loanTermUnit', value);
+                // Convert the current value when switching units
+                const currentTerm = watch('loanTerm');
+                if (currentTerm) {
+                  if (value === 'years') {
+                    setValue('loanTerm', Math.round(currentTerm / 12));
+                  } else {
+                    setValue('loanTerm', currentTerm * 12);
+                  }
+                }
+              }}
+            >
+              <div className="flex items-center">
+                <RadioGroup.Item 
+                  value="months" 
+                  className="px-3 py-1 rounded-md focus:outline-none data-[state=checked]:bg-white data-[state=checked]:shadow-sm"
+                >
+                  <span className="text-sm font-medium">Mēneši</span>
+                </RadioGroup.Item>
+              </div>
+              <div className="flex items-center">
+                <RadioGroup.Item 
+                  value="years" 
+                  className="px-3 py-1 rounded-md focus:outline-none data-[state=checked]:bg-white data-[state=checked]:shadow-sm"
+                >
+                  <span className="text-sm font-medium">Gadi</span>
+                </RadioGroup.Item>
+              </div>
+            </RadioGroup.Root>
+          </div>
+        </div>
       </FormField>
 
       <FormField
@@ -851,7 +916,7 @@ const FullCalculator = () => {
       {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
         <FormField
           name="taxDebtAmount"
-          label="Nodokļu parāda summa"
+          label="Nodokļu parāda summa (EUR)"
           required
         >
           <input
@@ -869,6 +934,32 @@ const FullCalculator = () => {
           />
         </FormField>
       )}
+
+      <FormField
+        name="hadPaymentDelays"
+        label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
+        required
+      >
+        <RadioGroup.Root 
+          className="flex gap-4"
+          onValueChange={(value) => setValue('hadPaymentDelays', value, { shouldValidate: true })}
+          aria-invalid={errors.hadPaymentDelays ? 'true' : 'false'}
+          {...register('hadPaymentDelays', { required: 'Šis lauks ir obligāts' })}
+        >
+          <div className="flex items-center">
+            <RadioGroup.Item value="yes" className="loan-form-radio-root">
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2">Jā</label>
+          </div>
+          <div className="flex items-center">
+            <RadioGroup.Item value="no" className="loan-form-radio-root">
+              <RadioGroup.Indicator className="loan-form-radio-indicator" />
+            </RadioGroup.Item>
+            <label className="pl-2">Nē</label>
+          </div>
+        </RadioGroup.Root>
+      </FormField>
 
       <FormField
         name="existingLoan"
