@@ -19,19 +19,26 @@ function handle_loan_submission($request) {
     
     $pipedrive_api_key = PIPEDRIVE_API_KEY;
 
-    // Prepare Pipedrive lead data
+    // Prepare minimal Pipedrive lead data
     $lead_data = array(
         'title' => $data['title'],
+        'owner_id' => null, // Will be assigned automatically
+        'person_name' => $data['contact_name'],
+        'organization_name' => $data['company_name'],
         'value' => array(
             'amount' => floatval($data['loan_amount']),
             'currency' => 'EUR'
         ),
+        'add_time' => date('Y-m-d'),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days')),
-        'visible_to' => '3', // Shared with entire company
-        'note' => sprintf(
+        'label_ids' => array(), // No labels for now
+        'was_seen' => false,
+        'content' => sprintf(
             "Loan Application Details:\n\n" .
             "Company: %s\n" .
             "Registration Number: %s\n" .
+            "Email: %s\n" .
+            "Phone: %s\n" .
             "Contact Position: %s\n" .
             "Company Age: %s\n" .
             "Annual Turnover: %s\n" .
@@ -44,6 +51,8 @@ function handle_loan_submission($request) {
             "Applied Elsewhere: %s",
             $data['company_name'],
             $data['reg_number'],
+            $data['email'],
+            $data['phone'],
             $data['company_position'],
             $data['company_age'],
             $data['annual_turnover'],
@@ -70,15 +79,17 @@ function handle_loan_submission($request) {
     ));
 
     if (is_wp_error($response)) {
-        error_log('Pipedrive API Error: ' . $response->get_error_message());
+        error_log('Pipedrive API Error (WP Error): ' . $response->get_error_message());
         return new WP_Error('pipedrive_error', $response->get_error_message(), array('status' => 500));
     }
 
-    $body = json_decode(wp_remote_retrieve_body($response), true);
     $status_code = wp_remote_retrieve_response_code($response);
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    error_log('Pipedrive API Response: ' . print_r($body, true));
 
     if ($status_code !== 201 && $status_code !== 200) {
-        error_log('Pipedrive API Error: ' . print_r($body, true));
+        error_log('Pipedrive API Error (Status ' . $status_code . '): ' . print_r($body, true));
         return new WP_Error(
             'pipedrive_error',
             isset($body['error']) ? $body['error'] : 'Failed to create lead in Pipedrive',
