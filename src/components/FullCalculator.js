@@ -43,20 +43,28 @@ const FullCalculator = () => {
     }
   }, []);
 
-  // Get URL parameters
+  // Get URL parameters and ensure kredit_id is a string
   const getUrlParams = () => {
     const params = new URLSearchParams(window.location.search);
+    const kreditId = params.get('kredit_id');
     return {
       amount: params.get('amount') || '',
       term: params.get('term') || '',
       email: params.get('email') || '',
       phone: params.get('phone') || '',
-      kredit_id: params.get('kredit_id') || ''
+      kredit_id: kreditId ? String(kreditId) : ''
     };
   };
 
   // Get initial values from URL or defaults
   const urlParams = getUrlParams();
+  
+  // Debug log to check values
+  useEffect(() => {
+    console.log('URL Params:', urlParams);
+    console.log('Kredits:', kredits);
+    console.log('Selected Kredit ID:', urlParams.kredit_id);
+  }, [kredits, urlParams]);
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
@@ -1098,7 +1106,7 @@ const FullCalculator = () => {
       >
         <div className="w-full relative">
           <Select.Root 
-            value={watch('financialProduct')} 
+            defaultValue={urlParams.kredit_id}
             onValueChange={(value) => setValue('financialProduct', value, { shouldValidate: true })}
           >
             <Select.Trigger 
