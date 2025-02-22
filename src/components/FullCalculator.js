@@ -29,12 +29,31 @@ const FullCalculator = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  // Get URL parameters
+  const getUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      amount: params.get('amount') || '',
+      term: params.get('term') || '',
+      email: params.get('email') || '',
+      phone: params.get('phone') || '',
+      kredit_id: params.get('kredit_id') || ''
+    };
+  };
+
+  // Get initial values from URL or defaults
+  const urlParams = getUrlParams();
+
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
     mode: 'onSubmit',        // Only validate when leaving a field, not during typing
     reValidateMode: 'onBlur', // Only re-validate on submit
     criteriaMode: 'firstError',
     defaultValues: {
+      loanAmount: urlParams.amount,
+      loanTerm: urlParams.term,
+      email: urlParams.email,
+      phone: urlParams.phone,
       hasAppliedElsewhere: '',
       collateralType: '',
       collateralDescription: '',
@@ -1061,7 +1080,7 @@ const FullCalculator = () => {
       
       <FormField
         name="financialProduct"
-        label="Nepieciešamais finanšu produkts *"
+        label="Nepieciešamais finanšu produkts"
         required
       >
         <div className="w-full relative">
@@ -1109,7 +1128,7 @@ const FullCalculator = () => {
 
       <FormField
         name="financingPurposes"
-        label="Finansējuma mērķis (var būt vairāki) *"
+        label="Finansējuma mērķis (var būt vairāki)"
         required
         {...register('financingPurposes', { 
           required: 'Lūdzu, izvēlieties vismaz vienu mērķi',
@@ -1166,7 +1185,7 @@ const FullCalculator = () => {
 
       <FormField
         name="collateralType"
-        label="Piedāvātais nodrošinājums *"
+        label="Piedāvātais nodrošinājums"
         required
       >
         <div className="w-full relative">
@@ -1215,7 +1234,7 @@ const FullCalculator = () => {
       {watch('collateralType') && watch('collateralType') !== 'none' && (
         <FormField
           name="collateralDescription"
-          label="Aprakstiet piedāvāto nodrošinājumu *"
+          label="Aprakstiet piedāvāto nodrošinājumu"
           required
         >
           <textarea
@@ -1235,7 +1254,7 @@ const FullCalculator = () => {
 
       <FormField
         name="hasAppliedElsewhere"
-        label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē? *"
+        label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
         required
       >
         <RadioGroup.Root 
