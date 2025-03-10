@@ -1151,7 +1151,7 @@ const FullCalculator = () => {
       
       <FormField
         name="financialProduct"
-        label="Nepieciešamais finanšu produkts"
+        label="Nepieciešamais finanšu produktss"
         required
       >
         <div className="w-full relative">
