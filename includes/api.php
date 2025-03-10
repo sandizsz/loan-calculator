@@ -218,16 +218,27 @@ function handle_loan_submission($request) {
     if (!empty($data['financial_product'])) {
         // Map financial product to the correct option ID
         $product_map = [
+            // English keys
             'loan' => 55,               // Aizdevums
             'credit_line' => 56,        // Kredītlīnija
             'leasing' => 57,            // Līzings
             'factoring' => 58,          // Faktorings
             'other' => 59,              // Cits
-            'Aizdevums' => 55,          // Direct Latvian names from the form
+            
+            // Direct Latvian names from the form
+            'Aizdevums' => 55,
             'Kredītlīnija' => 56,
             'Līzings' => 57,
             'Faktorings' => 58,
             'Cits finanšu produkts' => 59,
+            
+            // Specific product names from the form dropdown
+            'Lauksaimniecība' => 55,      // Agriculture - map to Aizdevums
+            'Ražošana' => 55,           // Production - map to Aizdevums
+            'Tirdzniecība un pakalpojumi' => 55, // Trade and services - map to Aizdevums
+            'Būvniecība' => 55,          // Construction - map to Aizdevums
+            'Transports un loģistika' => 55, // Transport and logistics - map to Aizdevums
+            
             'default' => 55             // Default to first option
         ];
         
@@ -263,19 +274,49 @@ function handle_loan_submission($request) {
     
     // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field (multipleOption)
     if (isset($data['collateral_type'])) {
+        // Log the incoming collateral type value
+        error_log('Collateral type from form: ' . $data['collateral_type']);
+        
         // Map collateral type to the correct option ID
         $collateral_map = [
+            // English keys
             'real_estate' => 60,        // Nekustamais īpašums
             'vehicles' => 61,           // Transportlīdzekļi
             'commercial' => 62,         // Komercķīla
             'none' => 63,               // Nav nodrošinājuma
             'other' => 64,              // Cits
+            
+            // Latvian keys
+            'Nekustamais īpašums' => 60,
+            'Transportlīdzekļi' => 61,
+            'Komercķīla' => 62,
+            'Nav nodrošinājuma' => 63,
+            'Cits' => 64,
+            
             'default' => 63             // Default to 'none'
         ];
         
-        $collateral_value = isset($collateral_map[$data['collateral_type']]) ? $collateral_map[$data['collateral_type']] : $collateral_map['default'];
+        if (isset($collateral_map[$data['collateral_type']])) {
+            $collateral_value = $collateral_map[$data['collateral_type']];
+        } else {
+            // Try to find a partial match
+            $matched = false;
+            foreach ($collateral_map as $key => $value) {
+                if (stripos($data['collateral_type'], $key) !== false) {
+                    $collateral_value = $value;
+                    $matched = true;
+                    break;
+                }
+            }
+            
+            if (!$matched) {
+                $collateral_value = $collateral_map['default'];
+            }
+        }
+        
         // For multipleOption fields, we need to send an array of option IDs
         $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = [$collateral_value];
+        error_log('Mapped collateral type value: ' . $collateral_value);
     }
     
     // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33) - varchar field
@@ -301,6 +342,15 @@ function handle_loan_submission($request) {
         foreach ($custom_fields as $key => $value) {
             $lead_data[$key] = $value;
         }
+    }
+    
+    // Explicitly check if the financial product field is set in the lead data
+    $financial_product_key = '15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca';
+    if (!isset($lead_data[$financial_product_key])) {
+        error_log('WARNING: Financial product field not set in lead data. Setting default value 55 (Aizdevums)');
+        $lead_data[$financial_product_key] = 55; // Default to 'Aizdevums'
+    } else {
+        error_log('Financial product field is set in lead data: ' . $lead_data[$financial_product_key]);
     }
     
     error_log('Final lead data structure: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
