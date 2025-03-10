@@ -90,75 +90,74 @@ function handle_loan_submission($request) {
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
     
-    // Map form data to Pipedrive lead custom fields
-    // We'll use custom_fields array for Pipedrive custom fields
+    // Map form data to Pipedrive lead custom fields using exact field keys
     $custom_fields = array();
     
     // Kontaktinformācija un Uzņēmuma informācija fields
     // Note: Some of these fields are already handled by person and organization creation
     
-    // Reģistrācijas numurs
+    // Reģistrācijas numurs (key: 35e584f3aeee47a58265149def733427d7beb2a2)
     if (isset($data['reg_number'])) {
-        $custom_fields['re_istr_cijas_numurs'] = $data['reg_number'];
+        $custom_fields['35e584f3aeee47a58265149def733427d7beb2a2'] = $data['reg_number'];
     }
     
-    // Uzņēmuma vecums
+    // Uzņēmuma vecums (key: e0b1fa455bd6e56030f83ae350863a357ed7e236)
     if (isset($data['company_age'])) {
-        $custom_fields['uz_muma_vecums'] = $data['company_age'];
+        $custom_fields['e0b1fa455bd6e56030f83ae350863a357ed7e236'] = $data['company_age'];
     }
     
-    // Apgrozījums pēdējā gadā (EUR)
+    // Apgrozījums pēdējā gadā (EUR) (key: 30b6a6278feea6cdfe8b2bcf7a295145804365d1)
     if (isset($data['annual_turnover'])) {
-        $custom_fields['apgroz_jums_p_d_j_gad_eur'] = $data['annual_turnover'];
+        $custom_fields['30b6a6278feea6cdfe8b2bcf7a295145804365d1'] = $data['annual_turnover'];
     }
     
-    // Peļņa vai zaudējumi pēdējā gadā
+    // Peļņa vai zaudējumi pēdējā gadā (key: c4cbde23802f42ce2856908a0ff6decf94dc7185)
     if (isset($data['profit_loss_status'])) {
-        $custom_fields['pe_a_vai_zaud_jumi_p_d_j_gad'] = $data['profit_loss_status'];
+        $custom_fields['c4cbde23802f42ce2856908a0ff6decf94dc7185'] = $data['profit_loss_status'];
     }
     
-    // Jūsu pozīcija uzņēmumā
+    // Jūsu pozīcija uzņēmumā (key: 2cd024df7983ad750a8b2828f8a0597fb764bd34)
     if (isset($data['company_position'])) {
-        $custom_fields['j_su_poz_cija_uz_mum'] = $data['company_position'];
+        $custom_fields['2cd024df7983ad750a8b2828f8a0597fb764bd34'] = $data['company_position'];
     }
     
-    // Pamata darbība (īss apraksts)
+    // Pamata darbība (īss apraksts) (key: 6c695fa59d23ce5853c14a270f19fef16e471c65)
     if (isset($data['core_activity'])) {
-        $custom_fields['pamata_darb_ba_ss_apraksts'] = $data['core_activity'];
+        $custom_fields['6c695fa59d23ce5853c14a270f19fef16e471c65'] = $data['core_activity'];
     }
     
     // Finanses, Kredītsaistības, Aizdevuma vajadzības fields
     
-    // Nepieciešamā summa (EUR) - already handled in value
+    // Nepieciešamā summa (EUR) - already handled in value (key: 5f3b98c8992283a4e7d4d6a1491b4f854cd99dbc)
     
-    // Vēlamais termiņš (mēneši/gadi)
+    // Vēlamais termiņš (mēneši/gadi) (key: 1b3bc3ee821b653b33c255b2012db731749ad292)
     if (isset($data['loan_term'])) {
-        $custom_fields['v_lamais_termi_m_ne_i_gadi'] = $data['loan_term'];
+        $custom_fields['1b3bc3ee821b653b33c255b2012db731749ad292'] = $data['loan_term'];
     }
     
-    // Finansējuma mērķis
+    // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533)
     if (isset($data['loan_purpose'])) {
-        $custom_fields['finans_juma_m_r_is'] = $data['loan_purpose'];
+        $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = $data['loan_purpose'];
     }
     
-    // Nepieciešamais finanšu produkts
+    // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca)
     if (isset($data['financial_product'])) {
-        $custom_fields['nepiecie_amais_finan_u_produkts'] = $data['financial_product'];
+        $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $data['financial_product'];
     }
     
-    // Piedāvātais nodrošinājums
+    // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8)
     if (isset($data['collateral_type'])) {
-        $custom_fields['pied_v_tais_nodro_in_jums'] = $data['collateral_type'];
+        $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = $data['collateral_type'];
     }
     
-    // Aprakstiet piedāvāto nodrošinājumu
+    // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33)
     if (isset($data['collateral_description'])) {
-        $custom_fields['aprakstiet_pied_v_to_nodro_in_jumu'] = $data['collateral_description'];
+        $custom_fields['9431e23f2b409deafaf14bccf8ca006a8d54da33'] = $data['collateral_description'];
     }
     
-    // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē?
+    // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē? (key: aaf42dc07ef7a915caf41d82e5fad57e79adc0ef)
     if (isset($data['has_applied_elsewhere'])) {
-        $custom_fields['vai_p_d_jo_3_m_ne_u_laik_esat_v_rsu_ies_cit_finan_u_iest_d'] = $data['has_applied_elsewhere'];
+        $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $data['has_applied_elsewhere'];
     }
     
     // Add custom fields to lead data
