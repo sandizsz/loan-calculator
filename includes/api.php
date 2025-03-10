@@ -216,56 +216,68 @@ function handle_loan_submission($request) {
     
     // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
     if (!empty($data['financial_product'])) {
-        // Map financial product to the correct option ID
-        $product_map = [
-            // English keys
-            'loan' => 55,               // Aizdevums
-            'credit_line' => 56,        // Kredītlīnija
-            'leasing' => 57,            // Līzings
-            'factoring' => 58,          // Faktorings
-            'other' => 59,              // Cits
-            
-            // Direct Latvian names from the form
-            'Aizdevums' => 55,
-            'Kredītlīnija' => 56,
-            'Līzings' => 57,
-            'Faktorings' => 58,
-            'Cits finanšu produkts' => 59,
-            
-            // Specific product names from the form dropdown
-            'Lauksaimniecība' => 55,      // Agriculture - map to Aizdevums
-            'Ražošana' => 55,           // Production - map to Aizdevums
-            'Tirdzniecība un pakalpojumi' => 55, // Trade and services - map to Aizdevums
-            'Būvniecība' => 55,          // Construction - map to Aizdevums
-            'Transports un loģistika' => 55, // Transport and logistics - map to Aizdevums
-            
-            'default' => 55             // Default to first option
+        // Get all available options from Pipedrive
+        $pipedrive_options = [
+            55 => 'Aizdevums',
+            56 => 'Kredītlīnija',
+            57 => 'Līzings',
+            58 => 'Faktorings',
+            59 => 'Cits finanšu produkts'
         ];
         
         // Log the incoming financial product value
         error_log('Financial product from form: ' . $data['financial_product']);
         
-        // If the value is directly in the map, use it, otherwise default to 'Aizdevums'
-        if (isset($product_map[$data['financial_product']])) {
-            $product_value = $product_map[$data['financial_product']];
-        } else {
-            // Try to find a partial match
-            $matched = false;
-            foreach ($product_map as $key => $value) {
-                if (stripos($data['financial_product'], $key) !== false) {
-                    $product_value = $value;
-                    $matched = true;
+        // First, check if the value matches a Pipedrive option name directly
+        $product_value = 55; // Default to Aizdevums
+        $found_direct_match = false;
+        
+        foreach ($pipedrive_options as $option_id => $option_name) {
+            if (strcasecmp($data['financial_product'], $option_name) === 0) {
+                $product_value = $option_id;
+                $found_direct_match = true;
+                error_log('Found direct match for financial product: ' . $option_name . ' => ' . $option_id);
+                break;
+            }
+        }
+        
+        // If no direct match, treat industry names as Aizdevums (55)
+        if (!$found_direct_match) {
+            $industry_names = [
+                'Lauksaimniecība',
+                'Ražošana',
+                'Tirdzniecība un pakalpojumi',
+                'Būvniecība',
+                'Transports un loģistika',
+                'Cits finanšu produkts'
+            ];
+            
+            $is_industry = false;
+            foreach ($industry_names as $industry) {
+                if (strcasecmp($data['financial_product'], $industry) === 0) {
+                    $is_industry = true;
+                    error_log('Found industry match: ' . $industry . ' => mapping to Aizdevums (55)');
                     break;
                 }
             }
             
-            if (!$matched) {
-                $product_value = $product_map['default'];
+            if ($is_industry) {
+                // For industry selections, default to Aizdevums
+                $product_value = 55; // Aizdevums
+            } else {
+                // Try partial matching as a last resort
+                foreach ($pipedrive_options as $option_id => $option_name) {
+                    if (stripos($data['financial_product'], $option_name) !== false) {
+                        $product_value = $option_id;
+                        error_log('Found partial match for financial product: ' . $option_name . ' => ' . $option_id);
+                        break;
+                    }
+                }
             }
         }
         
         $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $product_value;
-        error_log('Mapped financial product value: ' . $product_value);
+        error_log('Final mapped financial product value: ' . $product_value . ' (' . $pipedrive_options[$product_value] . ')');
     } else {
         // Set a default value if no financial product is specified
         $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = 55; // Default to 'Aizdevums'

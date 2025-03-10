@@ -57,6 +57,10 @@ const FullCalculator = () => {
 
     try {
       // Prepare basic data for Pipedrive
+      // Log all form data for debugging
+      console.log('Form data before submission:', data);
+      console.log('Financial product value:', data.financialProduct);
+      
       const pipedriveData = {
         title: `Aizdevuma pieteikums - ${data.companyName}`,
         company_name: data.companyName,
@@ -77,6 +81,11 @@ const FullCalculator = () => {
         has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē',
         financial_product: data.financialProduct || ''
       };
+      
+      // Double check the financial product is being included
+      if (!pipedriveData.financial_product) {
+        console.warn('Financial product is empty in submission data');
+      }
 
       console.log('Sending data to backend:', pipedriveData);
       
@@ -1157,7 +1166,10 @@ const FullCalculator = () => {
         <div className="w-full relative">
           <Select.Root 
             value={watch('financialProduct')} 
-            onValueChange={(value) => setValue('financialProduct', value, { shouldValidate: true })}
+            onValueChange={(value) => {
+              console.log('Financial product selected:', value);
+              setValue('financialProduct', value, { shouldValidate: true });
+            }}
           >
             <Select.Trigger 
               className="loan-form-select-trigger"
