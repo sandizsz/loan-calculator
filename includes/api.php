@@ -76,7 +76,14 @@ function handle_loan_submission($request) {
     $person_body = json_decode(wp_remote_retrieve_body($person_response), true);
     $person_id = !empty($person_body['data']['id']) ? $person_body['data']['id'] : null;
 
-    // Prepare minimal Pipedrive lead data
+    // Prepare Pipedrive lead data with custom fields
+    // According to Pipedrive API docs, leads inherit custom fields from deals
+    // Custom fields need to be formatted with their exact field keys from Pipedrive
+    
+    // Get custom field keys from Pipedrive (you can cache these values)
+    $custom_field_keys = get_pipedrive_custom_field_keys($pipedrive_api_key);
+    
+    // Base lead data
     $lead_data = array(
         'title' => $data['title'],
         'owner_id' => $owner_id,
@@ -88,6 +95,36 @@ function handle_loan_submission($request) {
         ),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
+    
+    // Map custom fields from FullCalculator to Pipedrive custom fields
+    // The field mapping should use the actual field keys from Pipedrive
+    $field_mapping = array(
+        'reg_number' => 'registration_number',
+        'company_position' => 'company_position',
+        'company_age' => 'company_age',
+        'annual_turnover' => 'annual_turnover',
+        'profit_loss_status' => 'profit_loss_status',
+        'core_activity' => 'core_activity',
+        'loan_term' => 'loan_term',
+        'loan_purpose' => 'loan_purpose',
+        'collateral_type' => 'collateral_type',
+        'collateral_description' => 'collateral_description',
+        'has_applied_elsewhere' => 'has_applied_elsewhere',
+        'financial_product' => 'financial_product',
+        'financing_purposes' => 'financing_purposes'
+    );
+    
+    // Add custom fields to lead data
+    foreach ($field_mapping as $form_field => $pipedrive_field) {
+        if (isset($data[$form_field]) && !empty($data[$form_field])) {
+            // Find the corresponding Pipedrive field key
+            $field_key = isset($custom_field_keys[$pipedrive_field]) ? $custom_field_keys[$pipedrive_field] : null;
+            
+            if ($field_key) {
+                $lead_data[$field_key] = $data[$form_field];
+            }
+        }
+    }
 
     error_log('Sending lead data to Pipedrive: ' . print_r($lead_data, true));
 
@@ -115,7 +152,7 @@ function handle_loan_submission($request) {
 
     $lead_id = $lead_body['data']['id'];
 
-    // Create note for the lead
+    // Create note for the lead with additional details
     $note_content = sprintf(
         "Loan Application Details:\n\n" .
         "Registration Number: %s\n" .
@@ -128,7 +165,8 @@ function handle_loan_submission($request) {
         "Loan Purpose: %s\n" .
         "Collateral Type: %s\n" .
         "Collateral Description: %s\n" .
-        "Applied Elsewhere: %s",
+        "Applied Elsewhere: %s\n" .
+        "Financial Product: %s",
         $data['reg_number'],
         $data['company_position'],
         $data['company_age'],
@@ -139,7 +177,8 @@ function handle_loan_submission($request) {
         $data['loan_purpose'],
         $data['collateral_type'],
         $data['collateral_description'],
-        $data['has_applied_elsewhere']
+        $data['has_applied_elsewhere'],
+        isset($data['financial_product']) ? $data['financial_product'] : 'Not specified'
     );
 
     $note_data = array(
@@ -169,6 +208,51 @@ function handle_loan_submission($request) {
             'lead_id' => $lead_id
         )
     );
+}
+
+/**
+ * Get Pipedrive custom field keys
+ * This function fetches and caches the custom field keys from Pipedrive
+ * 
+ * @param string $api_key The Pipedrive API key
+ * @return array An array of custom field keys mapped to their field names
+ */
+function get_pipedrive_custom_field_keys($api_key) {
+    // Try to get cached field keys first
+    $cached_keys = get_transient('pipedrive_custom_field_keys');
+    
+    if ($cached_keys !== false) {
+        return $cached_keys;
+    }
+    
+    // If no cache, fetch from Pipedrive API
+    $field_keys = array();
+    
+    // Fetch deal fields (leads inherit custom fields from deals)
+    $response = wp_remote_get('https://api.pipedrive.com/v1/dealFields?' . http_build_query([
+        'api_token' => $api_key
+    ]));
+    
+    if (!is_wp_error($response)) {
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if ($body['success'] && !empty($body['data'])) {
+            foreach ($body['data'] as $field) {
+                // Only include custom fields (not default Pipedrive fields)
+                if (isset($field['key']) && strpos($field['key'], 'cf_') === 0) {
+                    // Map a simplified name to the Pipedrive field key
+                    // You'll need to manually map these based on your Pipedrive setup
+                    $simplified_name = str_replace('cf_', '', $field['key']);
+                    $field_keys[$simplified_name] = $field['key'];
+                }
+            }
+        }
+    }
+    
+    // Cache the field keys for 1 hour (3600 seconds)
+    set_transient('pipedrive_custom_field_keys', $field_keys, 3600);
+    
+    return $field_keys;
 }
 
 function create_pipedrive_person($data, $api_key) {
