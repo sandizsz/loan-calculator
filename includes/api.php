@@ -195,7 +195,7 @@ function handle_loan_submission($request) {
         $custom_fields['1b3bc3ee821b653b33c255b2012db731749ad292'] = $data['loan_term'];
     }
     
-    // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533) - set field
+    // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533) - set field (multipleOption)
     if (isset($data['loan_purpose'])) {
         // Map loan purpose to the correct option ID(s)
         $purpose_map = [
@@ -210,7 +210,8 @@ function handle_loan_submission($request) {
         ];
         
         $purpose_value = isset($purpose_map[$data['loan_purpose']]) ? $purpose_map[$data['loan_purpose']] : $purpose_map['default'];
-        $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = $purpose_value;
+        // For multipleOption fields, we need to send an array of option IDs
+        $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = [$purpose_value];
     }
     
     // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
@@ -229,7 +230,7 @@ function handle_loan_submission($request) {
         $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $product_value;
     }
     
-    // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field
+    // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field (multipleOption)
     if (isset($data['collateral_type'])) {
         // Map collateral type to the correct option ID
         $collateral_map = [
@@ -242,7 +243,8 @@ function handle_loan_submission($request) {
         ];
         
         $collateral_value = isset($collateral_map[$data['collateral_type']]) ? $collateral_map[$data['collateral_type']] : $collateral_map['default'];
-        $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = $collateral_value;
+        // For multipleOption fields, we need to send an array of option IDs
+        $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = [$collateral_value];
     }
     
     // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33) - varchar field
