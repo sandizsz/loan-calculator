@@ -263,10 +263,14 @@ function handle_loan_submission($request) {
         $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $applied_elsewhere_value;
     }
     
-    // Add custom fields to lead data
+    // For leads, custom fields need to be added directly to the lead data, not in a 'custom_fields' object
     if (!empty($custom_fields)) {
-        $lead_data['custom_fields'] = $custom_fields;
+        foreach ($custom_fields as $key => $value) {
+            $lead_data[$key] = $value;
+        }
     }
+    
+    error_log('Final lead data structure: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
 
     // Log the complete lead data being sent to Pipedrive with better formatting
     error_log('Sending lead data to Pipedrive: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
