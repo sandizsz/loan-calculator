@@ -55,6 +55,10 @@ function handle_loan_submission($request) {
 
     $org_body = json_decode(wp_remote_retrieve_body($org_response), true);
     $org_id = !empty($org_body['data']['id']) ? $org_body['data']['id'] : null;
+    
+    // Log organization creation response
+    error_log('Organization creation response: ' . wp_remote_retrieve_response_code($org_response));
+    error_log('Organization data: ' . json_encode($org_body, JSON_PRETTY_PRINT));
 
     // Create person
     $person_data = array(
@@ -75,20 +79,37 @@ function handle_loan_submission($request) {
 
     $person_body = json_decode(wp_remote_retrieve_body($person_response), true);
     $person_id = !empty($person_body['data']['id']) ? $person_body['data']['id'] : null;
+    
+    // Log person creation response
+    error_log('Person creation response: ' . wp_remote_retrieve_response_code($person_response));
+    error_log('Person data: ' . json_encode($person_body, JSON_PRETTY_PRINT));
 
     // Prepare Pipedrive lead data with custom fields
     // Base lead data
     $lead_data = array(
         'title' => $data['title'],
         'owner_id' => $owner_id,
-        'person_id' => $person_id,
-        'organization_id' => $org_id,
         'value' => array(
             'amount' => floatval($data['loan_amount']),
             'currency' => 'EUR'
         ),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
+    
+    // Ensure at least one of person_id or organization_id is set (required by Pipedrive API)
+    if ($person_id) {
+        $lead_data['person_id'] = $person_id;
+    }
+    
+    if ($org_id) {
+        $lead_data['organization_id'] = $org_id;
+    }
+    
+    // If neither person_id nor organization_id was created successfully, return an error
+    if (empty($lead_data['person_id']) && empty($lead_data['organization_id'])) {
+        error_log('Pipedrive Lead API Error: Both person_id and organization_id are missing');
+        return new WP_Error('pipedrive_error', 'Failed to create contact or organization', array('status' => 500));
+    }
     
     // Map form data to Pipedrive lead custom fields using exact field keys
     $custom_fields = array();
@@ -101,24 +122,63 @@ function handle_loan_submission($request) {
         $custom_fields['35e584f3aeee47a58265149def733427d7beb2a2'] = $data['reg_number'];
     }
     
-    // Uzņēmuma vecums (key: e0b1fa455bd6e56030f83ae350863a357ed7e236)
+    // Uzņēmuma vecums (key: e0b1fa455bd6e56030f83ae350863a357ed7e236) - enum field
     if (isset($data['company_age'])) {
-        $custom_fields['e0b1fa455bd6e56030f83ae350863a357ed7e236'] = $data['company_age'];
+        // Map the company age to the correct option ID
+        $company_age_map = [
+            '<2' => 32,       // < 2 gadi
+            '2-5' => 33,      // 2–5 gadi
+            '>5' => 34,       // > 5 gadi
+            '6-12' => 34,     // > 5 gadi (mapping your value to closest match)
+            'default' => 32   // Default to first option
+        ];
+        
+        $age_value = isset($company_age_map[$data['company_age']]) ? $company_age_map[$data['company_age']] : $company_age_map['default'];
+        $custom_fields['e0b1fa455bd6e56030f83ae350863a357ed7e236'] = $age_value;
     }
     
-    // Apgrozījums pēdējā gadā (EUR) (key: 30b6a6278feea6cdfe8b2bcf7a295145804365d1)
+    // Apgrozījums pēdējā gadā (EUR) (key: 30b6a6278feea6cdfe8b2bcf7a295145804365d1) - enum field
     if (isset($data['annual_turnover'])) {
-        $custom_fields['30b6a6278feea6cdfe8b2bcf7a295145804365d1'] = $data['annual_turnover'];
+        // Map the turnover to the correct option ID
+        $turnover_map = [
+            '<200k' => 28,            // < 200 000
+            '200k-500k' => 29,        // 200 001 – 500 000
+            '500k-1m' => 30,          // 500 001 – 1 000 000
+            '>1m' => 31,              // > 1 000 000
+            'default' => 28           // Default to first option
+        ];
+        
+        $turnover_value = isset($turnover_map[$data['annual_turnover']]) ? $turnover_map[$data['annual_turnover']] : $turnover_map['default'];
+        $custom_fields['30b6a6278feea6cdfe8b2bcf7a295145804365d1'] = $turnover_value;
     }
     
-    // Peļņa vai zaudējumi pēdējā gadā (key: c4cbde23802f42ce2856908a0ff6decf94dc7185)
+    // Peļņa vai zaudējumi pēdējā gadā (key: c4cbde23802f42ce2856908a0ff6decf94dc7185) - enum field
     if (isset($data['profit_loss_status'])) {
-        $custom_fields['c4cbde23802f42ce2856908a0ff6decf94dc7185'] = $data['profit_loss_status'];
+        // Map profit/loss status to the correct option ID
+        $profit_loss_map = [
+            'profit' => 35,           // Peļņa
+            'loss' => 36,             // Zaudējumi
+            'no_data' => 37,          // Nav pieejamu datu
+            'default' => 35           // Default to first option
+        ];
+        
+        $profit_loss_value = isset($profit_loss_map[$data['profit_loss_status']]) ? $profit_loss_map[$data['profit_loss_status']] : $profit_loss_map['default'];
+        $custom_fields['c4cbde23802f42ce2856908a0ff6decf94dc7185'] = $profit_loss_value;
     }
     
-    // Jūsu pozīcija uzņēmumā (key: 2cd024df7983ad750a8b2828f8a0597fb764bd34)
+    // Jūsu pozīcija uzņēmumā (key: 2cd024df7983ad750a8b2828f8a0597fb764bd34) - enum field
     if (isset($data['company_position'])) {
-        $custom_fields['2cd024df7983ad750a8b2828f8a0597fb764bd34'] = $data['company_position'];
+        // Map position to the correct option ID
+        $position_map = [
+            'owner' => 38,             // Īpašnieks
+            'board_member' => 39,      // Valdes loceklis
+            'financial_director' => 40, // Finanšu direktors
+            'other' => 41,             // Cits
+            'default' => 38            // Default to first option
+        ];
+        
+        $position_value = isset($position_map[$data['company_position']]) ? $position_map[$data['company_position']] : $position_map['default'];
+        $custom_fields['2cd024df7983ad750a8b2828f8a0597fb764bd34'] = $position_value;
     }
     
     // Pamata darbība (īss apraksts) (key: 6c695fa59d23ce5853c14a270f19fef16e471c65)
@@ -135,29 +195,72 @@ function handle_loan_submission($request) {
         $custom_fields['1b3bc3ee821b653b33c255b2012db731749ad292'] = $data['loan_term'];
     }
     
-    // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533)
+    // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533) - set field
     if (isset($data['loan_purpose'])) {
-        $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = $data['loan_purpose'];
+        // Map loan purpose to the correct option ID(s)
+        $purpose_map = [
+            'apgrozamie' => 49,        // Apgrozāmie līdzekļi
+            'iekartas' => 50,          // Iekārtu iegāde
+            'nekustamais' => 51,       // Nekustamais īpašums
+            'transports' => 52,         // Transportlīdzekļi
+            'refinansesana' => 53,      // Refinansēšana
+            'pamatlidzekli' => 50,     // Mapping to closest match (Iekārtu iegāde)
+            'cits' => 54,              // Cits
+            'default' => 49             // Default to first option
+        ];
+        
+        $purpose_value = isset($purpose_map[$data['loan_purpose']]) ? $purpose_map[$data['loan_purpose']] : $purpose_map['default'];
+        $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = $purpose_value;
     }
     
-    // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca)
+    // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
     if (isset($data['financial_product'])) {
-        $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $data['financial_product'];
+        // Map financial product to the correct option ID
+        $product_map = [
+            'loan' => 55,               // Aizdevums
+            'credit_line' => 56,        // Kredītlīnija
+            'leasing' => 57,            // Līzings
+            'factoring' => 58,          // Faktorings
+            'other' => 59,              // Cits
+            'default' => 55             // Default to first option
+        ];
+        
+        $product_value = isset($product_map[$data['financial_product']]) ? $product_map[$data['financial_product']] : $product_map['default'];
+        $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $product_value;
     }
     
-    // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8)
+    // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field
     if (isset($data['collateral_type'])) {
-        $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = $data['collateral_type'];
+        // Map collateral type to the correct option ID
+        $collateral_map = [
+            'real_estate' => 60,        // Nekustamais īpašums
+            'vehicles' => 61,           // Transportlīdzekļi
+            'commercial' => 62,         // Komercķīla
+            'none' => 63,               // Nav nodrošinājuma
+            'other' => 64,              // Cits
+            'default' => 63             // Default to 'none'
+        ];
+        
+        $collateral_value = isset($collateral_map[$data['collateral_type']]) ? $collateral_map[$data['collateral_type']] : $collateral_map['default'];
+        $custom_fields['d41ac0a12ff272eb9932c157db783b12fa55d4a8'] = $collateral_value;
     }
     
-    // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33)
+    // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33) - varchar field
     if (isset($data['collateral_description'])) {
         $custom_fields['9431e23f2b409deafaf14bccf8ca006a8d54da33'] = $data['collateral_description'];
     }
     
-    // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē? (key: aaf42dc07ef7a915caf41d82e5fad57e79adc0ef)
+    // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē? (key: aaf42dc07ef7a915caf41d82e5fad57e79adc0ef) - enum field
     if (isset($data['has_applied_elsewhere'])) {
-        $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $data['has_applied_elsewhere'];
+        // Map yes/no to the correct option ID
+        $applied_elsewhere_map = [
+            'Jā' => 65,              // Jā
+            'Nē' => 66,              // Nē
+            'default' => 66             // Default to 'Nē'
+        ];
+        
+        $applied_elsewhere_value = isset($applied_elsewhere_map[$data['has_applied_elsewhere']]) ? $applied_elsewhere_map[$data['has_applied_elsewhere']] : $applied_elsewhere_map['default'];
+        $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $applied_elsewhere_value;
     }
     
     // Add custom fields to lead data
