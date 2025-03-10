@@ -74,7 +74,8 @@ const FullCalculator = () => {
         loan_purpose: data.loanPurpose,
         collateral_type: data.collateralType,
         collateral_description: data.collateralDescription,
-        has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē'
+        has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē',
+        financial_product: data.financialProduct || ''
       };
 
       console.log('Sending data to backend:', pipedriveData);

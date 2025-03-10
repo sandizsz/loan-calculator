@@ -77,12 +77,6 @@ function handle_loan_submission($request) {
     $person_id = !empty($person_body['data']['id']) ? $person_body['data']['id'] : null;
 
     // Prepare Pipedrive lead data with custom fields
-    // According to Pipedrive API docs, leads inherit custom fields from deals
-    // Custom fields need to be formatted with their exact field keys from Pipedrive
-    
-    // Get custom field keys from Pipedrive (you can cache these values)
-    $custom_field_keys = get_pipedrive_custom_field_keys($pipedrive_api_key);
-    
     // Base lead data
     $lead_data = array(
         'title' => $data['title'],
@@ -96,34 +90,80 @@ function handle_loan_submission($request) {
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
     
-    // Map custom fields from FullCalculator to Pipedrive custom fields
-    // The field mapping should use the actual field keys from Pipedrive
-    $field_mapping = array(
-        'reg_number' => 'registration_number',
-        'company_position' => 'company_position',
-        'company_age' => 'company_age',
-        'annual_turnover' => 'annual_turnover',
-        'profit_loss_status' => 'profit_loss_status',
-        'core_activity' => 'core_activity',
-        'loan_term' => 'loan_term',
-        'loan_purpose' => 'loan_purpose',
-        'collateral_type' => 'collateral_type',
-        'collateral_description' => 'collateral_description',
-        'has_applied_elsewhere' => 'has_applied_elsewhere',
-        'financial_product' => 'financial_product',
-        'financing_purposes' => 'financing_purposes'
-    );
+    // Map form data to Pipedrive lead custom fields
+    // We'll use custom_fields array for Pipedrive custom fields
+    $custom_fields = array();
+    
+    // Kontaktinformācija un Uzņēmuma informācija fields
+    // Note: Some of these fields are already handled by person and organization creation
+    
+    // Reģistrācijas numurs
+    if (isset($data['reg_number'])) {
+        $custom_fields['re_istr_cijas_numurs'] = $data['reg_number'];
+    }
+    
+    // Uzņēmuma vecums
+    if (isset($data['company_age'])) {
+        $custom_fields['uz_muma_vecums'] = $data['company_age'];
+    }
+    
+    // Apgrozījums pēdējā gadā (EUR)
+    if (isset($data['annual_turnover'])) {
+        $custom_fields['apgroz_jums_p_d_j_gad_eur'] = $data['annual_turnover'];
+    }
+    
+    // Peļņa vai zaudējumi pēdējā gadā
+    if (isset($data['profit_loss_status'])) {
+        $custom_fields['pe_a_vai_zaud_jumi_p_d_j_gad'] = $data['profit_loss_status'];
+    }
+    
+    // Jūsu pozīcija uzņēmumā
+    if (isset($data['company_position'])) {
+        $custom_fields['j_su_poz_cija_uz_mum'] = $data['company_position'];
+    }
+    
+    // Pamata darbība (īss apraksts)
+    if (isset($data['core_activity'])) {
+        $custom_fields['pamata_darb_ba_ss_apraksts'] = $data['core_activity'];
+    }
+    
+    // Finanses, Kredītsaistības, Aizdevuma vajadzības fields
+    
+    // Nepieciešamā summa (EUR) - already handled in value
+    
+    // Vēlamais termiņš (mēneši/gadi)
+    if (isset($data['loan_term'])) {
+        $custom_fields['v_lamais_termi_m_ne_i_gadi'] = $data['loan_term'];
+    }
+    
+    // Finansējuma mērķis
+    if (isset($data['loan_purpose'])) {
+        $custom_fields['finans_juma_m_r_is'] = $data['loan_purpose'];
+    }
+    
+    // Nepieciešamais finanšu produkts
+    if (isset($data['financial_product'])) {
+        $custom_fields['nepiecie_amais_finan_u_produkts'] = $data['financial_product'];
+    }
+    
+    // Piedāvātais nodrošinājums
+    if (isset($data['collateral_type'])) {
+        $custom_fields['pied_v_tais_nodro_in_jums'] = $data['collateral_type'];
+    }
+    
+    // Aprakstiet piedāvāto nodrošinājumu
+    if (isset($data['collateral_description'])) {
+        $custom_fields['aprakstiet_pied_v_to_nodro_in_jumu'] = $data['collateral_description'];
+    }
+    
+    // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē?
+    if (isset($data['has_applied_elsewhere'])) {
+        $custom_fields['vai_p_d_jo_3_m_ne_u_laik_esat_v_rsu_ies_cit_finan_u_iest_d'] = $data['has_applied_elsewhere'];
+    }
     
     // Add custom fields to lead data
-    foreach ($field_mapping as $form_field => $pipedrive_field) {
-        if (isset($data[$form_field]) && !empty($data[$form_field])) {
-            // Find the corresponding Pipedrive field key
-            $field_key = isset($custom_field_keys[$pipedrive_field]) ? $custom_field_keys[$pipedrive_field] : null;
-            
-            if ($field_key) {
-                $lead_data[$field_key] = $data[$form_field];
-            }
-        }
+    if (!empty($custom_fields)) {
+        $lead_data['custom_fields'] = $custom_fields;
     }
 
     error_log('Sending lead data to Pipedrive: ' . print_r($lead_data, true));
