@@ -215,7 +215,7 @@ function handle_loan_submission($request) {
     }
     
     // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
-    if (isset($data['financial_product'])) {
+    if (!empty($data['financial_product'])) {
         // Map financial product to the correct option ID
         $product_map = [
             'loan' => 55,               // Aizdevums
@@ -223,11 +223,42 @@ function handle_loan_submission($request) {
             'leasing' => 57,            // Līzings
             'factoring' => 58,          // Faktorings
             'other' => 59,              // Cits
+            'Aizdevums' => 55,          // Direct Latvian names from the form
+            'Kredītlīnija' => 56,
+            'Līzings' => 57,
+            'Faktorings' => 58,
+            'Cits finanšu produkts' => 59,
             'default' => 55             // Default to first option
         ];
         
-        $product_value = isset($product_map[$data['financial_product']]) ? $product_map[$data['financial_product']] : $product_map['default'];
+        // Log the incoming financial product value
+        error_log('Financial product from form: ' . $data['financial_product']);
+        
+        // If the value is directly in the map, use it, otherwise default to 'Aizdevums'
+        if (isset($product_map[$data['financial_product']])) {
+            $product_value = $product_map[$data['financial_product']];
+        } else {
+            // Try to find a partial match
+            $matched = false;
+            foreach ($product_map as $key => $value) {
+                if (stripos($data['financial_product'], $key) !== false) {
+                    $product_value = $value;
+                    $matched = true;
+                    break;
+                }
+            }
+            
+            if (!$matched) {
+                $product_value = $product_map['default'];
+            }
+        }
+        
         $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $product_value;
+        error_log('Mapped financial product value: ' . $product_value);
+    } else {
+        // Set a default value if no financial product is specified
+        $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = 55; // Default to 'Aizdevums'
+        error_log('No financial product specified, using default: 55 (Aizdevums)');
     }
     
     // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field (multipleOption)
