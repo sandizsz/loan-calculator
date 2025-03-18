@@ -384,7 +384,7 @@ const LoanCalculator = () => {
     }
 
     return (
-        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 w-full md:max-w-[600px] mx-auto">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 w-full md:max-w-[620px] mx-auto">
             {/* Dropdown Header */}
             <div className="relative mb-8" ref={dropdownRef}>
                 <div
