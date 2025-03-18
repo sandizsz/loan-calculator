@@ -699,8 +699,8 @@ input[type="range"]::-webkit-slider-thumb {
 .w-full {
   width: 100%;
 }
-.max-w-\[600px\] {
-  max-width: 600px;
+.max-w-full {
+  max-width: 100%;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -1148,10 +1148,6 @@ input[type="range"]::-webkit-slider-thumb {
 
   .md\:col-span-1 {
     grid-column: span 1 / span 1;
-  }
-
-  .md\:max-w-full {
-    max-width: 100%;
   }
 
   .md\:text-sm {
