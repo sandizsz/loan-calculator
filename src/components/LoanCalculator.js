@@ -578,7 +578,7 @@ const LoanCalculator = () => {
                     </button>
         
                     {/* Security Note */}
-                    <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
+                    <div className="mt-4 text-center text-sm md:text-xs text-gray-500 flex items-center justify-center gap-2">
                         <Shield className="w-4 h-4" />
                         Nodrošinām bankas līmeņa aizsardzību Jūsu datiem
                     </div>

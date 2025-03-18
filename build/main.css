@@ -1149,4 +1149,9 @@ input[type="range"]::-webkit-slider-thumb {
   .md\:max-w-full {
     max-width: 100%;
   }
+
+  .md\:text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
 }
