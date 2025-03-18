@@ -384,7 +384,7 @@ const LoanCalculator = () => {
     }
 
     return (
-        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 max-w-[600px] mx-auto">
+        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 w-full md:max-w-[600px] mx-auto">
             {/* Dropdown Header */}
             <div className="relative mb-8" ref={dropdownRef}>
                 <div
@@ -460,15 +460,15 @@ const LoanCalculator = () => {
                     <input
                         type="range"
                         min="500"
-                        max="25000"
+                        max="1000000"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        style={{ background: getSliderBackground(amount, 500, 25000) }}
+                        style={{ background: getSliderBackground(amount, 500, 1000000) }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
-                        <span>25000 €</span>
+                        <span>1000000 €</span>
                     </div>
                 </div>
             </div>
