@@ -460,11 +460,11 @@ const LoanCalculator = () => {
                     <input
                         type="range"
                         min="500"
-                        max="1000000"
+                        max="300000"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        style={{ background: getSliderBackground(amount, 500, 1000000) }}
+                        style={{ background: getSliderBackground(amount, 500, 300000) }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
