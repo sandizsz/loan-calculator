@@ -468,7 +468,7 @@ const LoanCalculator = () => {
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
                         <span>500 €</span>
-                        <span>1000000 €</span>
+                        <span>300000 €</span>
                     </div>
                 </div>
             </div>
