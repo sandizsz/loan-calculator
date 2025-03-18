@@ -544,7 +544,7 @@ const LoanCalculator = () => {
                     <div className="relative">
                         <div className="relative">
                             <div className="absolute top-0 left-0 h-[42px] flex items-center pl-3 pointer-events-none">
-                                <span className="text-gray-500 font-medium select-none">+371</span>
+                 
                             </div>
                             <input
                                 type="tel"
