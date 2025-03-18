@@ -84,8 +84,8 @@ const LoanCalculator = () => {
     // State declarations
     const [kredits, setKredits] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [amount, setAmount] = useState(3000);
-    const [term, setTerm] = useState(36);
+    const [amount, setAmount] = useState(20000);
+    const [term, setTerm] = useState(48);
     const [monthlyPayment, setMonthlyPayment] = useState(92.49);
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
