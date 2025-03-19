@@ -84,7 +84,7 @@ function loan_calculator_enqueue_scripts() {
         'post_type' => 'kredits',
         'posts_per_page' => -1,
         'orderby' => 'date',
-        'order' => 'DESC',
+        'order' => 'ASC',
         'post_status' => 'publish',
         'tax_query' => [
             [
