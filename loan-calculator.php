@@ -83,8 +83,8 @@ function loan_calculator_enqueue_scripts() {
     $kredits = get_posts([
         'post_type' => 'kredits',
         'posts_per_page' => -1,
-        'orderby' => 'menu_order',
-        'order' => 'ASC',
+        'orderby' => 'date',
+        'order' => 'DESC',
         'post_status' => 'publish',
         'tax_query' => [
             [
