@@ -411,7 +411,7 @@ const LoanCalculator = () => {
 
                 {isDropdownOpen && (
                     <div 
-                        className="absolute w-full mt-1 bg-white rounded-lg shadow-lg z-[100] border border-gray-200"
+                        className="absolute w-full mt-1 bg-white rounded-2xl shadow-lg z-[100] border border-gray-200"
                         style={{ maxHeight: '300px', overflowY: 'auto' }}
                     >
 
