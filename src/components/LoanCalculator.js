@@ -1,6 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronDown, Info, Shield, Mail, Phone } from 'lucide-react';
 
+// Add styles for Elementor input overrides
+const elementorInputStyles = `
+    /* Override Elementor styles for our loan calculator inputs */
+    .loan-calculator input[type=date], 
+    .loan-calculator input[type=email], 
+    .loan-calculator input[type=number], 
+    .loan-calculator input[type=password], 
+    .loan-calculator input[type=search], 
+    .loan-calculator input[type=tel], 
+    .loan-calculator input[type=text], 
+    .loan-calculator input[type=url], 
+    .loan-calculator select, 
+    .loan-calculator textarea {
+        width: 100% !important;
+        padding: 0.625rem 1rem !important;
+        border: 1px solid #ffc600 !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: none !important;
+        background-color: #fff !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        outline: none !important;
+    }
+    
+    .loan-calculator input[type=email]:focus,
+    .loan-calculator input[type=tel]:focus,
+    .loan-calculator input[type=text]:focus {
+        border-color: #ffc600 !important;
+        box-shadow: 0 0 0 1px #ffc600 !important;
+    }
+    
+    /* Preserve specific Tailwind styles */
+    .loan-calculator input[type=email].border-red-500,
+    .loan-calculator input[type=tel].border-red-500,
+    .loan-calculator input[type=text].border-red-500 {
+        border-color: #ef4444 !important;
+    }
+`;
+
 // Add styles for range input thumb
 const sliderStyles = `
     input[type='range'] {
@@ -72,10 +112,10 @@ const Input = ({ icon: Icon, className = '', ...props }) => (
 );
 
 const LoanCalculator = () => {
-    // Add slider styles to document
+    // Add styles to document
     useEffect(() => {
         const style = document.createElement('style');
-        style.textContent = sliderStyles;
+        style.textContent = sliderStyles + elementorInputStyles;
         document.head.appendChild(style);
         return () => document.head.removeChild(style);
     }, []);
@@ -384,7 +424,7 @@ const LoanCalculator = () => {
     }
 
     return (
-        <div className="bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 max-w-full mx-auto">
+        <div className="loan-calculator bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 max-w-full mx-auto">
             {/* Dropdown Header */}
             <div className="relative mb-8" ref={dropdownRef}>
                 <div
