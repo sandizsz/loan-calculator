@@ -74,7 +74,7 @@ const FullCalculator = () => {
         profit_loss_status: data.profitLossStatus,
         core_activity: data.coreActivity,
         loan_amount: parseFloat(data.loanAmount.replace(/[^0-9.]/g, '')), // Clean and convert to number
-        loan_term: `${data.loanTerm} ${data.loanTermUnit || 'months'}`,
+        loan_term: `${data.loanTerm} mēneši`,
         loan_purpose: data.loanPurpose,
         collateral_type: data.collateralType,
         collateral_description: data.collateralDescription,
@@ -932,17 +932,17 @@ const FullCalculator = () => {
 
       <FormField
         name="loanTerm"
-        label="Vēlamais aizdevuma termiņš"
+        label="Vēlamais aizdevuma termiņš (mēneši)"
         required
       >
-        <div className="flex space-x-4">
+        <div className="flex">
           <div className="flex-1">
             <input
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               className="loan-form-input"
-              placeholder="Ievadiet termiņu"
+              placeholder="Ievadiet termiņu mēnešos"
               aria-invalid={errors.loanTerm ? 'true' : 'false'}
               {...register('loanTerm', { 
                 required: 'Šis lauks ir obligāts',
@@ -950,56 +950,15 @@ const FullCalculator = () => {
                   const num = parseFloat(value);
                   if (isNaN(num)) return 'Lūdzu, ievadiet skaitli';
                   
-                  const isYears = watch('loanTermUnit') === 'years';
                   const min = 1;
-                  const max = isYears ? 10 : 120;
+                  const max = 120;
                   
-                  if (num < min) return isYears ? 'Minimālais termiņš ir 1 gads' : 'Minimālais termiņš ir 1 mēnesis';
-                  if (num > max) return isYears ? 'Maksimālais termiņš ir 10 gadi' : 'Maksimālais termiņš ir 120 mēneši';
+                  if (num < min) return 'Minimālais termiņš ir 1 mēnesis';
+                  if (num > max) return 'Maksimālais termiņš ir 120 mēneši';
                   return true;
                 }
               })}
             />
-          </div>
-          <div className="flex items-center bg-gray-100 rounded-lg p-1 loan-term-unit-toggle">
-            <RadioGroup.Root 
-              className="flex"
-              value={watch('loanTermUnit') || 'months'}
-              onValueChange={(value) => {
-                const currentTerm = watch('loanTerm');
-                const oldUnit = watch('loanTermUnit');
-                setValue('loanTermUnit', value);
-                
-                // Only convert if there's a value and we're actually changing units
-                if (currentTerm && oldUnit && oldUnit !== value) {
-                  const numericTerm = parseFloat(currentTerm);
-                  if (!isNaN(numericTerm)) {
-                    if (value === 'years' && oldUnit === 'months') {
-                      setValue('loanTerm', Math.round(numericTerm / 12));
-                    } else if (value === 'months' && oldUnit === 'years') {
-                      setValue('loanTerm', numericTerm * 12);
-                    }
-                  }
-                }
-              }}
-            >
-              <div className="flex items-center">
-                <RadioGroup.Item 
-                  value="months" 
-                  className="px-3 py-1 rounded-md focus:outline-none data-[state=checked]:bg-white data-[state=checked]:shadow-sm"
-                >
-                  <span className="text-sm font-medium">Mēneši</span>
-                </RadioGroup.Item>
-              </div>
-              <div className="flex items-center">
-                <RadioGroup.Item 
-                  value="years" 
-                  className="px-3 py-1 rounded-md focus:outline-none data-[state=checked]:bg-white data-[state=checked]:shadow-sm"
-                >
-                  <span className="text-sm font-medium">Gadi</span>
-                </RadioGroup.Item>
-              </div>
-            </RadioGroup.Root>
           </div>
         </div>
       </FormField>
