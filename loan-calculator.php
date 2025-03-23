@@ -191,11 +191,20 @@ function loan_calculator_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'loan_calculator_enqueue_scripts');
 
 // Shortcodes
-function loan_calculator_shortcode() {
+function loan_calculator_shortcode($atts = []) {
+    // Parse attributes
+    $atts = shortcode_atts([
+        'no_redirect' => 'false', // Default to allowing redirects
+    ], $atts);
+    
     // Enqueue the script
     wp_enqueue_script('loan-calculator');
     
+    // Add the no_redirect attribute to the data passed to JavaScript
+    $script = "<script>window.loanCalculatorConfig = { noRedirect: {$atts['no_redirect']} };</script>";
+    
     ob_start();
+    echo $script;
     ?>
     <div id="loan-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">

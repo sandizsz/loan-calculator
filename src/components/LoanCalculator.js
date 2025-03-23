@@ -16,7 +16,7 @@ const elementorInputStyles = `
     .loan-calculator textarea {
         width: 100% !important;
         padding: 0.625rem 1rem !important;
-        border: 1px solid #e5e7eb !important;
+        border: 1px solid #ffc600 !important;
         border-radius: 0.5rem !important;
         transition: all 0.2s ease !important;
         box-shadow: none !important;
@@ -463,7 +463,11 @@ const LoanCalculator = () => {
                                         setSelectedKredit(kredit);
                                         setIsDropdownOpen(false);
                                         
-                                        if (kredit.url) {
+                                        // Check if we should redirect or stay on the page
+                                        const config = window.loanCalculatorConfig || {};
+                                        const noRedirect = config.noRedirect === 'true' || config.noRedirect === true;
+                                        
+                                        if (kredit.url && !noRedirect) {
                                             // Add loading state to the clicked item
                                             e.currentTarget.classList.add('opacity-50');
                                             
