@@ -16,7 +16,7 @@ const elementorInputStyles = `
     .loan-calculator textarea {
         width: 100% !important;
         padding: 0.625rem 1rem !important;
-        border: 1px solid #ffc600 !important;
+        border: 1px solid #000 !important;
         border-radius: 0.5rem !important;
         transition: all 0.2s ease !important;
         box-shadow: none !important;
