@@ -29,8 +29,8 @@ const elementorInputStyles = `
     .loan-calculator input[type=email]:focus,
     .loan-calculator input[type=tel]:focus,
     .loan-calculator input[type=text]:focus {
-        border-color: #e5e7eb !important;
-        box-shadow: 0 0 0 1px #e5e7eb !important;
+        border-color: #ffc600 !important;
+        box-shadow: 0 0 0 1px #ffc600 !important;
     }
     
     /* Preserve specific Tailwind styles */
