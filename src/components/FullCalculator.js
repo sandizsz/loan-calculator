@@ -160,7 +160,6 @@ const FullCalculator = () => {
       hasAppliedElsewhere: '',
       collateralType: '',
       collateralDescription: '',
-      financingPurposes: [],
       contactName: 'John Doe',
       companyName: 'Test Company SIA',
       regNumber: '40000000000',
@@ -1119,7 +1118,7 @@ const FullCalculator = () => {
       
       <FormField
         name="financialProduct"
-        label="Nepieciešamais finanšu produktss"
+        label="Nepieciešamais finanšu produkts"
         required
       >
         <div className="w-full relative">
@@ -1179,62 +1178,7 @@ const FullCalculator = () => {
         </div>
       </FormField>
 
-      <FormField
-        name="financingPurposes"
-        label="Finansējuma mērķis (var būt vairāki)"
-        required
-        {...register('financingPurposes', { 
-          required: 'Lūdzu, izvēlieties vismaz vienu mērķi',
-          validate: value => {
-            if (!Array.isArray(value) || value.length === 0) {
-              return 'Lūdzu, izvēlieties vismaz vienu mērķi';
-            }
-            return true;
-          }
-        })}
-      >
-        <div className="loan-form-checkbox-group border border-gray-200 rounded-lg p-4">
-          {[
-            { id: 'working-capital', label: 'Apgrozāmie līdzekļi' },
-            { id: 'equipment', label: 'Iekārtu iegāde' },
-            { id: 'real-estate', label: 'Nekustamais īpašums' },
-            { id: 'vehicles', label: 'Transportlīdzekļi' },
-            { id: 'refinancing', label: 'Refinansēšana' },
-            { id: 'other', label: 'Cits' }
-          ].map((purpose) => (
-            <div key={purpose.id} className="loan-form-checkbox-wrapper">
-              <Checkbox.Root
-                className="loan-form-checkbox-root"
-                id={`purpose-${purpose.id}`}
-                onCheckedChange={(checked) => {
-                  const currentPurposes = watch('financingPurposes') || [];
-                  if (checked) {
-                    setValue('financingPurposes', [...currentPurposes, purpose.id]);
-                  } else {
-                    setValue('financingPurposes', currentPurposes.filter(p => p !== purpose.id));
-                  }
-                }}
-                checked={(watch('financingPurposes') || []).includes(purpose.id)}
-              >
-                <Checkbox.Indicator className="loan-form-checkbox-indicator">
-                  <Check className="w-4 h-4" />
-                </Checkbox.Indicator>
-              </Checkbox.Root>
-              <label 
-                className="pl-2 text-sm text-gray-700" 
-                htmlFor={`purpose-${purpose.id}`}
-              >
-                {purpose.label}
-              </label>
-            </div>
-          ))}
-        </div>
-        {errors.financingPurposes && (
-          <div className="text-red-500 text-sm mt-1">
-            Lūdzu, izvēlieties vismaz vienu mērķi
-          </div>
-        )}
-      </FormField>
+    
 
       <FormField
         name="collateralType"
