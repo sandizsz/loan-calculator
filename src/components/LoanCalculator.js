@@ -16,7 +16,7 @@ const elementorInputStyles = `
     .loan-calculator textarea {
         width: 100% !important;
         padding: 0.625rem 1rem !important;
-        border: 1px solid #ffc600 !important;
+        border: 1px solid #e5e7eb !important;
         border-radius: 0.5rem !important;
         transition: all 0.2s ease !important;
         box-shadow: none !important;
@@ -29,8 +29,8 @@ const elementorInputStyles = `
     .loan-calculator input[type=email]:focus,
     .loan-calculator input[type=tel]:focus,
     .loan-calculator input[type=text]:focus {
-        border-color: #ffc600 !important;
-        box-shadow: 0 0 0 1px #ffc600 !important;
+        border-color: #e5e7eb !important;
+        box-shadow: 0 0 0 1px #e5e7eb !important;
     }
     
     /* Preserve specific Tailwind styles */
