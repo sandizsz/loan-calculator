@@ -744,9 +744,11 @@ const FullCalculator = () => {
         {/* Personal Contact Information - Full width on mobile, half width on larger screens */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
             Kontaktinformācija
           </h4>
           
@@ -1505,11 +1507,11 @@ const FullCalculator = () => {
         {/* Progress Indicator */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-medium ${step >= 1 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
               1
             </div>
             <div className={`w-16 h-1 ${step >= 2 ? 'bg-[#FFC600]' : 'bg-gray-200'}`}></div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-medium ${step >= 2 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
               2
             </div>
           </div>
