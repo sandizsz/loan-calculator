@@ -739,12 +739,7 @@ const FullCalculator = () => {
 
   const renderStep1 = () => (
     <div className="space-y-8">
-      {/* Section Header with Icon */}
-      <div className="bg-blue-50 rounded-xl p-6 mb-8 border-l-4 border-blue-500 shadow-sm">
-        <h3 className="text-xl font-medium text-blue-800 mb-2">Uzņēmuma informācija</h3>
-        <p className="text-blue-600">Lūdzu, sniedziet precīzu informāciju par jūsu uzņēmumu, lai mēs varētu piedāvāt piemērotāko finansējuma risinājumu.</p>
-      </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Contact Information - Full width on mobile, half width on larger screens */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
