@@ -639,7 +639,7 @@ const FullCalculator = () => {
           name="phone"
           label="Telefona numurs"
           required
-          hint="Ievadiet 8 ciparu telefona numuru"
+       
         >
           <div className="relative w-full">
             <div className="absolute left-0 flex items-center justify-center h-full pointer-events-none pl-4">
