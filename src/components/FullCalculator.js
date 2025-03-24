@@ -202,8 +202,9 @@ const FullCalculator = () => {
         margin-bottom: 1rem !important;
       }
       
-      /* Elementor Button Overrides */
-      .loan-form-container button {
+      /* Elementor Button Overrides - Only for form navigation and submit buttons */
+      .loan-form-container form > .flex.flex-col > button[type="button"],
+      .loan-form-container form > .flex.flex-col > button[type="submit"] {
         background-color: #FFC600 !important;
         color: #000000 !important;
         border: none !important;
@@ -215,7 +216,7 @@ const FullCalculator = () => {
         justify-content: center !important;
       }
       
-      .loan-form-container button[type="submit"] {
+      .loan-form-container form > .flex.flex-col > button[type="submit"] {
         width: 100% !important;
         padding: 1rem 1.5rem !important;
         background-color: #FFC600 !important;
@@ -224,8 +225,18 @@ const FullCalculator = () => {
         font-weight: 500 !important;
       }
       
-      .loan-form-container button[type="submit"]:hover {
+      .loan-form-container form > .flex.flex-col > button[type="submit"]:hover {
         background-color: #E6B400 !important;
+      }
+      
+      /* Make sure dropdown buttons are not affected */
+      .loan-form-select-trigger,
+      [data-radix-select-trigger],
+      [data-radix-popper-content-wrapper] button {
+        background-color: initial !important;
+        color: initial !important;
+        display: initial !important;
+        width: initial !important;
       }
       
       /* Step Numbers */
