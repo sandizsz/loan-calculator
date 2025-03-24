@@ -201,6 +201,37 @@ const FullCalculator = () => {
         color: #374151 !important;
         margin-bottom: 1rem !important;
       }
+      
+      /* Elementor Button Overrides */
+      .loan-form-container button {
+        background-color: #FFC600 !important;
+        color: #000000 !important;
+        border: none !important;
+        border-radius: 0.5rem !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease-in-out !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      
+      .loan-form-container button[type="submit"] {
+        width: 100% !important;
+        padding: 1rem 1.5rem !important;
+        background-color: #FFC600 !important;
+        color: #000000 !important;
+        border-radius: 0.5rem !important;
+        font-weight: 500 !important;
+      }
+      
+      .loan-form-container button[type="submit"]:hover {
+        background-color: #E6B400 !important;
+      }
+      
+      /* Step Numbers */
+      .loan-form-container .rounded-lg {
+        border-radius: 0.5rem !important;
+      }
 
       /* Base form container */
       .loan-form-container {
