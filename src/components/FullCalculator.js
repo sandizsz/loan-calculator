@@ -1505,11 +1505,11 @@ const FullCalculator = () => {
         {/* Progress Indicator */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
               1
             </div>
-            <div className={`w-16 h-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`w-16 h-1 ${step >= 2 ? 'bg-[#FFC600]' : 'bg-gray-200'}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-[#FFC600] text-black' : 'bg-gray-200 text-gray-600'}`}>
               2
             </div>
           </div>
