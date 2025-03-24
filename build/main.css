@@ -571,9 +571,6 @@ input[type="range"]::-webkit-slider-thumb {
 .pointer-events-none {
   pointer-events: none;
 }
-.visible {
-  visibility: visible;
-}
 .static {
   position: static;
 }
