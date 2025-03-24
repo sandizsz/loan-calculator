@@ -176,31 +176,54 @@ const FullCalculator = () => {
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
+      /* Typography */
       h2 {
         font-family: inherit !important;
-        font-size: 2.25rem !important;
+        font-size: 2.5rem !important;
         font-weight: 700 !important;
         color: #1F2937 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
         line-height: 1.2 !important;
         text-align: center !important;
       }
 
       h3 {
-        font-size: 1.125rem !important;
-        color: #6B7280 !important;
+        font-size: 1.25rem !important;
+        color: #4B5563 !important;
         text-align: center !important;
-        margin-bottom: 2.5rem !important;
+        margin-bottom: 2rem !important;
+        font-weight: 500 !important;
+      }
+
+      h4 {
+        font-size: 1.125rem !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        margin-bottom: 1rem !important;
       }
 
       /* Base form container */
       .loan-form-container {
         background: #ffffff !important;
         border-radius: 16px !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
         padding: 2.5rem !important;
         max-width: 800px !important;
         margin: 2rem auto !important;
+        border: 1px solid #F3F4F6 !important;
+      }
+
+      /* Form fields */
+      .form-field {
+        margin-bottom: 1.5rem !important;
+      }
+
+      .loan-form-label {
+        display: block !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        color: #4B5563 !important;
+        margin-bottom: 0.5rem !important;
       }
 
       /* Form inputs */
@@ -208,28 +231,52 @@ const FullCalculator = () => {
         display: block !important;
         width: 100% !important;
         height: 56px !important;
-        padding: 1rem !important;
+        padding: 0.75rem 1rem !important;
         font-size: 1rem !important;
         line-height: 1.5 !important;
-        color: #1f2937 !important;
+        color: #1F2937 !important;
         background-color: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
+        border: 1px solid #E5E7EB !important;
         border-radius: 8px !important;
         transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+      }
+
+      textarea.loan-form-input {
+        height: auto !important;
+        min-height: 120px !important;
+        resize: vertical !important;
       }
 
       .loan-form-input[aria-invalid="true"] {
-        border-color: #dc2626 !important;
+        border-color: #EF4444 !important;
+        background-color: #FEF2F2 !important;
       }
 
       .loan-form-input::placeholder {
         color: #9CA3AF !important;
+        opacity: 0.8 !important;
       }
 
       .loan-form-input:focus {
         outline: none !important;
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+        border-color: #3B82F6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+      }
+
+      .loan-form-input:disabled {
+        background-color: #F3F4F6 !important;
+        cursor: not-allowed !important;
+        opacity: 0.7 !important;
+      }
+
+      /* Error messages */
+      .loan-form-error {
+        color: #EF4444 !important;
+        font-size: 0.875rem !important;
+        margin-top: 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
       }
 
       /* Multi-select checkbox styling */
@@ -242,30 +289,37 @@ const FullCalculator = () => {
       .loan-form-checkbox-wrapper {
         display: flex !important;
         align-items: center !important;
-        padding: 0.5rem !important;
-        border-radius: 0.375rem !important;
-        transition: background-color 0.2s !important;
+        padding: 0.75rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        border: 1px solid #E5E7EB !important;
       }
 
       .loan-form-checkbox-wrapper:hover {
-        background-color: #f3f4f6 !important;
+        background-color: #F9FAFB !important;
+        border-color: #D1D5DB !important;
       }
 
       .loan-form-checkbox-root {
         width: 1.25rem !important;
         height: 1.25rem !important;
         border-radius: 0.25rem !important;
-        border: 2px solid #d1d5db !important;
+        border: 2px solid #D1D5DB !important;
         background-color: white !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         cursor: pointer !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .loan-form-checkbox-root:hover {
+        border-color: #3B82F6 !important;
       }
 
       .loan-form-checkbox-root[data-state='checked'] {
-        border-color: #2563eb !important;
-        background-color: #2563eb !important;
+        border-color: #3B82F6 !important;
+        background-color: #3B82F6 !important;
       }
 
       .loan-form-checkbox-indicator {
@@ -275,61 +329,148 @@ const FullCalculator = () => {
         justify-content: center !important;
       }
 
-      .loan-form-input:disabled {
-        background-color: #f3f4f6 !important;
-        cursor: not-allowed !important;
+      /* Progress bar */
+      .loan-form-progress {
+        height: 8px !important;
+        background-color: #E5E7EB !important;
+        border-radius: 9999px !important;
+        margin-bottom: 2rem !important;
+        overflow: hidden !important;
       }
 
+      .loan-form-progress-bar {
+        height: 100% !important;
+        background-color: #3B82F6 !important;
+        border-radius: 9999px !important;
+        transition: width 0.3s ease-in-out !important;
+      }
 
+      /* Custom Select styling */
+      .loan-form-select-trigger {
+        all: unset !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        height: 56px !important;
+        padding: 0 1rem !important;
+        background-color: white !important;
+        border: 1px solid #E5E7EB !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+        color: #1F2937 !important;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s ease-in-out !important;
+      }
 
+      .loan-form-select-trigger:hover {
+        border-color: #D1D5DB !important;
+      }
 
-      
-   /* Custom Select styling */
-/* RESET the select styling completely */
-.loan-form-select-trigger {
-  all: unset !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  height: 56px !important;
-  padding: 0 1rem !important;
-  background-color: white !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 8px !important;
-  font-size: 1rem !important;
-  line-height: 1.5 !important;
-  color: #1f2937 !important;
-  cursor: pointer !important;
-  box-sizing: border-box !important;
-}
+      .loan-form-select-trigger[data-placeholder] {
+        color: #9CA3AF !important;
+      }
 
-.loan-form-select-trigger[data-placeholder] {
-  color: #9CA3AF !important;
-}
+      .loan-form-select-trigger[aria-invalid="true"] {
+        border-color: #EF4444 !important;
+        background-color: #FEF2F2 !important;
+      }
 
-.loan-form-select-trigger[aria-invalid="true"] {
-  border-color: #dc2626 !important;
-}
+      .loan-form-select-trigger:focus {
+        outline: none !important;
+        border-color: #3B82F6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+      }
 
-.loan-form-select-trigger:focus {
-  outline: none !important;
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
-}
+      /* Fix dropdown positioning and styling */
+      .loan-form-select-content {
+        background-color: white !important;
+        border-radius: 8px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        z-index: 1000 !important;
+        overflow: hidden !important;
+        width: var(--radix-select-trigger-width) !important;
+        max-height: 300px !important;
+        animation-duration: 0.2s !important;
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+        border: 1px solid #F3F4F6 !important;
+      }
 
-/* Fix dropdown positioning and styling */
-.loan-form-select-content {
-  background-color: white !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-  z-index: 1000 !important;
-  overflow: hidden !important;
-  width: var(--radix-select-trigger-width) !important;
-  max-height: 300px !important;
-  animation-duration: 0.6s !important;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
+      /* Buttons */
+      button.loan-form-button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+        color: white !important;
+        background-color: #3B82F6 !important;
+        border: none !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+      }
+
+      button.loan-form-button:hover {
+        background-color: #2563EB !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+      }
+
+      button.loan-form-button:disabled {
+        opacity: 0.7 !important;
+        cursor: not-allowed !important;
+        background-color: #9CA3AF !important;
+      }
+
+      /* Card styling */
+      .form-card {
+        background-color: white !important;
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+        padding: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        border: 1px solid #F3F4F6 !important;
+        transition: all 0.2s ease-in-out !important;
+      }
+
+      .form-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-10px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .loan-form-container {
+        animation: fadeIn 0.5s ease-out !important;
+      }
+
+      .form-field {
+        animation: slideDown 0.3s ease-out !important;
+      }
 
 /* Ensure the portal content is positioned correctly */
 .SelectPortal {
@@ -580,13 +721,16 @@ const FullCalculator = () => {
   // Custom field component with error handling
   const FormField = ({ name, label, required, children, hint }) => (
     <div className="form-field">
-      <Label.Root className="loan-form-label">
-        {label} {required && <span className="text-red-500">*</span>}
+      <Label.Root className="loan-form-label flex items-center text-gray-700 font-medium mb-2">
+        {label} {required && <span className="text-red-500 ml-1">*</span>}
       </Label.Root>
       {children}
-      {hint && <p className="form-helper-text">{hint}</p>}
+      {hint && <p className="text-sm text-gray-500 mt-1">{hint}</p>}
       {errors[name] && (
-        <p className="loan-form-error">
+        <p className="text-sm text-red-600 mt-1 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           {errors[name].message}
         </p>
       )}
@@ -594,329 +738,358 @@ const FullCalculator = () => {
   );
 
   const renderStep1 = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-      {/* Personal Contact Information - Full width on mobile, half width on larger screens */}
-      <div className="col-span-1 md:col-span-2">
-        <FormField
-          name="contactName"
-          label="Kontaktpersonas vārds, uzvārds"
-          required
-        >
-          <input
-            type="text"
-            className="loan-form-input w-full text-base md:text-lg"
-            aria-invalid={errors.contactName ? 'true' : 'false'}
-            {...register('contactName', { required: 'Šis lauks ir obligāts' })}
-          />
-        </FormField>
+    <div className="space-y-8">
+      {/* Section Header with Icon */}
+      <div className="bg-blue-50 rounded-xl p-6 mb-8 border-l-4 border-blue-500 shadow-sm">
+        <h3 className="text-xl font-medium text-blue-800 mb-2">Uzņēmuma informācija</h3>
+        <p className="text-blue-600">Lūdzu, sniedziet precīzu informāciju par jūsu uzņēmumu, lai mēs varētu piedāvāt piemērotāko finansējuma risinājumu.</p>
       </div>
-
-      {/* Email and Phone - Stack on mobile, side by side on larger screens */}
-      <div className="col-span-1">
-        <FormField
-          name="email"
-          label="E-pasta adrese"
-          required
-        >
-          <input
-            type="email"
-            className="loan-form-input w-full text-base md:text-lg"
-            placeholder="example@domain.com"
-            aria-invalid={errors.email ? 'true' : 'false'}
-            {...register('email', {
-              required: 'Šis lauks ir obligāts',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-              }
-            })}
-          />
-        </FormField>
-      </div>
-
-      <div className="col-span-1">
-        <FormField
-          name="phone"
-          label="Telefona numurs"
-          required
-       
-        >
-          <div className="relative w-full">
-            <div className="absolute left-0 flex items-center justify-center h-full pointer-events-none pl-4">
-            </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Contact Information - Full width on mobile, half width on larger screens */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Kontaktinformācija
+          </h4>
+          
+          <FormField
+            name="contactName"
+            label="Kontaktpersonas vārds, uzvārds"
+            required
+          >
             <input
-              type="tel"
-              className="loan-form-input pl-16 w-full text-base md:text-lg"
-              maxLength="8"
-              placeholder="12345678"
-              aria-invalid={errors.phone ? 'true' : 'false'}
-              {...register('phone', {
-                required: 'Šis lauks ir obligāts',
-                pattern: {
-                  value: /^[0-9]{8}$/,
-                  message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
-                }
-              })}
+              type="text"
+              className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+              aria-invalid={errors.contactName ? 'true' : 'false'}
+              {...register('contactName', { required: 'Šis lauks ir obligāts' })}
             />
-          </div>
-        </FormField>
-      </div>
-
-      {/* Company Information - Full width on mobile, half width on larger screens */}
-      <div className="col-span-1">
-        <FormField
-          name="companyName"
-          label="Uzņēmuma nosaukums"
-          required
-        >
-          <input
-            type="text"
-            className="loan-form-input w-full text-base md:text-lg"
-            aria-invalid={errors.companyName ? 'true' : 'false'}
-            {...register('companyName', { required: 'Šis lauks ir obligāts' })}
-          />
-        </FormField>
-      </div>
-
-      <div className="col-span-1">
-        <FormField
-          name="regNumber"
-          label="Reģistrācijas numurs"
-          required
-        >
-          <input
-            type="text"
-            className="loan-form-input w-full text-base md:text-lg"
-            aria-invalid={errors.regNumber ? 'true' : 'false'}
-            {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
-          />
-        </FormField>
-      </div>
-
-      {/* Company Details - Selects */}
-      <div className="col-span-1">
-        <FormField
-          name="companyAge"
-          label="Uzņēmuma vecums"
-          required
-        >
-          <div className="w-full relative">
-            <Select.Root 
-              value={watch('companyAge')} 
-              onValueChange={(value) => {
-                setValue('companyAge', value, { shouldValidate: true });
-              }}
+          </FormField>
+        </div>
+  
+        {/* Email and Phone - Stack on mobile, side by side on larger screens */}
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="email"
+            label="E-pasta adrese"
+            required
+          >
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <input
+                type="email"
+                className="loan-form-input w-full pl-10 text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                placeholder="example@domain.com"
+                aria-invalid={errors.email ? 'true' : 'false'}
+                {...register('email', {
+                  required: 'Šis lauks ir obligāts',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+                  }
+                })}
+              />
+            </div>
+          </FormField>
+        </div>
+  
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="phone"
+            label="Telefona numurs"
+            required
+          >
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <input
+                type="tel"
+                className="loan-form-input pl-10 w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                maxLength="8"
+                placeholder="12345678"
+                aria-invalid={errors.phone ? 'true' : 'false'}
+                {...register('phone', {
+                  required: 'Šis lauks ir obligāts',
+                  pattern: {
+                    value: /^[0-9]{8}$/,
+                    message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+                  }
+                })}
+              />
+            </div>
+          </FormField>
+        </div>
+  
+        {/* Company Information Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-4">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Uzņēmuma dati
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              name="companyName"
+              label="Uzņēmuma nosaukums"
+              required
             >
-              <Select.Trigger 
-                className="loan-form-select-trigger w-full text-base md:text-lg"
-                aria-invalid={errors.companyAge ? 'true' : 'false'}
-                {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
-              >
-                <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
-                <Select.Icon>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </Select.Icon>
-              </Select.Trigger>
-              
-              <Select.Portal>
-                <Select.Content 
-                  className="loan-form-select-content" 
-                  position="popper" 
-                  sideOffset={8}
-                >
-                  <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronUp className="w-4 h-4" />
-                  </Select.ScrollUpButton>
-                  
-                  <Select.Viewport className="p-2">
-                    <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
-                    <SelectItem value="6-12">6-12 mēneši</SelectItem>
-                    <SelectItem value="1-2">1-2 gadi</SelectItem>
-                    <SelectItem value="2-3">2-3 gadi</SelectItem>
-                    <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
-                  </Select.Viewport>
-                  
-                  <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronDown className="w-4 h-4" />
-                  </Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-        </FormField>
-      </div>
-
-      <div className="col-span-1">
-        <FormField
-          name="annualTurnover"
-          label="Apgrozījums pēdējā gadā (EUR)"
-          required
-        >
-          <div className="w-full relative">
-            <Select.Root 
-              value={watch('annualTurnover')} 
-              onValueChange={(value) => {
-                setValue('annualTurnover', value, { shouldValidate: true });
-              }}
+              <input
+                type="text"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                aria-invalid={errors.companyName ? 'true' : 'false'}
+                {...register('companyName', { required: 'Šis lauks ir obligāts' })}
+              />
+            </FormField>
+  
+            <FormField
+              name="regNumber"
+              label="Reģistrācijas numurs"
+              required
             >
-              <Select.Trigger 
-                className="loan-form-select-trigger w-full text-base md:text-lg"
-                aria-invalid={errors.annualTurnover ? 'true' : 'false'}
-                {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
-              >
-                <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
-                <Select.Icon>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </Select.Icon>
-              </Select.Trigger>
-              
-              <Select.Portal>
-                <Select.Content 
-                  className="loan-form-select-content" 
-                  position="popper" 
-                  sideOffset={8}
-                >
-                  <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronUp className="w-4 h-4" />
-                  </Select.ScrollUpButton>
-                  
-                  <Select.Viewport className="p-2">
-                    <SelectItem value="lt200k">&lt; 200 000</SelectItem>
-                    <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
-                    <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
-                    <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
-                  </Select.Viewport>
-                  
-                  <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronDown className="w-4 h-4" />
-                  </Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
+              <input
+                type="text"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                aria-invalid={errors.regNumber ? 'true' : 'false'}
+                {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
+              />
+            </FormField>
           </div>
-        </FormField>
-      </div>
-
-      <div className="col-span-1">
-        <FormField
-          name="profitLossStatus"
-          label="Peļņa vai zaudējumi pēdējā gadā"
-          required
-        >
-          <div className="w-full relative">
-            <Select.Root 
-              value={watch('profitLossStatus')} 
-              onValueChange={(value) => {
-                setValue('profitLossStatus', value, { shouldValidate: true });
-              }}
-            >
-              <Select.Trigger 
-                className="loan-form-select-trigger w-full text-base md:text-lg"
-                aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
-                {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
+        </div>
+  
+        {/* Company Details - Selects */}
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="companyAge"
+            label="Uzņēmuma vecums"
+            required
+          >
+            <div className="w-full relative">
+              <Select.Root 
+                value={watch('companyAge')} 
+                onValueChange={(value) => {
+                  setValue('companyAge', value, { shouldValidate: true });
+                }}
               >
-                <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
-                <Select.Icon>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </Select.Icon>
-              </Select.Trigger>
-              
-              <Select.Portal>
-                <Select.Content 
-                  className="loan-form-select-content" 
-                  position="popper" 
-                  sideOffset={8}
+                <Select.Trigger 
+                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  aria-invalid={errors.companyAge ? 'true' : 'false'}
+                  {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
                 >
-                  <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronUp className="w-4 h-4" />
-                  </Select.ScrollUpButton>
-                  
-                  <Select.Viewport className="p-2">
-                    <SelectItem value="profit">Peļņa</SelectItem>
-                    <SelectItem value="loss">Zaudējumi</SelectItem>
-                    <SelectItem value="noData">Nav pieejamu datu</SelectItem>
-                  </Select.Viewport>
-                  
-                  <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronDown className="w-4 h-4" />
-                  </Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-        </FormField>
-      </div>
-
-      <div className="col-span-1">
-        <FormField
-          name="companyPosition"
-          label="Jūsu pozīcija uzņēmumā"
-          required
-        >
-          <div className="w-full relative">
-            <Select.Root 
-              value={watch('companyPosition')} 
-              onValueChange={(value) => {
-                setValue('companyPosition', value, { shouldValidate: true });
-              }}
-            >
-              <Select.Trigger 
-                className="loan-form-select-trigger w-full text-base md:text-lg"
-                aria-invalid={errors.companyPosition ? 'true' : 'false'}
-                {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
+                  <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
+                  <Select.Icon>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </Select.Icon>
+                </Select.Trigger>
+                
+                <Select.Portal>
+                  <Select.Content 
+                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                    position="popper" 
+                    sideOffset={8}
+                  >
+                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronUp className="w-4 h-4" />
+                    </Select.ScrollUpButton>
+                    
+                    <Select.Viewport className="p-2">
+                      <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
+                      <SelectItem value="6-12">6-12 mēneši</SelectItem>
+                      <SelectItem value="1-2">1-2 gadi</SelectItem>
+                      <SelectItem value="2-3">2-3 gadi</SelectItem>
+                      <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
+                    </Select.Viewport>
+                    
+                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronDown className="w-4 h-4" />
+                    </Select.ScrollDownButton>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </FormField>
+        </div>
+  
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="annualTurnover"
+            label="Apgrozījums pēdējā gadā (EUR)"
+            required
+          >
+            <div className="w-full relative">
+              <Select.Root 
+                value={watch('annualTurnover')} 
+                onValueChange={(value) => {
+                  setValue('annualTurnover', value, { shouldValidate: true });
+                }}
               >
-                <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
-                <Select.Icon>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </Select.Icon>
-              </Select.Trigger>
-              
-              <Select.Portal>
-                <Select.Content 
-                  className="loan-form-select-content" 
-                  position="popper" 
-                  sideOffset={8}
+                <Select.Trigger 
+                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  aria-invalid={errors.annualTurnover ? 'true' : 'false'}
+                  {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
                 >
-                  <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronUp className="w-4 h-4" />
-                  </Select.ScrollUpButton>
-                  
-                  <Select.Viewport className="p-2">
-                    <SelectItem value="owner">Īpašnieks</SelectItem>
-                    <SelectItem value="board">Valdes loceklis</SelectItem>
-                    <SelectItem value="finance">Finanšu direktors</SelectItem>
-                    <SelectItem value="other">Cits</SelectItem>
-                  </Select.Viewport>
-                  
-                  <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                    <ChevronDown className="w-4 h-4" />
-                  </Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-          </div>
-        </FormField>
-      </div>
-
-      {/* Core Activity - Full width on all screen sizes */}
-      <div className="col-span-1 md:col-span-2">
-        <FormField
-          name="coreActivity"
-          label="Pamata darbība (īss apraksts)"
-          required
-        >
-          <textarea
-            className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg"
-            placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
-            aria-invalid={errors.coreActivity ? 'true' : 'false'}
-            {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
-          />
-        </FormField>
+                  <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
+                  <Select.Icon>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </Select.Icon>
+                </Select.Trigger>
+                
+                <Select.Portal>
+                  <Select.Content 
+                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                    position="popper" 
+                    sideOffset={8}
+                  >
+                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronUp className="w-4 h-4" />
+                    </Select.ScrollUpButton>
+                    
+                    <Select.Viewport className="p-2">
+                      <SelectItem value="lt200k">&lt; 200 000</SelectItem>
+                      <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
+                      <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
+                      <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
+                    </Select.Viewport>
+                    
+                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronDown className="w-4 h-4" />
+                    </Select.ScrollDownButton>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </FormField>
+        </div>
+  
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="profitLossStatus"
+            label="Peļņa vai zaudējumi pēdējā gadā"
+            required
+          >
+            <div className="w-full relative">
+              <Select.Root 
+                value={watch('profitLossStatus')} 
+                onValueChange={(value) => {
+                  setValue('profitLossStatus', value, { shouldValidate: true });
+                }}
+              >
+                <Select.Trigger 
+                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
+                  {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
+                >
+                  <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
+                  <Select.Icon>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </Select.Icon>
+                </Select.Trigger>
+                
+                <Select.Portal>
+                  <Select.Content 
+                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                    position="popper" 
+                    sideOffset={8}
+                  >
+                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronUp className="w-4 h-4" />
+                    </Select.ScrollUpButton>
+                    
+                    <Select.Viewport className="p-2">
+                      <SelectItem value="profit">Peļņa</SelectItem>
+                      <SelectItem value="loss">Zaudējumi</SelectItem>
+                      <SelectItem value="noData">Nav pieejamu datu</SelectItem>
+                    </Select.Viewport>
+                    
+                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronDown className="w-4 h-4" />
+                    </Select.ScrollDownButton>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </FormField>
+        </div>
+  
+        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="companyPosition"
+            label="Jūsu pozīcija uzņēmumā"
+            required
+          >
+            <div className="w-full relative">
+              <Select.Root 
+                value={watch('companyPosition')} 
+                onValueChange={(value) => {
+                  setValue('companyPosition', value, { shouldValidate: true });
+                }}
+              >
+                <Select.Trigger 
+                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  aria-invalid={errors.companyPosition ? 'true' : 'false'}
+                  {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
+                >
+                  <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
+                  <Select.Icon>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </Select.Icon>
+                </Select.Trigger>
+                
+                <Select.Portal>
+                  <Select.Content 
+                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                    position="popper" 
+                    sideOffset={8}
+                  >
+                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronUp className="w-4 h-4" />
+                    </Select.ScrollUpButton>
+                    
+                    <Select.Viewport className="p-2">
+                      <SelectItem value="owner">Īpašnieks</SelectItem>
+                      <SelectItem value="board">Valdes loceklis</SelectItem>
+                      <SelectItem value="finance">Finanšu direktors</SelectItem>
+                      <SelectItem value="other">Cits</SelectItem>
+                    </Select.Viewport>
+                    
+                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                      <ChevronDown className="w-4 h-4" />
+                    </Select.ScrollDownButton>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </FormField>
+        </div>
+  
+        {/* Core Activity - Full width on all screen sizes */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <FormField
+            name="coreActivity"
+            label="Pamata darbība (īss apraksts)"
+            required
+          >
+            <textarea
+              className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+              placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
+              aria-invalid={errors.coreActivity ? 'true' : 'false'}
+              {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
+            />
+          </FormField>
+        </div>
       </div>
     </div>
-
-    
-  );
+  )
 
   const renderStep2 = () => (
     <>
@@ -1321,22 +1494,23 @@ const FullCalculator = () => {
 
   if (isSuccess) {
     return (
-      <div className="loan-form-container">
-        <div className="text-center py-8">
-          <div className="mb-6">
-            <svg className="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="loan-form-container bg-white rounded-2xl shadow-xl border border-gray-100">
+        <div className="text-center py-12">
+          <div className="mb-6 bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto">
+            <svg className="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Paldies! Pieteikums pieņemts</h2>
-          <p className="text-gray-600 mb-8">Mēs izskatīsim Jūsu pieteikumu un sazināsimies ar Jums tuvākajā laikā.</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">Paldies par pieteikumu!</h2>
+          <p className="text-gray-600 mb-2 max-w-md mx-auto">Jūsu pieteikums ir veiksmīgi nosūtīts un tiks izskatīts tuvākajā laikā.</p>
+          <p className="text-gray-600 mb-8 max-w-md mx-auto">Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.</p>
           <button
             onClick={() => {
               setIsSuccess(false);
               setStep(1);
               reset();
             }}
-            className="loan-form-button bg-green-500 hover:bg-green-600"
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all"
           >
             Iesniegt jaunu pieteikumu
           </button>
@@ -1346,35 +1520,54 @@ const FullCalculator = () => {
   }
 
   return (
-    <div className="loan-form-container">
+    <div className="loan-form-container bg-gradient-to-b from-white to-blue-50 rounded-2xl shadow-xl border border-gray-100">
       <div className="mb-8">
-      <div className="loan-form-progress">
-          <div
-            className="loan-form-progress-bar"
-            style={{ width: `${(step / 2) * 100}%` }}
-          />
+        {/* Progress Indicator */}
+        <div className="flex justify-center mb-6">
+          <div className="flex items-center">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              1
+            </div>
+            <div className={`w-16 h-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              2
+            </div>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {step === 1 ? 'Kontaktinformācija un Uzņēmuma informācija' : 'Aizdevuma vajadzības'}
+        
+        {/* Heading */}
+        <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Aizdevuma vajadzības'}
         </h2>
-     
+        
+        {/* Subtitle */}
+        <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+          {step === 1 
+            ? 'Aizpildiet informāciju par jūsu uzņēmumu, lai mēs varētu sagatavot personalizētu finansējuma piedāvājumu.' 
+            : 'Pastāstiet mums par jūsu finansējuma vajadzībām, lai mēs varētu piedāvāt piemērotāko risinājumu.'}
+        </p>
       </div>
-
+  
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {step === 1 ? renderStep1() : renderStep2()}
         
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-md">
-            {error}
+          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100">
+            <div className="flex">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {error}
+            </div>
           </div>
         )}
-
+  
         <div className="flex justify-between pt-6">
           {step > 1 && (
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="loan-form-button bg-gray-500"
+              className="px-6 py-3 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
               Iepriekšējais
@@ -1383,11 +1576,27 @@ const FullCalculator = () => {
           
           <button
             type="submit"
-            className="loan-form-button"
+            className={`px-6 py-3 rounded-lg font-medium shadow-sm flex items-center ${
+              isSubmitting 
+                ? 'bg-gray-400 text-white cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700 text-white transition-all'
+            }`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Apstrādā...' : step === 2 ? 'Iesniegt' : 'Nākamais'}
-            {step < 2 && <ChevronRight className="w-5 h-5 ml-2" />}
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Apstrādā...
+              </>
+            ) : (
+              <>
+                {step === 2 ? 'Iesniegt pieteikumu' : 'Turpināt'}
+                {step < 2 && <ChevronRight className="w-5 h-5 ml-2" />}
+              </>
+            )}
           </button>
         </div>
       </form>
