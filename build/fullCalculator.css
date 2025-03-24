@@ -813,6 +813,9 @@ input[type="range"]::-webkit-slider-thumb {
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+.flex-col {
+  flex-direction: column;
+}
 .items-center {
   align-items: center;
 }
@@ -830,6 +833,15 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .gap-6 {
   gap: 1.5rem;
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * (1 - 0));
+  margin-top: calc(1rem * (1 - var(--tw-space-y-reverse)));
+  margin-top: calc(1rem * calc(1 - 0));
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * 0);
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 .space-y-6 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
@@ -931,11 +943,6 @@ input[type="range"]::-webkit-slider-thumb {
   --tw-bg-opacity: 1;
   background-color: rgba(239, 246, 255, 1);
   background-color: rgba(239, 246, 255, var(--tw-bg-opacity, 1));
-}
-.bg-blue-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgba(37, 99, 235, 1);
-  background-color: rgba(37, 99, 235, var(--tw-bg-opacity, 1));
 }
 .bg-gray-200 {
   --tw-bg-opacity: 1;
@@ -1046,6 +1053,10 @@ input[type="range"]::-webkit-slider-thumb {
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 .pl-10 {
   padding-left: 2.5rem;
@@ -1237,15 +1248,15 @@ input[type="range"]::-webkit-slider-thumb {
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
+.hover\:bg-\[\#E6B400\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(230, 180, 0, 1);
+  background-color: rgba(230, 180, 0, var(--tw-bg-opacity, 1));
+}
 .hover\:bg-blue-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgba(239, 246, 255, 1);
   background-color: rgba(239, 246, 255, var(--tw-bg-opacity, 1));
-}
-.hover\:bg-blue-700:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgba(29, 78, 216, 1);
-  background-color: rgba(29, 78, 216, var(--tw-bg-opacity, 1));
 }
 .hover\:bg-gray-50:hover {
   --tw-bg-opacity: 1;

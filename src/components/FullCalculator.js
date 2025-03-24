@@ -1546,7 +1546,7 @@ const FullCalculator = () => {
           </div>
         )}
   
-        <div className="flex justify-between pt-6">
+        <div className="flex flex-col space-y-4 pt-6">
           {step > 1 && (
             <button
               type="button"
@@ -1560,10 +1560,10 @@ const FullCalculator = () => {
           
           <button
             type="submit"
-            className={`px-6 py-3 rounded-lg font-medium shadow-sm flex items-center ${
+            className={`w-full px-6 py-4 rounded-lg font-medium shadow-sm flex items-center justify-center ${
               isSubmitting 
                 ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white transition-all'
+                : 'bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all'
             }`}
             disabled={isSubmitting}
           >
@@ -1578,7 +1578,7 @@ const FullCalculator = () => {
             ) : (
               <>
                 {step === 2 ? 'Iesniegt pieteikumu' : 'Turpināt'}
-                {step < 2 && <ChevronRight className="w-5 h-5 ml-2" />}
+                <ChevronRight className="w-5 h-5 ml-2" />
               </>
             )}
           </button>
