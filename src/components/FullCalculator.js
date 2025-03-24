@@ -217,6 +217,11 @@ const FullCalculator = () => {
         border-radius: 8px !important;
         transition: all 0.2s ease-in-out !important;
       }
+      
+      /* Ensure inputs with floating labels have proper padding */
+      .loan-form-input.loan-form-floating-input {
+        padding: 1.25rem 1rem 0.5rem !important;
+      }
 
       .loan-form-input[aria-invalid="true"] {
         border-color: #dc2626 !important;
@@ -471,38 +476,39 @@ const FullCalculator = () => {
 
       .loan-form-floating-input {
         height: 56px !important;
-        padding-top: 1.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding: 1.25rem 1rem 0.5rem !important;
       }
 
-      .loan-form-floating-input:focus,
-      .loan-form-floating-input[data-filled="true"] {
-        padding-top: 1.5rem !important;
-        padding-bottom: 0.5rem !important;
+      textarea.loan-form-floating-input {
+        padding-top: 2rem !important;
+        min-height: 120px !important;
       }
 
       .loan-form-floating-label {
         position: absolute !important;
-        top: 0 !important;
+        top: 50% !important;
         left: 1rem !important;
-        height: 100% !important;
-        display: flex !important;
-        align-items: center !important;
+        transform: translateY(-50%) !important;
         font-size: 1rem !important;
-        font-weight: 500 !important;
+        font-weight: 400 !important;
         color: #9CA3AF !important;
         pointer-events: none !important;
-        transform-origin: left top !important;
-        transition: transform 0.2s ease-in-out, color 0.2s ease-in-out !important;
+        transition: all 0.2s ease !important;
+        background: transparent !important;
       }
 
-      .loan-form-floating-input:focus + .loan-form-floating-label,
-      .loan-form-floating-input[data-filled="true"] + .loan-form-floating-label {
-        transform: translateY(-50%) scale(0.85) !important;
-        color: #2563eb !important;
+      /* When input is focused or has content */
+      .loan-form-floating-input:focus ~ .loan-form-floating-label,
+      .loan-form-floating-input[data-filled="true"] ~ .loan-form-floating-label {
+        top: 0.75rem !important;
+        left: 1rem !important;
+        transform: translateY(0) !important;
+        font-size: 0.75rem !important;
+        color: #6B7280 !important;
       }
 
-      .loan-form-floating-input:focus + .loan-form-floating-label {
+      /* When input is focused */
+      .loan-form-floating-input:focus ~ .loan-form-floating-label {
         color: #2563eb !important;
       }
 
@@ -626,22 +632,25 @@ const FullCalculator = () => {
     const value = watch(name);
     const isFilled = value !== undefined && value !== '';
     
+    // Create a unique ID for the input
+    const inputId = `field-${name}`;
+    
     return (
       <div className="form-field">
         <div className="loan-form-floating-wrapper">
           {React.cloneElement(children, {
-            id: name, // Ensure input has an id for the label
-            placeholder: " ", // Empty space placeholder to ensure the label floats properly
+            id: inputId,
+            placeholder: "", // Empty placeholder to ensure the label is visible
             className: `${children.props.className} loan-form-floating-input`,
             'data-filled': isFilled ? 'true' : 'false'
           })}
-          <Label.Root htmlFor={name} className="loan-form-floating-label">
+          <Label.Root htmlFor={inputId} className="loan-form-floating-label">
             {label} {required && <span className="text-red-500">*</span>}
           </Label.Root>
         </div>
-        {hint && <p className="form-helper-text">{hint}</p>}
+        {hint && <p className="form-helper-text mt-1">{hint}</p>}
         {errors[name] && (
-          <p className="loan-form-error">
+          <p className="loan-form-error mt-1">
             {errors[name].message}
           </p>
         )}
