@@ -755,36 +755,28 @@ const FullCalculator = () => {
             Kontaktinformācija
           </h4>
           
-          <FormField
-            name="contactName"
-            label="Kontaktpersonas vārds, uzvārds"
-            required
-          >
-            <input
-              type="text"
-              className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-              aria-invalid={errors.contactName ? 'true' : 'false'}
-              {...register('contactName', { required: 'Šis lauks ir obligāts' })}
-            />
-          </FormField>
-        </div>
-  
-        {/* Email and Phone - Stack on mobile, side by side on larger screens */}
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="email"
-            label="E-pasta adrese"
-            required
-          >
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              name="contactName"
+              label="Kontaktpersonas vārds, uzvārds"
+              required
+            >
+              <input
+                type="text"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                aria-invalid={errors.contactName ? 'true' : 'false'}
+                {...register('contactName', { required: 'Šis lauks ir obligāts' })}
+              />
+            </FormField>
+
+            <FormField
+              name="email"
+              label="E-pasta adrese"
+              required
+            >
               <input
                 type="email"
-                className="loan-form-input w-full pl-10 text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 placeholder="example@domain.com"
                 aria-invalid={errors.email ? 'true' : 'false'}
                 {...register('email', {
@@ -795,25 +787,16 @@ const FullCalculator = () => {
                   }
                 })}
               />
-            </div>
-          </FormField>
-        </div>
-  
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="phone"
-            label="Telefona numurs"
-            required
-          >
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </div>
+            </FormField>
+
+            <FormField
+              name="phone"
+              label="Telefona numurs"
+              required
+            >
               <input
                 type="tel"
-                className="loan-form-input pl-10 w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 maxLength="8"
                 placeholder="12345678"
                 aria-invalid={errors.phone ? 'true' : 'false'}
@@ -825,8 +808,8 @@ const FullCalculator = () => {
                   }
                 })}
               />
-            </div>
-          </FormField>
+            </FormField>
+          </div>
         </div>
   
         {/* Company Information Section */}
