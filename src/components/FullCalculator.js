@@ -755,20 +755,43 @@ const FullCalculator = () => {
             Kontaktinformācija
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormField
-              name="contactName"
-              label="Kontaktpersonas vārds, uzvārds"
-              required
-            >
-              <input
-                type="text"
-                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                aria-invalid={errors.contactName ? 'true' : 'false'}
-                {...register('contactName', { required: 'Šis lauks ir obligāts' })}
-              />
-            </FormField>
+          <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                name="contactName"
+                label="Kontaktpersonas vārds, uzvārds"
+                required
+              >
+                <input
+                  type="text"
+                  className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  aria-invalid={errors.contactName ? 'true' : 'false'}
+                  {...register('contactName', { required: 'Šis lauks ir obligāts' })}
+                />
+              </FormField>
 
+              <FormField
+                name="phone"
+                label="Telefona numurs"
+                required
+              >
+                <input
+                  type="tel"
+                  className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  maxLength="8"
+                  placeholder="12345678"
+                  aria-invalid={errors.phone ? 'true' : 'false'}
+                  {...register('phone', {
+                    required: 'Šis lauks ir obligāts',
+                    pattern: {
+                      value: /^[0-9]{8}$/,
+                      message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+                    }
+                  })}
+                />
+              </FormField>
+            </div>
+            
             <FormField
               name="email"
               label="E-pasta adrese"
@@ -784,27 +807,6 @@ const FullCalculator = () => {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
-                  }
-                })}
-              />
-            </FormField>
-
-            <FormField
-              name="phone"
-              label="Telefona numurs"
-              required
-            >
-              <input
-                type="tel"
-                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                maxLength="8"
-                placeholder="12345678"
-                aria-invalid={errors.phone ? 'true' : 'false'}
-                {...register('phone', {
-                  required: 'Šis lauks ir obligāts',
-                  pattern: {
-                    value: /^[0-9]{8}$/,
-                    message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
                   }
                 })}
               />
