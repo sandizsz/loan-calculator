@@ -463,7 +463,50 @@ const FullCalculator = () => {
         background-color: #2563eb !important;
       }
 
-      /* Labels */
+      /* Floating Label Styles */
+      .loan-form-floating-wrapper {
+        position: relative !important;
+        width: 100% !important;
+      }
+
+      .loan-form-floating-input {
+        height: 56px !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 0.5rem !important;
+      }
+
+      .loan-form-floating-input:focus,
+      .loan-form-floating-input[data-filled="true"] {
+        padding-top: 1.5rem !important;
+        padding-bottom: 0.5rem !important;
+      }
+
+      .loan-form-floating-label {
+        position: absolute !important;
+        top: 0 !important;
+        left: 1rem !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        color: #9CA3AF !important;
+        pointer-events: none !important;
+        transform-origin: left top !important;
+        transition: transform 0.2s ease-in-out, color 0.2s ease-in-out !important;
+      }
+
+      .loan-form-floating-input:focus + .loan-form-floating-label,
+      .loan-form-floating-input[data-filled="true"] + .loan-form-floating-label {
+        transform: translateY(-50%) scale(0.85) !important;
+        color: #2563eb !important;
+      }
+
+      .loan-form-floating-input:focus + .loan-form-floating-label {
+        color: #2563eb !important;
+      }
+
+      /* Original label styles for non-floating contexts */
       .loan-form-label {
         display: block !important;
         margin-bottom: 0.75rem !important;
@@ -577,21 +620,34 @@ const FullCalculator = () => {
   // Handle phone input to only allow digits
 
 
-  // Custom field component with error handling
-  const FormField = ({ name, label, required, children, hint }) => (
-    <div className="form-field">
-      <Label.Root className="loan-form-label">
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label.Root>
-      {children}
-      {hint && <p className="form-helper-text">{hint}</p>}
-      {errors[name] && (
-        <p className="loan-form-error">
-          {errors[name].message}
-        </p>
-      )}
-    </div>
-  );
+  // Custom field component with floating label handling
+  const FormField = ({ name, label, required, children, hint }) => {
+    // Get the current value of the field to determine if it's filled
+    const value = watch(name);
+    const isFilled = value !== undefined && value !== '';
+    
+    return (
+      <div className="form-field">
+        <div className="loan-form-floating-wrapper">
+          {React.cloneElement(children, {
+            id: name, // Ensure input has an id for the label
+            placeholder: " ", // Empty space placeholder to ensure the label floats properly
+            className: `${children.props.className} loan-form-floating-input`,
+            'data-filled': isFilled ? 'true' : 'false'
+          })}
+          <Label.Root htmlFor={name} className="loan-form-floating-label">
+            {label} {required && <span className="text-red-500">*</span>}
+          </Label.Root>
+        </div>
+        {hint && <p className="form-helper-text">{hint}</p>}
+        {errors[name] && (
+          <p className="loan-form-error">
+            {errors[name].message}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   const renderStep1 = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -621,7 +677,6 @@ const FullCalculator = () => {
           <input
             type="email"
             className="loan-form-input w-full text-base md:text-lg"
-            placeholder="example@domain.com"
             aria-invalid={errors.email ? 'true' : 'false'}
             {...register('email', {
               required: 'Šis lauks ir obligāts',
@@ -648,7 +703,6 @@ const FullCalculator = () => {
               type="tel"
               className="loan-form-input pl-16 w-full text-base md:text-lg"
               maxLength="8"
-              placeholder="12345678"
               aria-invalid={errors.phone ? 'true' : 'false'}
               {...register('phone', {
                 required: 'Šis lauks ir obligāts',
@@ -907,7 +961,6 @@ const FullCalculator = () => {
         >
           <textarea
             className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg"
-            placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
             aria-invalid={errors.coreActivity ? 'true' : 'false'}
             {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
           />
