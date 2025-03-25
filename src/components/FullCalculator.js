@@ -1546,7 +1546,7 @@ const FullCalculator = () => {
   }
 
   return (
-    <div className="loan-form-container bg-gradient-to-b from-white to-blue-50 rounded-2xl shadow-xl border border-gray-100">
+    <div className="loan-form-container rounded-2xl border border-gray-100">
       <div className="mb-8">
         {/* Progress Indicator */}
         <div className="flex justify-center mb-6">
