@@ -250,7 +250,6 @@ const FullCalculator = () => {
         
         border-radius: 16px !important;
         
-        padding: 2.5rem !important;
         max-width: 800px !important;
         margin: 2rem auto !important;
         border: 1px solid #F3F4F6 !important;
@@ -1609,7 +1608,7 @@ const FullCalculator = () => {
         
         {/* Heading */}
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Aizdevuma vajadzības'}
+          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Finansējuma vajadzības'}
         </h2>
         
         {/* Subtitle */}
