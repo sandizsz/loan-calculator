@@ -890,228 +890,218 @@ const FullCalculator = () => {
                 {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
               />
             </FormField>
+            
+            <FormField
+              name="companyAge"
+              label="Uzņēmuma vecums"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('companyAge')} 
+                  onValueChange={(value) => {
+                    setValue('companyAge', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.companyAge ? 'true' : 'false'}
+                    {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
+                        <SelectItem value="6-12">6-12 mēneši</SelectItem>
+                        <SelectItem value="1-2">1-2 gadi</SelectItem>
+                        <SelectItem value="2-3">2-3 gadi</SelectItem>
+                        <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+            
+            <FormField
+              name="annualTurnover"
+              label="Apgrozījums pēdējā gadā (EUR)"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('annualTurnover')} 
+                  onValueChange={(value) => {
+                    setValue('annualTurnover', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.annualTurnover ? 'true' : 'false'}
+                    {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="lt200k">&lt; 200 000</SelectItem>
+                        <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
+                        <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
+                        <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+            
+            <FormField
+              name="profitLossStatus"
+              label="Peļņa vai zaudējumi pēdējā gadā"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('profitLossStatus')} 
+                  onValueChange={(value) => {
+                    setValue('profitLossStatus', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
+                    {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="profit">Peļņa</SelectItem>
+                        <SelectItem value="loss">Zaudējumi</SelectItem>
+                        <SelectItem value="noData">Nav pieejamu datu</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+            
+            <FormField
+              name="companyPosition"
+              label="Jūsu pozīcija uzņēmumā"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('companyPosition')} 
+                  onValueChange={(value) => {
+                    setValue('companyPosition', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.companyPosition ? 'true' : 'false'}
+                    {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="owner">Īpašnieks</SelectItem>
+                        <SelectItem value="board">Valdes loceklis</SelectItem>
+                        <SelectItem value="finance">Finanšu direktors</SelectItem>
+                        <SelectItem value="other">Cits</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+            
+            <div className="col-span-1 md:col-span-2">
+              <FormField
+                name="coreActivity"
+                label="Pamata darbība (īss apraksts)"
+                required
+              >
+                <textarea
+                  className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
+                  aria-invalid={errors.coreActivity ? 'true' : 'false'}
+                  {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
+                />
+              </FormField>
+            </div>
           </div>
-        </div>
-  
-        {/* Company Details - Selects */}
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="companyAge"
-            label="Uzņēmuma vecums"
-            required
-          >
-            <div className="w-full relative">
-              <Select.Root 
-                value={watch('companyAge')} 
-                onValueChange={(value) => {
-                  setValue('companyAge', value, { shouldValidate: true });
-                }}
-              >
-                <Select.Trigger 
-                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  aria-invalid={errors.companyAge ? 'true' : 'false'}
-                  {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
-                >
-                  <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
-                  <Select.Icon>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </Select.Icon>
-                </Select.Trigger>
-                
-                <Select.Portal>
-                  <Select.Content 
-                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                    position="popper" 
-                    sideOffset={8}
-                  >
-                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronUp className="w-4 h-4" />
-                    </Select.ScrollUpButton>
-                    
-                    <Select.Viewport className="p-2">
-                      <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
-                      <SelectItem value="6-12">6-12 mēneši</SelectItem>
-                      <SelectItem value="1-2">1-2 gadi</SelectItem>
-                      <SelectItem value="2-3">2-3 gadi</SelectItem>
-                      <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
-                    </Select.Viewport>
-                    
-                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronDown className="w-4 h-4" />
-                    </Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
-            </div>
-          </FormField>
-        </div>
-  
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="annualTurnover"
-            label="Apgrozījums pēdējā gadā (EUR)"
-            required
-          >
-            <div className="w-full relative">
-              <Select.Root 
-                value={watch('annualTurnover')} 
-                onValueChange={(value) => {
-                  setValue('annualTurnover', value, { shouldValidate: true });
-                }}
-              >
-                <Select.Trigger 
-                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  aria-invalid={errors.annualTurnover ? 'true' : 'false'}
-                  {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
-                >
-                  <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
-                  <Select.Icon>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </Select.Icon>
-                </Select.Trigger>
-                
-                <Select.Portal>
-                  <Select.Content 
-                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                    position="popper" 
-                    sideOffset={8}
-                  >
-                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronUp className="w-4 h-4" />
-                    </Select.ScrollUpButton>
-                    
-                    <Select.Viewport className="p-2">
-                      <SelectItem value="lt200k">&lt; 200 000</SelectItem>
-                      <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
-                      <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
-                      <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
-                    </Select.Viewport>
-                    
-                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronDown className="w-4 h-4" />
-                    </Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
-            </div>
-          </FormField>
-        </div>
-  
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="profitLossStatus"
-            label="Peļņa vai zaudējumi pēdējā gadā"
-            required
-          >
-            <div className="w-full relative">
-              <Select.Root 
-                value={watch('profitLossStatus')} 
-                onValueChange={(value) => {
-                  setValue('profitLossStatus', value, { shouldValidate: true });
-                }}
-              >
-                <Select.Trigger 
-                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
-                  {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
-                >
-                  <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
-                  <Select.Icon>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </Select.Icon>
-                </Select.Trigger>
-                
-                <Select.Portal>
-                  <Select.Content 
-                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                    position="popper" 
-                    sideOffset={8}
-                  >
-                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronUp className="w-4 h-4" />
-                    </Select.ScrollUpButton>
-                    
-                    <Select.Viewport className="p-2">
-                      <SelectItem value="profit">Peļņa</SelectItem>
-                      <SelectItem value="loss">Zaudējumi</SelectItem>
-                      <SelectItem value="noData">Nav pieejamu datu</SelectItem>
-                    </Select.Viewport>
-                    
-                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronDown className="w-4 h-4" />
-                    </Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
-            </div>
-          </FormField>
-        </div>
-  
-        <div className="col-span-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="companyPosition"
-            label="Jūsu pozīcija uzņēmumā"
-            required
-          >
-            <div className="w-full relative">
-              <Select.Root 
-                value={watch('companyPosition')} 
-                onValueChange={(value) => {
-                  setValue('companyPosition', value, { shouldValidate: true });
-                }}
-              >
-                <Select.Trigger 
-                  className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  aria-invalid={errors.companyPosition ? 'true' : 'false'}
-                  {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
-                >
-                  <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
-                  <Select.Icon>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  </Select.Icon>
-                </Select.Trigger>
-                
-                <Select.Portal>
-                  <Select.Content 
-                    className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                    position="popper" 
-                    sideOffset={8}
-                  >
-                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronUp className="w-4 h-4" />
-                    </Select.ScrollUpButton>
-                    
-                    <Select.Viewport className="p-2">
-                      <SelectItem value="owner">Īpašnieks</SelectItem>
-                      <SelectItem value="board">Valdes loceklis</SelectItem>
-                      <SelectItem value="finance">Finanšu direktors</SelectItem>
-                      <SelectItem value="other">Cits</SelectItem>
-                    </Select.Viewport>
-                    
-                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                      <ChevronDown className="w-4 h-4" />
-                    </Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
-            </div>
-          </FormField>
-        </div>
-  
-        {/* Core Activity - Full width on all screen sizes */}
-        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <FormField
-            name="coreActivity"
-            label="Pamata darbība (īss apraksts)"
-            required
-          >
-            <textarea
-              className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-              placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
-              aria-invalid={errors.coreActivity ? 'true' : 'false'}
-              {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
-            />
-          </FormField>
         </div>
       </div>
     </div>
