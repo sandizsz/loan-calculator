@@ -1121,7 +1121,7 @@ const FullCalculator = () => {
             Aizdevuma informācija
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <FormField
               name="loanAmount"
               label="Nepieciešamā aizdevuma summa (EUR)"
@@ -1305,7 +1305,7 @@ const FullCalculator = () => {
             Finanšu statuss
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <FormField
               name="taxDebtStatus"
               label="Vai uzņēmumam ir nodokļu parāds?"
@@ -1422,7 +1422,7 @@ const FullCalculator = () => {
             Nodrošinājuma informācija
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <FormField
               name="collateralType"
               label="Piedāvātais nodrošinājums"
@@ -1505,7 +1505,7 @@ const FullCalculator = () => {
             Papildu informācija
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <FormField
               name="hasAppliedElsewhere"
               label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
