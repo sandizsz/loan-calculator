@@ -1108,306 +1108,345 @@ const FullCalculator = () => {
   )
 
   const renderStep2 = () => (
-    <>
-      <FormField
-        name="loanAmount"
-        label="Nepieciešamā aizdevuma summa (EUR)"
-        required
-      >
-        <input
-          type="number"
-          className="loan-form-input"
-          min="1000"
-          max="1000000"
-          {...register('loanAmount', { 
-            required: 'Šis lauks ir obligāts',
-            min: {
-              value: 1000,
-              message: 'Minimālā summa ir €1,000'
-            },
-            max: {
-              value: 1000000,
-              message: 'Maksimālā summa ir €1,000,000'
-            }
-          })}
-        />
-      </FormField>
-
-      <FormField
-        name="loanTerm"
-        label="Vēlamais aizdevuma termiņš (mēneši)"
-        required
-      >
-        <div className="flex">
-          <div className="flex-1">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              className="loan-form-input"
-              placeholder="Ievadiet termiņu mēnešos"
-              aria-invalid={errors.loanTerm ? 'true' : 'false'}
-              {...register('loanTerm', { 
-                required: 'Šis lauks ir obligāts',
-                validate: (value) => {
-                  const num = parseFloat(value);
-                  if (isNaN(num)) return 'Lūdzu, ievadiet skaitli';
-                  
-                  const min = 1;
-                  const max = 120;
-                  
-                  if (num < min) return 'Minimālais termiņš ir 1 mēnesis';
-                  if (num > max) return 'Maksimālais termiņš ir 120 mēneši';
-                  return true;
-                }
-              })}
-            />
-          </div>
-        </div>
-      </FormField>
-
-      <FormField
-  name="loanPurpose"
-  label="Aizdevuma mērķis"
-  required
->
-  <div className="w-full relative">
-    <Select.Root 
-      value={watch('loanPurpose')} 
-      onValueChange={(value) => {
-        setValue('loanPurpose', value, { shouldValidate: true });
-      }}
-    >
-      <Select.Trigger 
-        className={`loan-form-select-trigger ${errors.loanPurpose ? 'border-red-500' : ''}`}
-        {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
-      >
-        <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
-        <Select.Icon>
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        </Select.Icon>
-      </Select.Trigger>
-      
-      <Select.Portal>
-        <Select.Content 
-          className="loan-form-select-content" 
-          position="popper" 
-          sideOffset={8}
-        >
-          <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-            <ChevronUp className="w-4 h-4" />
-          </Select.ScrollUpButton>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Loan Information Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            Aizdevuma informācija
+          </h4>
           
-          <Select.Viewport className="p-2">
-            <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-            <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-            <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-            <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-            <SelectItem value="cits">Cits mērķis</SelectItem>
-          </Select.Viewport>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              name="loanAmount"
+              label="Nepieciešamā aizdevuma summa (EUR)"
+              required
+            >
+              <input
+                type="number"
+                className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                min="1000"
+                max="1000000"
+                aria-invalid={errors.loanAmount ? 'true' : 'false'}
+                {...register('loanAmount', { 
+                  required: 'Šis lauks ir obligāts',
+                  min: {
+                    value: 1000,
+                    message: 'Minimālā summa ir €1,000'
+                  },
+                  max: {
+                    value: 1000000,
+                    message: 'Maksimālā summa ir €1,000,000'
+                  }
+                })}
+              />
+            </FormField>
+
+            <FormField
+              name="loanTerm"
+              label="Vēlamais aizdevuma termiņš (mēneši)"
+              required
+            >
+              <div className="flex">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    placeholder="Ievadiet termiņu mēnešos"
+                    aria-invalid={errors.loanTerm ? 'true' : 'false'}
+                    {...register('loanTerm', { 
+                      required: 'Šis lauks ir obligāts',
+                      validate: (value) => {
+                        const num = parseFloat(value);
+                        if (isNaN(num)) return 'Lūdzu, ievadiet skaitli';
+                        
+                        const min = 1;
+                        const max = 120;
+                        
+                        if (num < min) return 'Minimālais termiņš ir 1 mēnesis';
+                        if (num > max) return 'Maksimālais termiņš ir 120 mēneši';
+                        return true;
+                      }
+                    })}
+                  />
+                </div>
+              </div>
+            </FormField>
+
+            <FormField
+              name="loanPurpose"
+              label="Aizdevuma mērķis"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('loanPurpose')} 
+                  onValueChange={(value) => {
+                    setValue('loanPurpose', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.loanPurpose ? 'true' : 'false'}
+                    {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
+                        <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
+                        <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
+                        <SelectItem value="projekti">Projektu finansēšana</SelectItem>
+                        <SelectItem value="cits">Cits mērķis</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+
+            <FormField
+              name="financialProduct"
+              label="Nepieciešamais finanšu produkts"
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('financialProduct')} 
+                  onValueChange={(value) => {
+                    console.log('Financial product selected:', value);
+                    setValue('financialProduct', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.financialProduct ? 'true' : 'false'}
+                    {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                      {window.loanCalculatorData?.kredits?.map((kredit) => (
+                        <SelectItem key={kredit.id} value={kredit.title}>
+                          <div className="flex items-center gap-2">
+                            {kredit.icon && (
+                              <img 
+                                src={kredit.icon} 
+                                alt=""
+                                className="w-4 h-4 object-contain"
+                                onError={(e) => e.target.style.display = 'none'}
+                              />
+                            )}
+                            {kredit.title}
+                          </div>
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Cits finanšu produkts">Cits finanšu produkts</SelectItem>
+                    </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+          </div>
+        </div>
+
+        {/* Financial Status Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            Finanšu statuss
+          </h4>
           
-          <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-            <ChevronDown className="w-4 h-4" />
-          </Select.ScrollDownButton>
-        </Select.Content>
-      </Select.Portal>
-    </Select.Root>
-    
-  </div>
-</FormField>
-
-      <FormField
-        name="taxDebtStatus"
-        label="Vai uzņēmumam ir nodokļu parāds?"
-        required
-      >
-        <div className="w-full relative">
-          <Select.Root 
-            value={watch('taxDebtStatus')} 
-            onValueChange={(value) => {
-              setValue('taxDebtStatus', value, { shouldValidate: true });
-            }}
-          >
-            <Select.Trigger 
-              className="loan-form-select-trigger"
-              aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
-              {...register('taxDebtStatus', { required: 'Šis lauks ir obligāts' })}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              name="taxDebtStatus"
+              label="Vai uzņēmumam ir nodokļu parāds?"
+              required
             >
-              <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
-              <Select.Icon>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </Select.Icon>
-            </Select.Trigger>
-            
-            <Select.Portal>
-              <Select.Content 
-                className="loan-form-select-content" 
-                position="popper" 
-                sideOffset={8}
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('taxDebtStatus')} 
+                  onValueChange={(value) => {
+                    setValue('taxDebtStatus', value, { shouldValidate: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
+                    {...register('taxDebtStatus', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="no">Nav</SelectItem>
+                        <SelectItem value="withSchedule">Ir, ar VID grafiku</SelectItem>
+                        <SelectItem value="withoutSchedule">Ir, bez VID grafika</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
+
+            {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
+              <FormField
+                name="taxDebtAmount"
+                label="Nodokļu parāda summa (EUR)"
+                required
               >
-                <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                  <ChevronUp className="w-4 h-4" />
-                </Select.ScrollUpButton>
-                
-                <Select.Viewport className="p-2">
-                  <SelectItem value="no">Nav</SelectItem>
-                  <SelectItem value="withSchedule">Ir, ar VID grafiku</SelectItem>
-                  <SelectItem value="withoutSchedule">Ir, bez VID grafika</SelectItem>
-                </Select.Viewport>
-                
-                <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                  <ChevronDown className="w-4 h-4" />
-                </Select.ScrollDownButton>
-              </Select.Content>
-            </Select.Portal>
-          </Select.Root>
-        </div>
-      </FormField>
+                <input
+                  type="number"
+                  className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                  placeholder="Ievadiet summu"
+                  aria-invalid={errors.taxDebtAmount ? 'true' : 'false'}
+                  {...register('taxDebtAmount', { 
+                    required: 'Šis lauks ir obligāts',
+                    min: {
+                      value: 0,
+                      message: 'Summai jābūt lielākai par 0'
+                    }
+                  })}
+                />
+              </FormField>
+            )}
 
-      {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
-        <FormField
-          name="taxDebtAmount"
-          label="Nodokļu parāda summa (EUR)"
-          required
-        >
-          <input
-            type="number"
-            className="loan-form-input"
-            placeholder="Ievadiet summu"
-            aria-invalid={errors.taxDebtAmount ? 'true' : 'false'}
-            {...register('taxDebtAmount', { 
-              required: 'Šis lauks ir obligāts',
-              min: {
-                value: 0,
-                message: 'Summai jābūt lielākai par 0'
-              }
-            })}
-          />
-        </FormField>
-      )}
-
-      <FormField
-        name="hadPaymentDelays"
-        label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības? *"
-        required
-      >
-        <RadioGroup.Root 
-          className="flex gap-4"
-          defaultValue={watch('hadPaymentDelays')}
-          onValueChange={(value) => setValue('hadPaymentDelays', value)}
-        >
-          <div className="flex items-center">
-            <RadioGroup.Item 
-              value="yes" 
-              className="loan-form-radio-root"
-              id="hadPaymentDelays-yes"
+            <FormField
+              name="hadPaymentDelays"
+              label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
+              required
             >
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2" htmlFor="hadPaymentDelays-yes">Jā</label>
-          </div>
-          <div className="flex items-center">
-            <RadioGroup.Item 
-              value="no" 
-              className="loan-form-radio-root"
-              id="hadPaymentDelays-no"
-            >
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2" htmlFor="hadPaymentDelays-no">Nē</label>
-          </div>
-        </RadioGroup.Root>
-      </FormField>
-
-      
-      <FormField
-        name="financialProduct"
-        label="Nepieciešamais finanšu produkts"
-        required
-      >
-        <div className="w-full relative">
-          <Select.Root 
-            value={watch('financialProduct')} 
-            onValueChange={(value) => {
-              console.log('Financial product selected:', value);
-              setValue('financialProduct', value, { shouldValidate: true });
-            }}
-          >
-            <Select.Trigger 
-              className="loan-form-select-trigger"
-              aria-invalid={errors.financialProduct ? 'true' : 'false'}
-              {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
-            >
-              <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
-              <Select.Icon>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </Select.Icon>
-            </Select.Trigger>
-            
-            <Select.Portal>
-              <Select.Content 
-                className="loan-form-select-content" 
-                position="popper" 
-                sideOffset={8}
+              <RadioGroup.Root 
+                className="flex gap-4"
+                defaultValue={watch('hadPaymentDelays')}
+                onValueChange={(value) => setValue('hadPaymentDelays', value)}
               >
-                <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                  <ChevronUp className="w-4 h-4" />
-                </Select.ScrollUpButton>
-                
-                <Select.Viewport className="p-2">
-                {window.loanCalculatorData?.kredits?.map((kredit) => (
-                  <SelectItem key={kredit.id} value={kredit.title}>
-                    <div className="flex items-center gap-2">
-                      {kredit.icon && (
-                        <img 
-                          src={kredit.icon} 
-                          alt=""
-                          className="w-4 h-4 object-contain"
-                          onError={(e) => e.target.style.display = 'none'}
-                        />
-                      )}
-                      {kredit.title}
-                    </div>
-                  </SelectItem>
-                ))}
-                <SelectItem value="Cits finanšu produkts">Cits finanšu produkts</SelectItem>
-              </Select.Viewport>
-                
-                <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                  <ChevronDown className="w-4 h-4" />
-                </Select.ScrollDownButton>
-              </Select.Content>
-            </Select.Portal>
-          </Select.Root>
+                <div className="flex items-center">
+                  <RadioGroup.Item 
+                    value="yes" 
+                    className="loan-form-radio-root"
+                    id="hadPaymentDelays-yes"
+                  >
+                    <RadioGroup.Indicator className="loan-form-radio-indicator" />
+                  </RadioGroup.Item>
+                  <label className="pl-2" htmlFor="hadPaymentDelays-yes">Jā</label>
+                </div>
+                <div className="flex items-center">
+                  <RadioGroup.Item 
+                    value="no" 
+                    className="loan-form-radio-root"
+                    id="hadPaymentDelays-no"
+                  >
+                    <RadioGroup.Indicator className="loan-form-radio-indicator" />
+                  </RadioGroup.Item>
+                  <label className="pl-2" htmlFor="hadPaymentDelays-no">Nē</label>
+                </div>
+              </RadioGroup.Root>
+            </FormField>
+          </div>
         </div>
-      </FormField>
 
-    
-
-      <FormField
-        name="collateralType"
-        label="Piedāvātais nodrošinājums"
-        required
-      >
-        <div className="w-full relative">
-          <Select.Root 
-            value={watch('collateralType')} 
-            onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true })}
-          >
-            <Select.Trigger 
-              className="loan-form-select-trigger"
-              aria-invalid={errors.collateralType ? 'true' : 'false'}
-              {...register('collateralType', { required: 'Šis lauks ir obligāts' })}
+        {/* Collateral Information Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            Nodrošinājuma informācija
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              name="collateralType"
+              label="Piedāvātais nodrošinājums"
+              required
             >
-              <Select.Value placeholder="Izvēlieties nodrošinājuma veidu" className="text-gray-400" />
-              <Select.Icon>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </Select.Icon>
-            </Select.Trigger>
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('collateralType')} 
+                  onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true })}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.collateralType ? 'true' : 'false'}
+                    {...register('collateralType', { required: 'Šis lauks ir obligāts' })}
+                  >
+                    <Select.Value placeholder="Izvēlieties nodrošinājuma veidu" className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
             
             <Select.Portal>
               <Select.Content 
-                className="loan-form-select-content" 
+                className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
                 position="popper" 
                 sideOffset={8}
               >
@@ -1439,7 +1478,7 @@ const FullCalculator = () => {
           required
         >
           <textarea
-            className="loan-form-input min-h-[100px] resize-none"
+            className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all min-h-[100px] resize-none"
             placeholder="Lūdzu, sniedziet detalizētu informāciju par piedāvāto nodrošinājumu"
             aria-invalid={errors.collateralDescription ? 'true' : 'false'}
             {...register('collateralDescription', { 
@@ -1452,60 +1491,77 @@ const FullCalculator = () => {
           />
         </FormField>
       )}
-
-      <FormField
-        name="hasAppliedElsewhere"
-        label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
-        required
-      >
-        <RadioGroup.Root 
-          className="flex gap-4"
-          defaultValue={watch('hasAppliedElsewhere')}
-          onValueChange={(value) => setValue('hasAppliedElsewhere', value)}
-        >
-          <div className="flex items-center">
-            <RadioGroup.Item 
-              value="yes" 
-              className="loan-form-radio-root"
-              id="hasAppliedElsewhere-yes"
-            >
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2" htmlFor="hasAppliedElsewhere-yes">Jā</label>
           </div>
-          <div className="flex items-center">
-            <RadioGroup.Item 
-              value="no" 
-              className="loan-form-radio-root"
-              id="hasAppliedElsewhere-no"
-            >
-              <RadioGroup.Indicator className="loan-form-radio-indicator" />
-            </RadioGroup.Item>
-            <label className="pl-2" htmlFor="hasAppliedElsewhere-no">Nē</label>
-          </div>
-        </RadioGroup.Root>
-      </FormField>
-
-      <FormField
-        name="gdprConsent"
-        label="Piekrītu personas datu apstrādei"
-        required
-      >
-        <div className="flex items-center">
-          <Checkbox.Root 
-            className="loan-form-checkbox-root"
-            onCheckedChange={(checked) => setValue('gdprConsent', checked)}
-          >
-            <Checkbox.Indicator className="loan-form-checkbox-indicator">
-              <Check className="w-4 h-4" />
-            </Checkbox.Indicator>
-          </Checkbox.Root>
-          <label className="pl-2 text-sm text-gray-600">
-            Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar privātuma politiku
-          </label>
         </div>
-      </FormField>
-    </>
+        
+        {/* Additional Information Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            Papildu informācija
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              name="hasAppliedElsewhere"
+              label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
+              required
+            >
+              <RadioGroup.Root 
+                className="flex gap-4"
+                defaultValue={watch('hasAppliedElsewhere')}
+                onValueChange={(value) => setValue('hasAppliedElsewhere', value)}
+              >
+                <div className="flex items-center">
+                  <RadioGroup.Item 
+                    value="yes" 
+                    className="loan-form-radio-root"
+                    id="hasAppliedElsewhere-yes"
+                  >
+                    <RadioGroup.Indicator className="loan-form-radio-indicator" />
+                  </RadioGroup.Item>
+                  <label className="pl-2" htmlFor="hasAppliedElsewhere-yes">Jā</label>
+                </div>
+                <div className="flex items-center">
+                  <RadioGroup.Item 
+                    value="no" 
+                    className="loan-form-radio-root"
+                    id="hasAppliedElsewhere-no"
+                  >
+                    <RadioGroup.Indicator className="loan-form-radio-indicator" />
+                  </RadioGroup.Item>
+                  <label className="pl-2" htmlFor="hasAppliedElsewhere-no">Nē</label>
+                </div>
+              </RadioGroup.Root>
+            </FormField>
+
+            <FormField
+              name="gdprConsent"
+              label="Piekrītu personas datu apstrādei"
+              required
+            >
+              <div className="flex items-center">
+                <Checkbox.Root 
+                  className="loan-form-checkbox-root"
+                  onCheckedChange={(checked) => setValue('gdprConsent', checked)}
+                >
+                  <Checkbox.Indicator className="loan-form-checkbox-indicator">
+                    <Check className="w-4 h-4" />
+                  </Checkbox.Indicator>
+                </Checkbox.Root>
+                <label className="pl-2 text-sm text-gray-600">
+                  Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar privātuma politiku
+                </label>
+              </div>
+            </FormField>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   if (isSuccess) {
