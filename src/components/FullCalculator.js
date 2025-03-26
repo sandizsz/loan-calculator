@@ -782,10 +782,10 @@ const FullCalculator = () => {
   const renderStep1 = () => (
     <div className="space-y-8">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Personal Contact Information - Full width on mobile, half width on larger screens */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -794,8 +794,8 @@ const FullCalculator = () => {
             Kontaktinformācija
           </h4>
           
-          <div className="grid grid-cols-1 gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 name="contactName"
                 label="Kontaktpersonas vārds, uzvārds"
@@ -855,7 +855,7 @@ const FullCalculator = () => {
   
         {/* Company Information Section */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100 ">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -864,7 +864,7 @@ const FullCalculator = () => {
             Uzņēmuma dati
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               name="companyName"
               label="Uzņēmuma nosaukums"
@@ -1109,10 +1109,10 @@ const FullCalculator = () => {
 
   const renderStep2 = () => (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Loan Information Section */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1121,7 +1121,7 @@ const FullCalculator = () => {
             Aizdevuma informācija
           </h4>
           
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             <FormField
               name="loanAmount"
               label="Nepieciešamā aizdevuma summa (EUR)"
@@ -1296,7 +1296,7 @@ const FullCalculator = () => {
 
         {/* Financial Status Section */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -1305,7 +1305,7 @@ const FullCalculator = () => {
             Finanšu statuss
           </h4>
           
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             <FormField
               name="taxDebtStatus"
               label="Vai uzņēmumam ir nodokļu parāds?"
@@ -1413,7 +1413,7 @@ const FullCalculator = () => {
 
         {/* Collateral Information Section */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -1422,7 +1422,7 @@ const FullCalculator = () => {
             Nodrošinājuma informācija
           </h4>
           
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             <FormField
               name="collateralType"
               label="Piedāvātais nodrošinājums"
@@ -1496,7 +1496,7 @@ const FullCalculator = () => {
         
         {/* Additional Information Section */}
         <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1505,7 +1505,7 @@ const FullCalculator = () => {
             Papildu informācija
           </h4>
           
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             <FormField
               name="hasAppliedElsewhere"
               label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
