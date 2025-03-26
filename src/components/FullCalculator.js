@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import * as Label from '@radix-ui/react-label';
@@ -148,8 +148,9 @@ const FullCalculator = () => {
 
   // Form setup with proper validation
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
-    mode: 'onSubmit',        // Only validate when leaving a field, not during typing
-    reValidateMode: 'onBlur', // Only re-validate on submit
+    shouldUnregister: false,
+    mode: 'onBlur',        // Only validate when leaving a field, not during typing
+    reValidateMode: 'onChange', // Only re-validate on change, not during typing
     criteriaMode: 'firstError',
     defaultValues: {
       financialProduct: urlParams.kredit_id,
@@ -1189,7 +1190,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('loanPurpose')} 
                   onValueChange={(value) => {
-                    setValue('loanPurpose', value, { shouldValidate: true });
+                    setValue('loanPurpose', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1239,8 +1240,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('financialProduct')} 
                   onValueChange={(value) => {
-                    console.log('Financial product selected:', value);
-                    setValue('financialProduct', value, { shouldValidate: true });
+                    setValue('financialProduct', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1315,7 +1315,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('taxDebtStatus')} 
                   onValueChange={(value) => {
-                    setValue('taxDebtStatus', value, { shouldValidate: true });
+                    setValue('taxDebtStatus', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1384,7 +1384,7 @@ const FullCalculator = () => {
               <RadioGroup.Root 
                 className="flex gap-4"
                 defaultValue={watch('hadPaymentDelays')}
-                onValueChange={(value) => setValue('hadPaymentDelays', value)}
+                onValueChange={(value) => setValue('hadPaymentDelays', value, { shouldValidate: true, shouldDirty: true })}
               >
                 <div className="flex items-center">
                   <RadioGroup.Item 
@@ -1431,7 +1431,7 @@ const FullCalculator = () => {
               <div className="w-full relative">
                 <Select.Root 
                   value={watch('collateralType')} 
-                  onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true })}
+                  onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true, shouldDirty: true })}
                 >
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
@@ -1514,7 +1514,7 @@ const FullCalculator = () => {
               <RadioGroup.Root 
                 className="flex gap-4"
                 defaultValue={watch('hasAppliedElsewhere')}
-                onValueChange={(value) => setValue('hasAppliedElsewhere', value)}
+                onValueChange={(value) => setValue('hasAppliedElsewhere', value, { shouldValidate: true, shouldDirty: true })}
               >
                 <div className="flex items-center">
                   <RadioGroup.Item 
@@ -1547,7 +1547,7 @@ const FullCalculator = () => {
               <div className="flex items-center">
                 <Checkbox.Root 
                   className="loan-form-checkbox-root"
-                  onCheckedChange={(checked) => setValue('gdprConsent', checked)}
+                  onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
                 >
                   <Checkbox.Indicator className="loan-form-checkbox-indicator">
                     <Check className="w-4 h-4" />
