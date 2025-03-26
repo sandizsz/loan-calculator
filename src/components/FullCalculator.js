@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import * as Label from '@radix-ui/react-label';
@@ -147,10 +147,10 @@ const FullCalculator = () => {
   const urlParams = getUrlParams();
 
   // Form setup with proper validation
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
+  const formMethods = useForm({
     shouldUnregister: false,
     mode: 'onBlur',        // Only validate when leaving a field, not during typing
-    reValidateMode: 'onChange', // Only re-validate on change, not during typing
+    reValidateMode: 'onSubmit', // Only re-validate on submit to prevent animations
     criteriaMode: 'firstError',
     defaultValues: {
       financialProduct: urlParams.kredit_id,
@@ -1189,7 +1189,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('loanPurpose')} 
                   onValueChange={(value) => {
-                    setValue('loanPurpose', value, { shouldValidate: true, shouldDirty: true });
+                    setValue('loanPurpose', value, { shouldValidate: false, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1239,7 +1239,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('financialProduct')} 
                   onValueChange={(value) => {
-                    setValue('financialProduct', value, { shouldValidate: true, shouldDirty: true });
+                    setValue('financialProduct', value, { shouldValidate: false, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1314,7 +1314,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('taxDebtStatus')} 
                   onValueChange={(value) => {
-                    setValue('taxDebtStatus', value, { shouldValidate: true, shouldDirty: true });
+                    setValue('taxDebtStatus', value, { shouldValidate: false, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1430,7 +1430,7 @@ const FullCalculator = () => {
               <div className="w-full relative">
                 <Select.Root 
                   value={watch('collateralType')} 
-                  onValueChange={(value) => setValue('collateralType', value, { shouldValidate: true, shouldDirty: true })}
+                  onValueChange={(value) => setValue('collateralType', value, { shouldValidate: false, shouldDirty: true })}
                 >
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
@@ -1513,7 +1513,7 @@ const FullCalculator = () => {
               <RadioGroup.Root 
                 className="flex gap-4"
                 defaultValue={watch('hasAppliedElsewhere')}
-                onValueChange={(value) => setValue('hasAppliedElsewhere', value, { shouldValidate: true, shouldDirty: true })}
+                onValueChange={(value) => setValue('hasAppliedElsewhere', value, { shouldValidate: false, shouldDirty: true })}
               >
                 <div className="flex items-center">
                   <RadioGroup.Item 
@@ -1546,7 +1546,7 @@ const FullCalculator = () => {
               <div className="flex items-center">
                 <Checkbox.Root 
                   className="loan-form-checkbox-root"
-                  onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
+                  onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: false, shouldDirty: true })}
                 >
                   <Checkbox.Indicator className="loan-form-checkbox-indicator">
                     <Check className="w-4 h-4" />
