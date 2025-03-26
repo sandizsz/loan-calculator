@@ -854,7 +854,7 @@ const FullCalculator = () => {
         </div>
   
         {/* Company Information Section */}
-        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-4">
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100 ">
           <h4 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
             <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
