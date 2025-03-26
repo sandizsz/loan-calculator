@@ -908,7 +908,7 @@ const FullCalculator = () => {
                     aria-invalid={errors.companyAge ? 'true' : 'false'}
                     {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
                   >
-                    <Select.Value placeholder="Izvēlieties vecumu" className="text-gray-400" />
+                    <Select.Value placeholder="Izvēlieties uzņēmuma vecumu" className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
