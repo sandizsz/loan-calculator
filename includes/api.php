@@ -142,8 +142,27 @@ function handle_loan_submission($request) {
         return new WP_Error('pipedrive_error', 'Failed to create contact or organization', array('status' => 500));
     }
     
-    // Map form data to Pipedrive lead custom fields using exact field keys
+    // Map form data to Pipedrive lead custom fields
     $custom_fields = array();
+    
+    // Field ID mapping - convert our hash IDs to the format Pipedrive expects
+    $field_id_mapping = [
+        '35e584f3aeee47a58265149def733427d7beb2a2' => 'reg_number',
+        '7a9e2d5c8b3f6e0d1c4a7b2e5f8d9c6a3b2e1d4' => 'tax_debt_status',
+        '9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0' => 'tax_debt_amount',
+        '1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0' => 'payment_delays',
+        'e0b1fa455bd6e56030f83ae350863a357ed7e236' => 'company_age',
+        '30b6a6278feea6cdfe8b2bcf7a295145804365d1' => 'annual_revenue',
+        'c4cbde23802f42ce2856908a0ff6decf94dc7185' => 'profit_loss',
+        '2cd024df7983ad750a8b2828f8a0597fb764bd34' => 'position',
+        '6c695fa59d23ce5853c14a270f19fef16e471c65' => 'main_activity',
+        '1b3bc3ee821b653b33c255b2012db731749ad292' => 'loan_term',
+        '27aa379d105b5516eb80e88e563bca3829a56533' => 'loan_purpose',
+        '15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca' => 'financial_product',
+        'd41ac0a12ff272eb9932c157db783b12fa55d4a8' => 'collateral_type',
+        '9431e23f2b409deafaf14bccf8ca006a8d54da33' => 'collateral_description',
+        'aaf42dc07ef7a915caf41d82e5fad57e79adc0ef' => 'applied_elsewhere'
+    ];
     
     // Kontaktinformācija un Uzņēmuma informācija fields
     // Note: Some of these fields are already handled by person and organization creation
@@ -443,7 +462,19 @@ function handle_loan_submission($request) {
     
     // For leads, custom fields need to be added to the custom_fields property
     if (!empty($custom_fields)) {
-        error_log('FINAL CUSTOM FIELDS: ' . json_encode($custom_fields, JSON_PRETTY_PRINT));
+        // Convert field IDs to the proper format
+        $formatted_custom_fields = [];
+        foreach ($custom_fields as $hash_id => $value) {
+            if (isset($field_id_mapping[$hash_id])) {
+                $formatted_custom_fields[$field_id_mapping[$hash_id]] = $value;
+            } else {
+                // Keep the original ID if not in the mapping
+                $formatted_custom_fields[$hash_id] = $value;
+            }
+        }
+        error_log('FINAL CUSTOM FIELDS (ORIGINAL): ' . json_encode($custom_fields, JSON_PRETTY_PRINT));
+        error_log('FINAL CUSTOM FIELDS (FORMATTED): ' . json_encode($formatted_custom_fields, JSON_PRETTY_PRINT));
+        $custom_fields = $formatted_custom_fields;
     } else {
         error_log('WARNING: No custom fields were added');
     }
