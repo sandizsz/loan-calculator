@@ -87,14 +87,56 @@ function handle_loan_submission($request) {
     // Prepare Pipedrive lead data with custom fields
     // Base lead data
     $lead_data = array(
-        'title' => isset($data['title']) ? $data['title'] : (isset($data['company_name']) ? $data['company_name'] . ' - ' . $data['financial_product'] : $data['financial_product']),
         'owner_id' => $owner_id,
-        'value' => array(
-            'amount' => floatval(isset($data['loan_amount']) ? $data['loan_amount'] : $data['loanAmount']),
-            'currency' => 'EUR'
-        ),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
+    
+    // Set title with proper fallbacks
+    if (isset($data['title']) && !empty($data['title'])) {
+        $lead_data['title'] = $data['title'];
+    } else {
+        // Get company name
+        $company_name = isset($data['company_name']) && !empty($data['company_name']) ? $data['company_name'] : '';
+        
+        // Get financial product
+        $financial_product = '';
+        if (isset($data['financial_product']) && !empty($data['financial_product'])) {
+            $financial_product = $data['financial_product'];
+        } elseif (isset($data['financialProduct']) && !empty($data['financialProduct'])) {
+            $financial_product = $data['financialProduct'];
+        }
+        
+        // Combine for title
+        if (!empty($company_name) && !empty($financial_product)) {
+            $lead_data['title'] = $company_name . ' - ' . $financial_product;
+        } elseif (!empty($company_name)) {
+            $lead_data['title'] = $company_name;
+        } elseif (!empty($financial_product)) {
+            $lead_data['title'] = $financial_product;
+        } else {
+            $lead_data['title'] = 'Loan Application'; // Default title
+        }
+    }
+    
+    // Set loan amount
+    $loan_amount = 0;
+    if (isset($data['loan_amount']) && !empty($data['loan_amount'])) {
+        $loan_amount = $data['loan_amount'];
+    } elseif (isset($data['loanAmount']) && !empty($data['loanAmount'])) {
+        $loan_amount = $data['loanAmount'];
+    }
+    
+    // Make sure loan amount is numeric
+    $loan_amount = preg_replace('/[^0-9.]/', '', $loan_amount);
+    
+    $lead_data['value'] = array(
+        'amount' => floatval($loan_amount),
+        'currency' => 'EUR'
+    );
+    
+    // Log the lead data construction
+    error_log('Lead data construction - Title: ' . $lead_data['title']);
+    error_log('Lead data construction - Amount: ' . $loan_amount);
     
     // Ensure at least one of person_id or organization_id is set (required by Pipedrive API)
     if ($person_id) {
@@ -428,6 +470,10 @@ function handle_loan_submission($request) {
         
         // Log the mapping for debugging
         error_log('Applied elsewhere mapping: ' . $applied_elsewhere . ' => ' . $applied_elsewhere_value);
+    } else {
+        // Set a default value if not provided
+        $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = 66; // Default to 'Nē'
+        error_log('No applied elsewhere value provided, defaulting to 66 (Nē)');
     }
     
     // GDPR consent (key: 8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9)
@@ -455,13 +501,18 @@ function handle_loan_submission($request) {
     error_log('Sending lead data to Pipedrive: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
 
     // Create lead in Pipedrive
-    $lead_response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+    // Log the exact URL and request body being sent
+    $pipedrive_url = 'https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]);
+    error_log('Pipedrive API URL: ' . $pipedrive_url);
+    error_log('Pipedrive API Request Body: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
+    
+    $lead_response = wp_remote_post($pipedrive_url, array(
         'headers' => array(
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ),
         'body' => json_encode($lead_data),
-        'timeout' => 30
+        'timeout' => 60 // Increased timeout for API call
     ));
 
     if (is_wp_error($lead_response)) {
@@ -480,7 +531,25 @@ function handle_loan_submission($request) {
     if ($response_code !== 200 && $response_code !== 201) {
         error_log('Pipedrive Lead API Error: Non-success status code: ' . $response_code);
         error_log('Pipedrive Lead API Error details: ' . print_r($lead_body, true));
-        return new WP_Error('pipedrive_error', 'Failed to create lead', array('status' => 500));
+        
+        // Get more detailed error information
+        $error_message = 'Failed to create lead';
+        if (!empty($lead_body['error'])) {
+            $error_message .= ': ' . $lead_body['error'];
+        }
+        if (!empty($lead_body['error_info'])) {
+            $error_message .= ' - ' . $lead_body['error_info'];
+        }
+        
+        // Check for specific error conditions
+        if (strpos($response_body, 'validation') !== false) {
+            error_log('Validation error detected in Pipedrive response');
+            if (!empty($lead_body['data']['validation_errors'])) {
+                error_log('Validation errors: ' . json_encode($lead_body['data']['validation_errors'], JSON_PRETTY_PRINT));
+            }
+        }
+        
+        return new WP_Error('pipedrive_error', $error_message, array('status' => 500));
     }
     
     if (empty($lead_body['data']['id'])) {
