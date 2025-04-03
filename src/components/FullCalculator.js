@@ -231,6 +231,26 @@ const FullCalculator = () => {
         background-color: #E6B400 !important;
       }
       
+      /* Back button specific styling to override Elementor */
+      .loan-form-container form .back-button {
+        background-color: transparent !important;
+        color: #2563EB !important;
+        border: 1px solid #BFDBFE !important;
+        border-radius: 0.5rem !important;
+        font-weight: 500 !important;
+        padding: 0.75rem 1.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+      }
+      
+      .loan-form-container form .back-button:hover {
+        background-color: #EFF6FF !important;
+        border-color: #93C5FD !important;
+      }
+      
       /* Make sure dropdown buttons are not affected */
       .loan-form-select-trigger,
       [data-radix-select-trigger],
