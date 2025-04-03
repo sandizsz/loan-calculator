@@ -1643,7 +1643,7 @@ const FullCalculator = () => {
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="px-6 py-3 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
+              className="px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
               Atpakaļ
