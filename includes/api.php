@@ -476,13 +476,18 @@ function handle_loan_submission($request) {
         error_log('No applied elsewhere value provided, defaulting to 66 (Nē)');
     }
     
-    // GDPR consent (key: 8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9)
-    $custom_fields['8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9'] = isset($data['gdprConsent']) && $data['gdprConsent'] ? 'Yes' : 'No';
+    // GDPR consent - store this in a note instead of as a custom field
+    // The field ID 8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9 is not allowed in the API
+    $gdpr_consent = isset($data['gdprConsent']) && $data['gdprConsent'] ? 'Yes' : 'No';
+    error_log('GDPR consent: ' . $gdpr_consent . ' - This will be added to the note instead of as a custom field');
     
     // For leads, custom fields need to be added directly to the lead data, not in a 'custom_fields' object
     if (!empty($custom_fields)) {
         foreach ($custom_fields as $key => $value) {
-            $lead_data[$key] = $value;
+            // Skip the GDPR consent field as it's not allowed
+            if ($key !== '8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9') {
+                $lead_data[$key] = $value;
+            }
         }
     }
     
@@ -580,6 +585,7 @@ function handle_loan_submission($request) {
         "Collateral Description: %s\n" .
         "Applied Elsewhere: %s\n" .
         "GDPR Consent: %s",
+        "Submission Timestamp: %s",
         isset($data['reg_number']) ? $data['reg_number'] : 'Not provided',
         isset($data['position']) ? $data['position'] : 'Not provided',
         isset($data['company_age']) ? $data['company_age'] : 'Not provided',
@@ -596,7 +602,8 @@ function handle_loan_submission($request) {
         isset($data['collateralType']) ? $data['collateralType'] : 'Not provided',
         isset($data['collateralDescription']) ? $data['collateralDescription'] : 'Not provided',
         isset($data['hasAppliedElsewhere']) ? $data['hasAppliedElsewhere'] : 'Not provided',
-        isset($data['gdprConsent']) ? 'Yes' : 'No'
+        isset($data['gdprConsent']) ? 'Yes' : 'No',
+        date('Y-m-d H:i:s')
     );
 
     $note_data = array(
