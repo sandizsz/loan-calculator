@@ -169,6 +169,7 @@ const FullCalculator = () => {
       profitLossStatus: 'profit',
       companyPosition: 'owner',
       coreActivity: 'Tirdzniecība ar būvmateriāliem',
+      gdprConsent: false, // Add default value for GDPR consent
     },
     shouldFocusError: false, // Prevent automatic focus on error fields
   });
@@ -1547,7 +1548,10 @@ const FullCalculator = () => {
               <div className="flex items-center">
                 <Checkbox.Root 
                   className="loan-form-checkbox-root"
+                  id="gdprConsent"
+                  checked={watch('gdprConsent')}
                   onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
+                  {...register('gdprConsent', { required: 'Šis lauks ir obligāts' })}
                 >
                   <Checkbox.Indicator className="loan-form-checkbox-indicator">
                     <Check className="w-4 h-4" />
