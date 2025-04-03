@@ -420,7 +420,7 @@ const LoanCalculator = () => {
     };
 
     if (isLoading) {
-        return <div className="p-4 text-center">Loading calculator...</div>;
+        return <div className="p-4 text-center">Sagatavojam kalkulatoru...</div>;
     }
 
     return (
@@ -498,7 +498,7 @@ const LoanCalculator = () => {
             <div className="mb-8">
                 <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Aizdevuma summa</span>
-                    <span className="font-medium">{amount} €</span>
+                    <span className="font-medium text-lg">{amount} €</span>
                 </div>
                 <div className="relative">
                     <input
@@ -522,7 +522,7 @@ const LoanCalculator = () => {
             <div className="mb-8">
                 <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Aizdevuma termiņš</span>
-                    <span className="font-medium">{term} mēn.</span>
+                    <span className="font-medium text-lg">{term} mēn.</span>
                 </div>
                 <div className="relative">
                     <input
