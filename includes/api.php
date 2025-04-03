@@ -448,7 +448,7 @@ function handle_loan_submission($request) {
         error_log('WARNING: No custom fields were added');
     }
 
-    // Make sure custom fields are properly structured and not directly in the lead data
+    // For Pipedrive leads, custom fields need to be added directly to the lead data
     $final_lead_data = array(
         'title' => $lead_data['title'],
         'owner_id' => $lead_data['owner_id'],
@@ -458,9 +458,11 @@ function handle_loan_submission($request) {
         'organization_id' => isset($lead_data['organization_id']) ? $lead_data['organization_id'] : null
     );
     
-    // Add custom fields if they exist
+    // Add custom fields directly to the lead data object
     if (!empty($custom_fields)) {
-        $final_lead_data['custom_fields'] = $custom_fields;
+        foreach ($custom_fields as $field_key => $field_value) {
+            $final_lead_data[$field_key] = $field_value;
+        }
     }
     
     error_log('Final lead data structure: ' . json_encode($final_lead_data, JSON_PRETTY_PRINT));
