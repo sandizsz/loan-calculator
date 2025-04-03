@@ -124,7 +124,7 @@ const LoanCalculator = () => {
     // State declarations
     const [kredits, setKredits] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [amount, setAmount] = useState(20000);
+    const [amount, setAmount] = useState(20000); // Starting amount, now with min 5000 and step 100
     const [term, setTerm] = useState(48);
     const [monthlyPayment, setMonthlyPayment] = useState(92.49);
     const [email, setEmail] = useState('');
@@ -503,15 +503,16 @@ const LoanCalculator = () => {
                 <div className="relative">
                     <input
                         type="range"
-                        min="500"
+                        min="5000"
                         max="300000"
+                        step="100"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        style={{ background: getSliderBackground(amount, 500, 300000) }}
+                        style={{ background: getSliderBackground(amount, 5000, 300000) }}
                     />
                     <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-sm text-gray-500">
-                        <span>500 €</span>
+                        <span>5000 €</span>
                         <span>300000 €</span>
                     </div>
                 </div>
