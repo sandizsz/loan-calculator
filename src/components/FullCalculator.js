@@ -150,7 +150,7 @@ const FullCalculator = () => {
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
     shouldUnregister: false,
     mode: 'onBlur',        // Only validate when leaving a field, not during typing
-    reValidateMode: 'onChange', // Only re-validate on change, not during typing
+    reValidateMode: 'onBlur', // Changed from onChange to onBlur to reduce refreshes
     criteriaMode: 'firstError',
     defaultValues: {
       financialProduct: urlParams.kredit_id,
@@ -485,7 +485,7 @@ const FullCalculator = () => {
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
       }
 
-      /* Animations */
+      /* Animations - only on initial load */
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -506,12 +506,14 @@ const FullCalculator = () => {
         }
       }
 
+      /* Only animate the container on initial load */
       .loan-form-container {
         animation: fadeIn 0.5s ease-out !important;
       }
-
+      
+      /* Disable animations on form fields to prevent refresh flicker */
       .form-field {
-        animation: slideDown 0.3s ease-out !important;
+        /* animation disabled to prevent refresh flicker */
       }
 
 /* Ensure the portal content is positioned correctly */
@@ -537,11 +539,11 @@ const FullCalculator = () => {
   cursor: pointer !important;
 }
 
-/* Simple dropdown animations */
+/* Dropdown animations - simplified to reduce visual refresh */
 @keyframes slideDownAndFade {
   from {
-    opacity: 0;
-    transform: translateY(-2px);
+    opacity: 0.95;
+    transform: translateY(-1px);
   }
   to {
     opacity: 1;
@@ -551,8 +553,8 @@ const FullCalculator = () => {
 
 @keyframes slideUpAndFade {
   from {
-    opacity: 0;
-    transform: translateY(2px);
+    opacity: 0.95;
+    transform: translateY(1px);
   }
   to {
     opacity: 1;
@@ -900,7 +902,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('companyAge')} 
                   onValueChange={(value) => {
-                    setValue('companyAge', value, { shouldValidate: true });
+                    setValue('companyAge', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -950,7 +952,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('annualTurnover')} 
                   onValueChange={(value) => {
-                    setValue('annualTurnover', value, { shouldValidate: true });
+                    setValue('annualTurnover', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -999,7 +1001,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('profitLossStatus')} 
                   onValueChange={(value) => {
-                    setValue('profitLossStatus', value, { shouldValidate: true });
+                    setValue('profitLossStatus', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
@@ -1047,7 +1049,7 @@ const FullCalculator = () => {
                 <Select.Root 
                   value={watch('companyPosition')} 
                   onValueChange={(value) => {
-                    setValue('companyPosition', value, { shouldValidate: true });
+                    setValue('companyPosition', value, { shouldValidate: true, shouldDirty: true });
                   }}
                 >
                   <Select.Trigger 
