@@ -240,13 +240,9 @@ const FullCalculator = () => {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        border: none !important;
         transition: all 0.2s ease-in-out !important;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-      }
-      
-      .loan-form-container form .back-button:hover {
-        background-color: #EFF6FF !important;
-        border-color: #93C5FD !important;
       }
       
       /* Make sure dropdown buttons are not affected */
