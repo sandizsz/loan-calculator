@@ -1072,9 +1072,8 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="owner">Īpašnieks</SelectItem>
+                        <SelectItem value="owner">Īpašnieks / valdes loceklis</SelectItem>
                         <SelectItem value="board">Valdes loceklis</SelectItem>
-                        <SelectItem value="finance">Finanšu direktors</SelectItem>
                         <SelectItem value="other">Cits</SelectItem>
                       </Select.Viewport>
                       
@@ -1553,7 +1552,7 @@ const FullCalculator = () => {
                   </Checkbox.Indicator>
                 </Checkbox.Root>
                 <label className="pl-2 text-sm text-gray-600">
-                  Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar privātuma politiku
+                  Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo <a href="https://findexo.lv/datu-apstrades-noteikumi/" target="_blank" rel="noopener noreferrer" className=" hover:underline">datu apstrādes noteikumiem</a>.
                 </label>
               </div>
             </FormField>
@@ -1641,7 +1640,7 @@ const FullCalculator = () => {
               className="px-6 py-3 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
-              Iepriekšējais
+              Atpakaļ
             </button>
           )}
           
