@@ -87,56 +87,14 @@ function handle_loan_submission($request) {
     // Prepare Pipedrive lead data with custom fields
     // Base lead data
     $lead_data = array(
+        'title' => isset($data['company_name']) ? $data['company_name'] . ' - ' . $data['financialProduct'] : $data['financialProduct'],
         'owner_id' => $owner_id,
+        'value' => array(
+            'amount' => floatval($data['loanAmount']),
+            'currency' => 'EUR'
+        ),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
-    
-    // Set title with proper fallbacks
-    if (isset($data['title']) && !empty($data['title'])) {
-        $lead_data['title'] = $data['title'];
-    } else {
-        // Get company name
-        $company_name = isset($data['company_name']) && !empty($data['company_name']) ? $data['company_name'] : '';
-        
-        // Get financial product
-        $financial_product = '';
-        if (isset($data['financial_product']) && !empty($data['financial_product'])) {
-            $financial_product = $data['financial_product'];
-        } elseif (isset($data['financialProduct']) && !empty($data['financialProduct'])) {
-            $financial_product = $data['financialProduct'];
-        }
-        
-        // Combine for title
-        if (!empty($company_name) && !empty($financial_product)) {
-            $lead_data['title'] = $company_name . ' - ' . $financial_product;
-        } elseif (!empty($company_name)) {
-            $lead_data['title'] = $company_name;
-        } elseif (!empty($financial_product)) {
-            $lead_data['title'] = $financial_product;
-        } else {
-            $lead_data['title'] = 'Loan Application'; // Default title
-        }
-    }
-    
-    // Set loan amount
-    $loan_amount = 0;
-    if (isset($data['loan_amount']) && !empty($data['loan_amount'])) {
-        $loan_amount = $data['loan_amount'];
-    } elseif (isset($data['loanAmount']) && !empty($data['loanAmount'])) {
-        $loan_amount = $data['loanAmount'];
-    }
-    
-    // Make sure loan amount is numeric
-    $loan_amount = preg_replace('/[^0-9.]/', '', $loan_amount);
-    
-    $lead_data['value'] = array(
-        'amount' => floatval($loan_amount),
-        'currency' => 'EUR'
-    );
-    
-    // Log the lead data construction
-    error_log('Lead data construction - Title: ' . $lead_data['title']);
-    error_log('Lead data construction - Amount: ' . $loan_amount);
     
     // Ensure at least one of person_id or organization_id is set (required by Pipedrive API)
     if ($person_id) {
@@ -212,10 +170,7 @@ function handle_loan_submission($request) {
     }
     
     // Apgrozījums pēdējā gadā (EUR) (key: 30b6a6278feea6cdfe8b2bcf7a295145804365d1) - enum field
-    if (isset($data['annual_turnover']) || isset($data['annualTurnover'])) {
-        // Get the value from either field name format
-        $revenue = isset($data['annual_turnover']) ? $data['annual_turnover'] : $data['annualTurnover'];
-        
+    if (isset($data['revenue'])) {
         // Map the turnover to the correct option ID
         $turnover_map = [
             '<200k' => 28,            // < 200 000
@@ -225,18 +180,12 @@ function handle_loan_submission($request) {
             'default' => 28           // Default to first option
         ];
         
-        $turnover_value = isset($turnover_map[$revenue]) ? $turnover_map[$revenue] : $turnover_map['default'];
+        $turnover_value = isset($turnover_map[$data['revenue']]) ? $turnover_map[$data['revenue']] : $turnover_map['default'];
         $custom_fields['30b6a6278feea6cdfe8b2bcf7a295145804365d1'] = $turnover_value;
-        
-        // Log the mapping for debugging
-        error_log('Annual turnover mapping: ' . $revenue . ' => ' . $turnover_value);
     }
     
     // Peļņa vai zaudējumi pēdējā gadā (key: c4cbde23802f42ce2856908a0ff6decf94dc7185) - enum field
-    if (isset($data['profit_loss_status']) || isset($data['profitLossStatus'])) {
-        // Get the value from either field name format
-        $profit_loss = isset($data['profit_loss_status']) ? $data['profit_loss_status'] : $data['profitLossStatus'];
-        
+    if (isset($data['profitOrLoss'])) {
         // Map profit/loss status to the correct option ID
         $profit_loss_map = [
             'profit' => 35,           // Peļņa
@@ -245,42 +194,27 @@ function handle_loan_submission($request) {
             'default' => 35           // Default to first option
         ];
         
-        $profit_loss_value = isset($profit_loss_map[$profit_loss]) ? $profit_loss_map[$profit_loss] : $profit_loss_map['default'];
+        $profit_loss_value = isset($profit_loss_map[$data['profitOrLoss']]) ? $profit_loss_map[$data['profitOrLoss']] : $profit_loss_map['default'];
         $custom_fields['c4cbde23802f42ce2856908a0ff6decf94dc7185'] = $profit_loss_value;
-        
-        // Log the mapping for debugging
-        error_log('Profit/loss status mapping: ' . $profit_loss . ' => ' . $profit_loss_value);
     }
     
     // Jūsu pozīcija uzņēmumā (key: 2cd024df7983ad750a8b2828f8a0597fb764bd34) - enum field
-    if (isset($data['company_position']) || isset($data['companyPosition'])) {
-        // Get the value from either field name format
-        $position = isset($data['company_position']) ? $data['company_position'] : $data['companyPosition'];
-        
+    if (isset($data['position'])) {
         // Map position to the correct option ID
         $position_map = [
             'owner' => 38,             // Īpašnieks
-            'board_member' => 39,      // Valdes loceklis
-            'financial_director' => 40, // Finanšu direktors
+            'board_member' => 39,      // Valdes loceklis // Finanšu direktors
             'other' => 41,             // Cits
             'default' => 38            // Default to first option
         ];
         
-        $position_value = isset($position_map[$position]) ? $position_map[$position] : $position_map['default'];
+        $position_value = isset($position_map[$data['position']]) ? $position_map[$data['position']] : $position_map['default'];
         $custom_fields['2cd024df7983ad750a8b2828f8a0597fb764bd34'] = $position_value;
-        
-        // Log the mapping for debugging
-        error_log('Company position mapping: ' . $position . ' => ' . $position_value);
     }
     
     // Pamata darbība (īss apraksts) (key: 6c695fa59d23ce5853c14a270f19fef16e471c65)
-    if (isset($data['core_activity']) || isset($data['coreActivity'])) {
-        // Get the value from either field name format
-        $activity = isset($data['core_activity']) ? $data['core_activity'] : $data['coreActivity'];
-        $custom_fields['6c695fa59d23ce5853c14a270f19fef16e471c65'] = $activity;
-        
-        // Log for debugging
-        error_log('Core activity: ' . $activity);
+    if (isset($data['mainActivity'])) {
+        $custom_fields['6c695fa59d23ce5853c14a270f19fef16e471c65'] = $data['mainActivity'];
     }
     
     // Finanses, Kredītsaistības, Aizdevuma vajadzības fields
@@ -313,9 +247,7 @@ function handle_loan_submission($request) {
     }
     
     // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
-    if (!empty($data['financial_product']) || !empty($data['financialProduct'])) {
-        // Get the value from either field name format
-        $financial_product = !empty($data['financial_product']) ? $data['financial_product'] : $data['financialProduct'];
+    if (!empty($data['financialProduct'])) {
         // Get all available options from Pipedrive
         $pipedrive_options = [
             55 => 'Aizdevums',
@@ -326,14 +258,14 @@ function handle_loan_submission($request) {
         ];
         
         // Log the incoming financial product value
-        error_log('Financial product from form: ' . $financial_product);
+        error_log('Financial product from form: ' . $data['financialProduct']);
         
         // First, check if the value matches a Pipedrive option name directly
         $product_value = 55; // Default to Aizdevums
         $found_direct_match = false;
         
         foreach ($pipedrive_options as $option_id => $option_name) {
-            if (strcasecmp($financial_product, $option_name) === 0) {
+            if (strcasecmp($data['financialProduct'], $option_name) === 0) {
                 $product_value = $option_id;
                 $found_direct_match = true;
                 error_log('Found direct match for financial product: ' . $option_name . ' => ' . $option_id);
@@ -354,7 +286,7 @@ function handle_loan_submission($request) {
             
             $is_industry = false;
             foreach ($industry_names as $industry) {
-                if (strcasecmp($financial_product, $industry) === 0) {
+                if (strcasecmp($data['financialProduct'], $industry) === 0) {
                     $is_industry = true;
                     error_log('Found industry match: ' . $industry . ' => mapping to Aizdevums (55)');
                     break;
@@ -367,7 +299,7 @@ function handle_loan_submission($request) {
             } else {
                 // Try partial matching as a last resort
                 foreach ($pipedrive_options as $option_id => $option_name) {
-                    if (stripos($financial_product, $option_name) !== false) {
+                    if (stripos($data['financialProduct'], $option_name) !== false) {
                         $product_value = $option_id;
                         error_log('Found partial match for financial product: ' . $option_name . ' => ' . $option_id);
                         break;
@@ -439,55 +371,26 @@ function handle_loan_submission($request) {
     }
     
     // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē? (key: aaf42dc07ef7a915caf41d82e5fad57e79adc0ef) - enum field
-    if (isset($data['has_applied_elsewhere']) || isset($data['hasAppliedElsewhere'])) {
-        // Get the value from either field name format
-        $applied_elsewhere = isset($data['has_applied_elsewhere']) ? $data['has_applied_elsewhere'] : $data['hasAppliedElsewhere'];
-        
-        // Log the raw value for debugging
-        error_log('Raw hasAppliedElsewhere value: ' . $applied_elsewhere);
-        
+    if (isset($data['hasAppliedElsewhere'])) {
         // Map yes/no to the correct option ID
         $applied_elsewhere_map = [
             'yes' => 65,              // Jā
             'no' => 66,               // Nē
             'Jā' => 65,               // Jā (for backward compatibility)
             'Nē' => 66,               // Nē (for backward compatibility)
-            'default' => 66           // Default to 'Nē'
+            'default' => 66             // Default to 'Nē'
         ];
         
-        // Fix the issue where 'no' might be transformed to 'Jā'
-        // Make sure we're using the correct value
-        if ($applied_elsewhere === 'no' || strtolower($applied_elsewhere) === 'nē') {
-            $applied_elsewhere_value = 66; // Set to 'Nē'
-        } else if ($applied_elsewhere === 'yes' || strtolower($applied_elsewhere) === 'jā') {
-            $applied_elsewhere_value = 65; // Set to 'Jā'
-        } else {
-            $applied_elsewhere_value = isset($applied_elsewhere_map[$applied_elsewhere]) ? 
-                $applied_elsewhere_map[$applied_elsewhere] : $applied_elsewhere_map['default'];
-        }
-        
+        $applied_elsewhere_value = isset($applied_elsewhere_map[$data['hasAppliedElsewhere']]) ? $applied_elsewhere_map[$data['hasAppliedElsewhere']] : $applied_elsewhere_map['default'];
         $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $applied_elsewhere_value;
-        
-        // Log the mapping for debugging
-        error_log('Applied elsewhere mapping: ' . $applied_elsewhere . ' => ' . $applied_elsewhere_value);
-    } else {
-        // Set a default value if not provided
-        $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = 66; // Default to 'Nē'
-        error_log('No applied elsewhere value provided, defaulting to 66 (Nē)');
     }
     
-    // GDPR consent - store this in a note instead of as a custom field
-    // The field ID 8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9 is not allowed in the API
-    $gdpr_consent = isset($data['gdprConsent']) && $data['gdprConsent'] ? 'Yes' : 'No';
-    error_log('GDPR consent: ' . $gdpr_consent . ' - This will be added to the note instead of as a custom field');
+    // GDPR consent is not sent to Pipedrive
     
     // For leads, custom fields need to be added directly to the lead data, not in a 'custom_fields' object
     if (!empty($custom_fields)) {
         foreach ($custom_fields as $key => $value) {
-            // Skip the GDPR consent field as it's not allowed
-            if ($key !== '8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9') {
-                $lead_data[$key] = $value;
-            }
+            $lead_data[$key] = $value;
         }
     }
     
@@ -506,18 +409,13 @@ function handle_loan_submission($request) {
     error_log('Sending lead data to Pipedrive: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
 
     // Create lead in Pipedrive
-    // Log the exact URL and request body being sent
-    $pipedrive_url = 'https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]);
-    error_log('Pipedrive API URL: ' . $pipedrive_url);
-    error_log('Pipedrive API Request Body: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
-    
-    $lead_response = wp_remote_post($pipedrive_url, array(
+    $lead_response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
         'headers' => array(
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ),
         'body' => json_encode($lead_data),
-        'timeout' => 60 // Increased timeout for API call
+        'timeout' => 30
     ));
 
     if (is_wp_error($lead_response)) {
@@ -536,25 +434,7 @@ function handle_loan_submission($request) {
     if ($response_code !== 200 && $response_code !== 201) {
         error_log('Pipedrive Lead API Error: Non-success status code: ' . $response_code);
         error_log('Pipedrive Lead API Error details: ' . print_r($lead_body, true));
-        
-        // Get more detailed error information
-        $error_message = 'Failed to create lead';
-        if (!empty($lead_body['error'])) {
-            $error_message .= ': ' . $lead_body['error'];
-        }
-        if (!empty($lead_body['error_info'])) {
-            $error_message .= ' - ' . $lead_body['error_info'];
-        }
-        
-        // Check for specific error conditions
-        if (strpos($response_body, 'validation') !== false) {
-            error_log('Validation error detected in Pipedrive response');
-            if (!empty($lead_body['data']['validation_errors'])) {
-                error_log('Validation errors: ' . json_encode($lead_body['data']['validation_errors'], JSON_PRETTY_PRINT));
-            }
-        }
-        
-        return new WP_Error('pipedrive_error', $error_message, array('status' => 500));
+        return new WP_Error('pipedrive_error', 'Failed to create lead', array('status' => 500));
     }
     
     if (empty($lead_body['data']['id'])) {
@@ -583,9 +463,7 @@ function handle_loan_submission($request) {
         "Had Payment Delays: %s\n" .
         "Collateral Type: %s\n" .
         "Collateral Description: %s\n" .
-        "Applied Elsewhere: %s\n" .
-        "GDPR Consent: %s",
-        "Submission Timestamp: %s",
+        "Applied Elsewhere: %s",
         isset($data['reg_number']) ? $data['reg_number'] : 'Not provided',
         isset($data['position']) ? $data['position'] : 'Not provided',
         isset($data['company_age']) ? $data['company_age'] : 'Not provided',
@@ -601,9 +479,7 @@ function handle_loan_submission($request) {
         isset($data['hadPaymentDelays']) ? $data['hadPaymentDelays'] : 'Not provided',
         isset($data['collateralType']) ? $data['collateralType'] : 'Not provided',
         isset($data['collateralDescription']) ? $data['collateralDescription'] : 'Not provided',
-        isset($data['hasAppliedElsewhere']) ? $data['hasAppliedElsewhere'] : 'Not provided',
-        isset($data['gdprConsent']) ? 'Yes' : 'No',
-        date('Y-m-d H:i:s')
+        isset($data['hasAppliedElsewhere']) ? $data['hasAppliedElsewhere'] : 'Not provided'
     );
 
     $note_data = array(
