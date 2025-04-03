@@ -208,7 +208,7 @@ function loan_calculator_shortcode($atts = []) {
     ?>
     <div id="loan-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
-            Loading calculator...
+            Sagatavojam kalkulatoru...
         </div>
     </div>
     <?php
@@ -221,7 +221,7 @@ function full_calculator_shortcode() {
     ?>
     <div id="full-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
-            Loading full calculator...
+            Sagatavojam finansējuma kalkulatoru...
         </div>
     </div>
     <?php
