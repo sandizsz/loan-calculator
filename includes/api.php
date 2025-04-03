@@ -12,6 +12,9 @@ add_action('rest_api_init', function () {
 function handle_loan_submission($request) {
     $data = $request->get_params();
     
+    // Debug: Log all form data received
+    error_log('FORM DATA RECEIVED: ' . json_encode($data, JSON_PRETTY_PRINT));
+    
     // Get Pipedrive API key from wp-config.php
     if (!defined('PIPEDRIVE_API_KEY')) {
         return new WP_Error('pipedrive_error', 'PIPEDRIVE_API_KEY not defined in wp-config.php', array('status' => 500));
@@ -118,8 +121,8 @@ function handle_loan_submission($request) {
     // Note: Some of these fields are already handled by person and organization creation
     
     // Reģistrācijas numurs (key: 35e584f3aeee47a58265149def733427d7beb2a2)
-    if (isset($data['reg_number'])) {
-        $custom_fields['35e584f3aeee47a58265149def733427d7beb2a2'] = $data['reg_number'];
+    if (isset($data['regNumber'])) {
+        $custom_fields['35e584f3aeee47a58265149def733427d7beb2a2'] = $data['regNumber'];
     }
     
     // Vai uzņēmumam ir nodokļu parāds? (key: 7a9e2d5c8b3f6e0d1c4a7b2e5f8d9c6a3b2e1d4)
@@ -155,7 +158,7 @@ function handle_loan_submission($request) {
     }
     
     // Uzņēmuma vecums (key: e0b1fa455bd6e56030f83ae350863a357ed7e236) - enum field
-    if (isset($data['company_age'])) {
+    if (isset($data['companyAge'])) {
         // Map the company age to the correct option ID
         $company_age_map = [
             '<2' => 32,       // < 2 gadi
@@ -165,7 +168,7 @@ function handle_loan_submission($request) {
             'default' => 32   // Default to first option
         ];
         
-        $age_value = isset($company_age_map[$data['company_age']]) ? $company_age_map[$data['company_age']] : $company_age_map['default'];
+        $age_value = isset($company_age_map[$data['companyAge']]) ? $company_age_map[$data['companyAge']] : $company_age_map['default'];
         $custom_fields['e0b1fa455bd6e56030f83ae350863a357ed7e236'] = $age_value;
     }
     
@@ -464,9 +467,9 @@ function handle_loan_submission($request) {
         "Collateral Type: %s\n" .
         "Collateral Description: %s\n" .
         "Applied Elsewhere: %s",
-        isset($data['reg_number']) ? $data['reg_number'] : 'Not provided',
+        isset($data['regNumber']) ? $data['regNumber'] : 'Not provided',
         isset($data['position']) ? $data['position'] : 'Not provided',
-        isset($data['company_age']) ? $data['company_age'] : 'Not provided',
+        isset($data['companyAge']) ? $data['companyAge'] : 'Not provided',
         isset($data['revenue']) ? $data['revenue'] : 'Not provided',
         isset($data['profitOrLoss']) ? $data['profitOrLoss'] : 'Not provided',
         isset($data['mainActivity']) ? $data['mainActivity'] : 'Not provided',

@@ -68,22 +68,25 @@ const FullCalculator = () => {
         contact_name: data.contactName,
         email: data.email,
         phone: data.phone,
-        company_position: data.companyPosition,
+        position: data.companyPosition,
         company_age: data.companyAge,
-        annual_turnover: data.annualTurnover,
-        profit_loss_status: data.profitLossStatus,
-        core_activity: data.coreActivity,
-        loan_amount: parseFloat(data.loanAmount.replace(/[^0-9.]/g, '')), // Clean and convert to number
-        loan_term: `${data.loanTerm} mēneši`,
-        loan_purpose: data.loanPurpose,
-        collateral_type: data.collateralType,
-        collateral_description: data.collateralDescription,
-        has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē',
-        financial_product: data.financialProduct || ''
+        revenue: data.annualTurnover,
+        profitOrLoss: data.profitLossStatus,
+        mainActivity: data.coreActivity,
+        loanAmount: parseFloat(data.loanAmount.replace(/[^0-9.]/g, '')),
+        loanTerm: data.loanTerm,
+        loanPurpose: data.loanPurpose,
+        collateralType: data.collateralType,
+        collateralDescription: data.collateralDescription,
+        hasAppliedElsewhere: data.hasAppliedElsewhere ? 'yes' : 'no',
+        financialProduct: data.financialProduct || '',
+        taxDebtStatus: data.taxDebtStatus || 'no',
+        taxDebtAmount: data.taxDebtAmount || '',
+        hadPaymentDelays: data.hadPaymentDelays || 'no'
       };
       
       // Double check the financial product is being included
-      if (!pipedriveData.financial_product) {
+      if (!pipedriveData.financialProduct) {
         console.warn('Financial product is empty in submission data');
       }
 
