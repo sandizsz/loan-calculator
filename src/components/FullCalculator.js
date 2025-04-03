@@ -242,6 +242,7 @@ const FullCalculator = () => {
         justify-content: center !important;
         border: none !important;
         transition: all 0.2s ease-in-out !important;
+        box-shadow: none !important;
       }
       
       /* Make sure dropdown buttons are not affected */

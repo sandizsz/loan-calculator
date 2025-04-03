@@ -208,7 +208,7 @@ function loan_calculator_shortcode($atts = []) {
     ?>
     <div id="loan-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
-            Sagatavojam kalkulatoru...
+            Sagatavojam pieteikuma anketu...
         </div>
     </div>
     <?php
