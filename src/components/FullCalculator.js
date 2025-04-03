@@ -234,14 +234,12 @@ const FullCalculator = () => {
       /* Back button specific styling to override Elementor */
       .loan-form-container form .back-button {
         background-color: transparent !important;
-        color: #2563EB !important;
-        border: 1px solid #BFDBFE !important;
-        border-radius: 0.5rem !important;
+       color: #000000 !important;
         font-weight: 500 !important;
         padding: 0.75rem 1.5rem !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         transition: all 0.2s ease-in-out !important;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
       }
