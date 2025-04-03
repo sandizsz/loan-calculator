@@ -460,22 +460,52 @@ function handle_loan_submission($request) {
     error_log('Sending lead data to Pipedrive: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
 
     // Create lead in Pipedrive
-    $lead_response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
-        'headers' => array(
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ),
-        'body' => json_encode($lead_data),
-        'timeout' => 30
-    ));
+    error_log('STEP: Creating lead in Pipedrive');
+    error_log('LEAD DATA BEING SENT: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
+    
+    try {
+        $lead_response = wp_remote_post('https://api.pipedrive.com/v1/leads?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            ),
+            'body' => json_encode($lead_data),
+            'timeout' => 60
+        ));
+        
+        error_log('LEAD API REQUEST COMPLETED');
+    } catch (Exception $e) {
+        error_log('EXCEPTION DURING LEAD CREATION: ' . $e->getMessage());
+        error_log('EXCEPTION TRACE: ' . $e->getTraceAsString());
+        return new WP_Error('pipedrive_error', 'Exception during lead creation: ' . $e->getMessage(), array('status' => 500));
+    }
 
     if (is_wp_error($lead_response)) {
         error_log('ERROR: Pipedrive Lead API Error: ' . $lead_response->get_error_message());
         return new WP_Error('pipedrive_error', $lead_response->get_error_message(), array('status' => 500));
     }
     
+    $response_code = wp_remote_retrieve_response_code($lead_response);
     $response_body = wp_remote_retrieve_body($lead_response);
+    error_log('LEAD API RESPONSE CODE: ' . $response_code);
     error_log('LEAD API RESPONSE BODY: ' . $response_body);
+    
+    // Check if the response code indicates an error
+    if ($response_code >= 400) {
+        $error_data = json_decode($response_body, true);
+        error_log('PIPEDRIVE API ERROR: ' . json_encode($error_data, JSON_PRETTY_PRINT));
+        
+        // Extract error message if available
+        $error_message = 'Failed to create lead';
+        if (isset($error_data['error'])) {
+            $error_message .= ': ' . $error_data['error'];
+        }
+        if (isset($error_data['error_info'])) {
+            $error_message .= ' - ' . $error_data['error_info'];
+        }
+        
+        error_log('FORMATTED ERROR MESSAGE: ' . $error_message);
+        return new WP_Error('pipedrive_error', $error_message, array('status' => $response_code));
+    }
 
     // Log the complete response from Pipedrive
     $response_code = wp_remote_retrieve_response_code($lead_response);
