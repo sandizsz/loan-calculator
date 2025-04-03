@@ -1379,7 +1379,7 @@ const FullCalculator = () => {
 
             <FormField
               name="hadPaymentDelays"
-              label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
+              label={<span className="max-w-[700px] block">Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?</span>}
               required
             >
               <RadioGroup.Root 
@@ -1542,7 +1542,7 @@ const FullCalculator = () => {
 
             <FormField
               name="gdprConsent"
-              label="Piekrītu personas datu apstrādei"
+              label={<span className="max-w-[700px] block">Piekrītu personas datu apstrādei</span>}
               required
             >
               <div className="flex items-center">
