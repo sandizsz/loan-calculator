@@ -358,9 +358,14 @@ function handle_loan_submission($request) {
         $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = $product_value;
         error_log('Final mapped financial product value: ' . $product_value . ' (' . $pipedrive_options[$product_value] . ')');
     } else {
-        // Set a default value if no financial product is specified
-        $custom_fields['15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca'] = 55; // Default to 'Aizdevums'
-        error_log('No financial product specified, using default: 55 (Aizdevums)');
+        // Explicitly check if the financial product field is set in the custom fields
+        $financial_product_key = '15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca';
+        if (!isset($custom_fields[$financial_product_key])) {
+            error_log('WARNING: Financial product field not set in custom fields. Setting default value 55 (Aizdevums)');
+            $custom_fields[$financial_product_key] = 55; // Default to 'Aizdevums'
+        } else {
+            error_log('Financial product field is set in custom fields: ' . $custom_fields[$financial_product_key]);
+        }
     }
     
     // Piedāvātais nodrošinājums (key: d41ac0a12ff272eb9932c157db783b12fa55d4a8) - set field (multipleOption)
@@ -436,28 +441,32 @@ function handle_loan_submission($request) {
     
     // GDPR consent is not sent to Pipedrive
     
-    // For leads, custom fields need to be added directly to the lead data, not in a 'custom_fields' object
+    // For leads, custom fields need to be added to the custom_fields property
     if (!empty($custom_fields)) {
-        foreach ($custom_fields as $key => $value) {
-            $lead_data[$key] = $value;
-        }
-    }
-    
-    error_log('FINAL CUSTOM FIELDS: ' . json_encode($custom_fields, JSON_PRETTY_PRINT));
-    
-    // Explicitly check if the financial product field is set in the lead data
-    $financial_product_key = '15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca';
-    if (!isset($lead_data[$financial_product_key])) {
-        error_log('WARNING: Financial product field not set in lead data. Setting default value 55 (Aizdevums)');
-        $lead_data[$financial_product_key] = 55; // Default to 'Aizdevums'
+        error_log('FINAL CUSTOM FIELDS: ' . json_encode($custom_fields, JSON_PRETTY_PRINT));
     } else {
-        error_log('Financial product field is set in lead data: ' . $lead_data[$financial_product_key]);
+        error_log('WARNING: No custom fields were added');
+    }
+
+    // Make sure custom fields are properly structured and not directly in the lead data
+    $final_lead_data = array(
+        'title' => $lead_data['title'],
+        'owner_id' => $lead_data['owner_id'],
+        'value' => $lead_data['value'],
+        'expected_close_date' => $lead_data['expected_close_date'],
+        'person_id' => isset($lead_data['person_id']) ? $lead_data['person_id'] : null,
+        'organization_id' => isset($lead_data['organization_id']) ? $lead_data['organization_id'] : null
+    );
+    
+    // Add custom fields if they exist
+    if (!empty($custom_fields)) {
+        $final_lead_data['custom_fields'] = $custom_fields;
     }
     
-    error_log('Final lead data structure: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
+    error_log('Final lead data structure: ' . json_encode($final_lead_data, JSON_PRETTY_PRINT));
 
     // Log the complete lead data being sent to Pipedrive with better formatting
-    error_log('Sending lead data to Pipedrive: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
+    error_log('Sending lead data to Pipedrive: ' . json_encode($final_lead_data, JSON_PRETTY_PRINT));
 
     // Create lead in Pipedrive
     error_log('STEP: Creating lead in Pipedrive');
@@ -468,7 +477,7 @@ function handle_loan_submission($request) {
             'headers' => array(
                 'Content-Type' => 'application/json'
             ),
-            'body' => json_encode($lead_data),
+            'body' => json_encode($final_lead_data),
             'timeout' => 60
         ));
         
