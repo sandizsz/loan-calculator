@@ -205,7 +205,7 @@ const FullCalculator = () => {
       }
       
       /* Elementor Button Overrides - Only for form navigation and submit buttons */
-      .loan-form-container form > .flex.flex-col > button[type="button"],
+      .loan-form-container form > .flex.flex-col > button[type="button"]:not(.back-button),
       .loan-form-container form > .flex.flex-col > button[type="submit"] {
         background-color: #FFC600 !important;
         color: #000000 !important;
@@ -1379,7 +1379,7 @@ const FullCalculator = () => {
 
             <FormField
               name="hadPaymentDelays"
-              label={<span className="max-w-[700px] block">Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?</span>}
+              label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
               required
             >
               <RadioGroup.Root 
@@ -1542,7 +1542,7 @@ const FullCalculator = () => {
 
             <FormField
               name="gdprConsent"
-              label={<span className="max-w-[700px] block">Piekrītu personas datu apstrādei</span>}
+              label="Piekrītu personas datu apstrādei"
               required
             >
               <div className="flex items-center">
@@ -1643,7 +1643,7 @@ const FullCalculator = () => {
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
+              className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
               Atpakaļ
