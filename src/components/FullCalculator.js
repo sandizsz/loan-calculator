@@ -1600,7 +1600,7 @@ const FullCalculator = () => {
               setStep(1);
               reset();
             }}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all"
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all !border-none"
           >
             Iesniegt jaunu pieteikumu
           </button>
