@@ -44,7 +44,7 @@ function handle_loan_submission($request) {
 
     // Create organization first
     $org_data = array(
-        'name' => $data['company_name'],
+        'name' => $data['companyName'],
         'owner_id' => $owner_id
     );
 
@@ -65,7 +65,7 @@ function handle_loan_submission($request) {
 
     // Create person
     $person_data = array(
-        'name' => $data['contact_name'],
+        'name' => $data['contactName'],
         'email' => array($data['email']),
         'phone' => array($data['phone']),
         'org_id' => $org_id,
@@ -90,7 +90,7 @@ function handle_loan_submission($request) {
     // Prepare Pipedrive lead data with custom fields
     // Base lead data
     $lead_data = array(
-        'title' => isset($data['company_name']) ? $data['company_name'] . ' - ' . $data['financialProduct'] : $data['financialProduct'],
+        'title' => isset($data['companyName']) ? $data['companyName'] . ' - ' . $data['financialProduct'] : $data['financialProduct'],
         'owner_id' => $owner_id,
         'value' => array(
             'amount' => floatval($data['loanAmount']),
@@ -561,7 +561,7 @@ function get_pipedrive_custom_field_keys($api_key) {
 
 function create_pipedrive_person($data, $api_key) {
     $person_data = array(
-        'name' => $data['contact_name'],
+        'name' => $data['contactName'],
         'email' => array($data['email']),
         'phone' => array($data['phone']),
         'visible_to' => 3
@@ -591,10 +591,10 @@ function create_pipedrive_person($data, $api_key) {
 
 function create_pipedrive_organization($data, $api_key) {
     $org_data = array(
-        'name' => $data['company_name'],
+        'name' => $data['companyName'],
         'visible_to' => 3,
         'custom_fields' => array(
-            'registration_number' => $data['reg_number']
+            'registration_number' => $data['regNumber']
         )
     );
 

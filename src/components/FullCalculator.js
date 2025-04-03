@@ -63,13 +63,13 @@ const FullCalculator = () => {
       
       const pipedriveData = {
         title: `Aizdevuma pieteikums - ${data.companyName}`,
-        company_name: data.companyName,
-        reg_number: data.regNumber,
-        contact_name: data.contactName,
+        companyName: data.companyName,
+        regNumber: data.regNumber,
+        contactName: data.contactName,
         email: data.email,
         phone: data.phone,
         position: data.companyPosition,
-        company_age: data.companyAge,
+        companyAge: data.companyAge,
         revenue: data.annualTurnover,
         profitOrLoss: data.profitLossStatus,
         mainActivity: data.coreActivity,
