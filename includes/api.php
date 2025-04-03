@@ -14,19 +14,26 @@ function handle_loan_submission($request) {
     
     // Debug: Log all form data received
     error_log('FORM DATA RECEIVED: ' . json_encode($data, JSON_PRETTY_PRINT));
+    error_log('REQUEST METHOD: ' . $_SERVER['REQUEST_METHOD']);
+    error_log('REQUEST HEADERS: ' . json_encode(getallheaders(), JSON_PRETTY_PRINT));
     
     // Get Pipedrive API key from wp-config.php
     if (!defined('PIPEDRIVE_API_KEY')) {
+        error_log('ERROR: PIPEDRIVE_API_KEY not defined in wp-config.php');
         return new WP_Error('pipedrive_error', 'PIPEDRIVE_API_KEY not defined in wp-config.php', array('status' => 500));
     }
     
     $pipedrive_api_key = PIPEDRIVE_API_KEY;
+    error_log('API KEY CHECK: API key is defined');
 
     // Get the first user from Pipedrive to use as owner
+    error_log('STEP: Fetching Pipedrive users');
     $users_response = wp_remote_get('https://api.pipedrive.com/v1/users?' . http_build_query([
         'api_token' => $pipedrive_api_key,
         'limit' => 1
     ]));
+    
+    error_log('USERS API RESPONSE CODE: ' . wp_remote_retrieve_response_code($users_response));
 
     if (is_wp_error($users_response)) {
         error_log('Pipedrive Users API Error: ' . $users_response->get_error_message());
@@ -34,19 +41,27 @@ function handle_loan_submission($request) {
     }
 
     $users_body = json_decode(wp_remote_retrieve_body($users_response), true);
+    error_log('USERS API RESPONSE BODY: ' . json_encode($users_body, JSON_PRETTY_PRINT));
     
     if (empty($users_body['data'][0]['id'])) {
-        error_log('Pipedrive Users API Error: No users found');
+        error_log('ERROR: Pipedrive Users API Error: No users found');
         return new WP_Error('pipedrive_error', 'No Pipedrive users found', array('status' => 500));
     }
+    
+    error_log('SUCCESS: Found Pipedrive user');
 
     $owner_id = $users_body['data'][0]['id'];
 
     // Create organization first
+    error_log('STEP: Creating organization');
+    error_log('COMPANY NAME: ' . (isset($data['companyName']) ? $data['companyName'] : 'NOT SET'));
+    
     $org_data = array(
         'name' => $data['companyName'],
         'owner_id' => $owner_id
     );
+    
+    error_log('ORG DATA: ' . json_encode($org_data, JSON_PRETTY_PRINT));
 
     $org_response = wp_remote_post('https://api.pipedrive.com/v1/organizations?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
         'headers' => array(
@@ -64,6 +79,11 @@ function handle_loan_submission($request) {
     error_log('Organization data: ' . json_encode($org_body, JSON_PRETTY_PRINT));
 
     // Create person
+    error_log('STEP: Creating person');
+    error_log('CONTACT NAME: ' . (isset($data['contactName']) ? $data['contactName'] : 'NOT SET'));
+    error_log('EMAIL: ' . (isset($data['email']) ? $data['email'] : 'NOT SET'));
+    error_log('PHONE: ' . (isset($data['phone']) ? $data['phone'] : 'NOT SET'));
+    
     $person_data = array(
         'name' => $data['contactName'],
         'email' => array($data['email']),
@@ -71,6 +91,8 @@ function handle_loan_submission($request) {
         'org_id' => $org_id,
         'owner_id' => $owner_id
     );
+    
+    error_log('PERSON DATA: ' . json_encode($person_data, JSON_PRETTY_PRINT));
 
     $person_response = wp_remote_post('https://api.pipedrive.com/v1/persons?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
         'headers' => array(
@@ -88,6 +110,10 @@ function handle_loan_submission($request) {
     error_log('Person data: ' . json_encode($person_body, JSON_PRETTY_PRINT));
 
     // Prepare Pipedrive lead data with custom fields
+    error_log('STEP: Preparing lead data');
+    error_log('FINANCIAL PRODUCT: ' . (isset($data['financialProduct']) ? $data['financialProduct'] : 'NOT SET'));
+    error_log('LOAN AMOUNT: ' . (isset($data['loanAmount']) ? $data['loanAmount'] : 'NOT SET'));
+    
     // Base lead data
     $lead_data = array(
         'title' => isset($data['companyName']) ? $data['companyName'] . ' - ' . $data['financialProduct'] : $data['financialProduct'],
@@ -98,6 +124,8 @@ function handle_loan_submission($request) {
         ),
         'expected_close_date' => date('Y-m-d', strtotime('+30 days'))
     );
+    
+    error_log('BASE LEAD DATA: ' . json_encode($lead_data, JSON_PRETTY_PRINT));
     
     // Ensure at least one of person_id or organization_id is set (required by Pipedrive API)
     if ($person_id) {
@@ -121,11 +149,14 @@ function handle_loan_submission($request) {
     // Note: Some of these fields are already handled by person and organization creation
     
     // Reģistrācijas numurs (key: 35e584f3aeee47a58265149def733427d7beb2a2)
+    error_log('CHECKING regNumber: ' . (isset($data['regNumber']) ? $data['regNumber'] : 'NOT SET'));
     if (isset($data['regNumber'])) {
         $custom_fields['35e584f3aeee47a58265149def733427d7beb2a2'] = $data['regNumber'];
+        error_log('ADDED regNumber to custom fields');
     }
     
     // Vai uzņēmumam ir nodokļu parāds? (key: 7a9e2d5c8b3f6e0d1c4a7b2e5f8d9c6a3b2e1d4)
+    error_log('CHECKING taxDebtStatus: ' . (isset($data['taxDebtStatus']) ? $data['taxDebtStatus'] : 'NOT SET'));
     if (isset($data['taxDebtStatus'])) {
         // Map tax debt status to the correct option ID
         $tax_debt_map = [
@@ -137,11 +168,14 @@ function handle_loan_submission($request) {
         
         $tax_debt_value = isset($tax_debt_map[$data['taxDebtStatus']]) ? $tax_debt_map[$data['taxDebtStatus']] : $tax_debt_map['default'];
         $custom_fields['7a9e2d5c8b3f6e0d1c4a7b2e5f8d9c6a3b2e1d4'] = $tax_debt_value;
+        error_log('ADDED taxDebtStatus to custom fields');
     }
     
     // Nodokļu parāda summa (EUR) (key: 9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0)
+    error_log('CHECKING taxDebtAmount: ' . (isset($data['taxDebtAmount']) ? $data['taxDebtAmount'] : 'NOT SET'));
     if (isset($data['taxDebtAmount']) && !empty($data['taxDebtAmount'])) {
         $custom_fields['9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0'] = $data['taxDebtAmount'];
+        error_log('ADDED taxDebtAmount to custom fields');
     }
     
     // Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības? (key: 1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0)
@@ -155,9 +189,11 @@ function handle_loan_submission($request) {
         
         $payment_delays_value = isset($payment_delays_map[$data['hadPaymentDelays']]) ? $payment_delays_map[$data['hadPaymentDelays']] : $payment_delays_map['default'];
         $custom_fields['1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0'] = $payment_delays_value;
+        error_log('ADDED hadPaymentDelays to custom fields');
     }
     
     // Uzņēmuma vecums (key: e0b1fa455bd6e56030f83ae350863a357ed7e236) - enum field
+    error_log('CHECKING companyAge: ' . (isset($data['companyAge']) ? $data['companyAge'] : 'NOT SET'));
     if (isset($data['companyAge'])) {
         // Map the company age to the correct option ID
         $company_age_map = [
@@ -170,9 +206,11 @@ function handle_loan_submission($request) {
         
         $age_value = isset($company_age_map[$data['companyAge']]) ? $company_age_map[$data['companyAge']] : $company_age_map['default'];
         $custom_fields['e0b1fa455bd6e56030f83ae350863a357ed7e236'] = $age_value;
+        error_log('ADDED companyAge to custom fields: ' . $age_value);
     }
     
     // Apgrozījums pēdējā gadā (EUR) (key: 30b6a6278feea6cdfe8b2bcf7a295145804365d1) - enum field
+    error_log('CHECKING revenue: ' . (isset($data['revenue']) ? $data['revenue'] : 'NOT SET'));
     if (isset($data['revenue'])) {
         // Map the turnover to the correct option ID
         $turnover_map = [
@@ -185,6 +223,7 @@ function handle_loan_submission($request) {
         
         $turnover_value = isset($turnover_map[$data['revenue']]) ? $turnover_map[$data['revenue']] : $turnover_map['default'];
         $custom_fields['30b6a6278feea6cdfe8b2bcf7a295145804365d1'] = $turnover_value;
+        error_log('ADDED revenue to custom fields: ' . $turnover_value);
     }
     
     // Peļņa vai zaudējumi pēdējā gadā (key: c4cbde23802f42ce2856908a0ff6decf94dc7185) - enum field
@@ -199,6 +238,7 @@ function handle_loan_submission($request) {
         
         $profit_loss_value = isset($profit_loss_map[$data['profitOrLoss']]) ? $profit_loss_map[$data['profitOrLoss']] : $profit_loss_map['default'];
         $custom_fields['c4cbde23802f42ce2856908a0ff6decf94dc7185'] = $profit_loss_value;
+        error_log('ADDED profitOrLoss to custom fields');
     }
     
     // Jūsu pozīcija uzņēmumā (key: 2cd024df7983ad750a8b2828f8a0597fb764bd34) - enum field
@@ -213,11 +253,13 @@ function handle_loan_submission($request) {
         
         $position_value = isset($position_map[$data['position']]) ? $position_map[$data['position']] : $position_map['default'];
         $custom_fields['2cd024df7983ad750a8b2828f8a0597fb764bd34'] = $position_value;
+        error_log('ADDED position to custom fields');
     }
     
     // Pamata darbība (īss apraksts) (key: 6c695fa59d23ce5853c14a270f19fef16e471c65)
     if (isset($data['mainActivity'])) {
         $custom_fields['6c695fa59d23ce5853c14a270f19fef16e471c65'] = $data['mainActivity'];
+        error_log('ADDED mainActivity to custom fields');
     }
     
     // Finanses, Kredītsaistības, Aizdevuma vajadzības fields
@@ -227,6 +269,7 @@ function handle_loan_submission($request) {
     // Vēlamais termiņš (mēneši/gadi) (key: 1b3bc3ee821b653b33c255b2012db731749ad292)
     if (isset($data['loanTerm'])) {
         $custom_fields['1b3bc3ee821b653b33c255b2012db731749ad292'] = $data['loanTerm'];
+        error_log('ADDED loanTerm to custom fields');
     }
     
     // Finansējuma mērķis (key: 27aa379d105b5516eb80e88e563bca3829a56533) - set field (multipleOption)
@@ -247,6 +290,7 @@ function handle_loan_submission($request) {
         $purpose_value = isset($purpose_map[$data['loanPurpose']]) ? $purpose_map[$data['loanPurpose']] : $purpose_map['default'];
         // For multipleOption fields, we need to send an array of option IDs
         $custom_fields['27aa379d105b5516eb80e88e563bca3829a56533'] = [$purpose_value];
+        error_log('ADDED loanPurpose to custom fields');
     }
     
     // Nepieciešamais finanšu produkts (key: 15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca) - enum field
@@ -371,6 +415,7 @@ function handle_loan_submission($request) {
     // Aprakstiet piedāvāto nodrošinājumu (key: 9431e23f2b409deafaf14bccf8ca006a8d54da33) - varchar field
     if (isset($data['collateralDescription'])) {
         $custom_fields['9431e23f2b409deafaf14bccf8ca006a8d54da33'] = $data['collateralDescription'];
+        error_log('ADDED collateralDescription to custom fields');
     }
     
     // Vai pēdējo 3 mēnešu laikā esat vērsušies citā finanšu iestādē? (key: aaf42dc07ef7a915caf41d82e5fad57e79adc0ef) - enum field
@@ -386,6 +431,7 @@ function handle_loan_submission($request) {
         
         $applied_elsewhere_value = isset($applied_elsewhere_map[$data['hasAppliedElsewhere']]) ? $applied_elsewhere_map[$data['hasAppliedElsewhere']] : $applied_elsewhere_map['default'];
         $custom_fields['aaf42dc07ef7a915caf41d82e5fad57e79adc0ef'] = $applied_elsewhere_value;
+        error_log('ADDED hasAppliedElsewhere to custom fields');
     }
     
     // GDPR consent is not sent to Pipedrive
@@ -396,6 +442,8 @@ function handle_loan_submission($request) {
             $lead_data[$key] = $value;
         }
     }
+    
+    error_log('FINAL CUSTOM FIELDS: ' . json_encode($custom_fields, JSON_PRETTY_PRINT));
     
     // Explicitly check if the financial product field is set in the lead data
     $financial_product_key = '15ff4b6ef37a1fee1b1893c9e1f892f62c38a0ca';
@@ -422,9 +470,12 @@ function handle_loan_submission($request) {
     ));
 
     if (is_wp_error($lead_response)) {
-        error_log('Pipedrive Lead API Error: ' . $lead_response->get_error_message());
+        error_log('ERROR: Pipedrive Lead API Error: ' . $lead_response->get_error_message());
         return new WP_Error('pipedrive_error', $lead_response->get_error_message(), array('status' => 500));
     }
+    
+    $response_body = wp_remote_retrieve_body($lead_response);
+    error_log('LEAD API RESPONSE BODY: ' . $response_body);
 
     // Log the complete response from Pipedrive
     $response_code = wp_remote_retrieve_response_code($lead_response);

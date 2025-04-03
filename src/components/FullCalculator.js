@@ -91,7 +91,8 @@ const FullCalculator = () => {
       }
 
       console.log('Sending data to backend:', pipedriveData);
-      
+      console.log('FINAL DATA STRINGIFIED:', JSON.stringify(pipedriveData));
+    
       const response = await axios.post('/wp-json/loan-calculator/v1/submit', pipedriveData);
 
       if (response.data.success) {
