@@ -13,6 +13,8 @@ if (!defined('ABSPATH')) {
 // Include API functions
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 
+require_once(plugin_dir_path(__FILE__) . 'pipedrive-admin.php');
+
 // Register Kredits Custom Post Type
 
 
