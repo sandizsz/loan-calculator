@@ -482,6 +482,29 @@ $applied_elsewhere_label = !empty($data['hasAppliedElsewhere']) && isset($applie
     : 'Nav norādīts';
 $note_content .= "Vērsies citā finanšu iestādē: " . $applied_elsewhere_label;
 
+// Add this right after creating the note_data array
+error_log('Note content: ' . $note_content);
+    
+// Add note to the lead
+$note_response = wp_remote_post('https://api.pipedrive.com/v1/notes?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
+    'headers' => array(
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json',
+    ),
+    'body' => json_encode($note_data),
+    'timeout' => 30
+));
+
+if (is_wp_error($note_response)) {
+    error_log('Pipedrive Note API Error: ' . $note_response->get_error_message());
+    // Don't return error here as the lead was created successfully
+} else {
+    $note_status = wp_remote_retrieve_response_code($note_response);
+    $note_body = wp_remote_retrieve_body($note_response);
+    error_log('Pipedrive Note API response code: ' . $note_status);
+    error_log('Pipedrive Note API response body: ' . $note_body);
+}
+
 $note_data = array(
     'content' => $note_content,
     'lead_id' => $lead_id
