@@ -169,12 +169,13 @@ function handle_loan_submission($request) {
     if (!empty($data['companyPosition'])) {
         // Map position to the correct option ID
         $position_map = [
-            'owner' => 38,        // Īpašnieks
+            'owner' => 38,        // Īpašnieks / valdes loceklis
             'board' => 39,        // Valdes loceklis
             'other' => 41,        // Cits
         ];
 
-   
+     
+        
 
         
         $position_value = isset($position_map[$data['companyPosition']]) ? $position_map[$data['companyPosition']] : 38;
@@ -352,75 +353,126 @@ function handle_loan_submission($request) {
 
     $lead_id = $lead_body['data']['id'];
 
+// Create note for the lead with additional details in Latvian
+$note_content = "Aizdevuma pieteikuma detaļas:\n\n";
     
+// Company information
+$note_content .= "Reģistrācijas numurs: " . (!empty($data['regNumber']) ? $data['regNumber'] : 'Nav norādīts') . "\n";
 
-    // Create note for the lead with additional details
-    $note_content = sprintf(
-        "Loan Application Details:\n\n" .
-        "Registration Number: %s\n" .
-        "Contact Position: %s\n" .
-        "Company Age: %s\n" .
-        "Annual Turnover: %s\n" .
-        "Profit/Loss Status: %s\n" .
-        "Core Activity: %s\n" .
-        "Loan Term: %s\n" .
-        "Loan Purpose: %s\n" .
-        "Collateral Type: %s\n" .
-        "Collateral Description: %s\n" .
-        "Applied Elsewhere: %s\n" .
-        "Financial Product: %s\n" .
-        "Tax Debt Status: %s\n" .
-        "Tax Debt Amount: %s\n" .
-        "Payment Delays: %s",
-        !empty($data['regNumber']) ? $data['regNumber'] : 'Not provided',
-        !empty($data['companyPosition']) ? $data['companyPosition'] : 'Not provided',
-        !empty($data['companyAge']) ? $data['companyAge'] : 'Not provided',
-        !empty($data['annualTurnover']) ? $data['annualTurnover'] : 'Not provided',
-        !empty($data['profitLossStatus']) ? $data['profitLossStatus'] : 'Not provided',
-        !empty($data['coreActivity']) ? $data['coreActivity'] : 'Not provided',
-        !empty($data['loanTerm']) ? $data['loanTerm'] . ' mēneši' : 'Not provided',
-        !empty($data['loanPurpose']) ? $data['loanPurpose'] : 'Not provided',
-        !empty($data['collateralType']) ? $data['collateralType'] : 'Not provided',
-        !empty($data['collateralDescription']) ? $data['collateralDescription'] : 'Not provided',
-        !empty($data['hasAppliedElsewhere']) ? $data['hasAppliedElsewhere'] : 'Not provided',
-        !empty($data['financialProduct']) ? $data['financialProduct'] : 'Not provided',
-        !empty($data['taxDebtStatus']) ? $data['taxDebtStatus'] : 'Not provided',
-        !empty($data['taxDebtAmount']) ? $data['taxDebtAmount'] : 'Not applicable',
-        !empty($data['hadPaymentDelays']) ? $data['hadPaymentDelays'] : 'Not provided'
-    );
+// Map company position to Latvian
+$position_labels = [
+    'owner' => 'Īpašnieks / valdes loceklis',
+    'board' => 'Valdes loceklis',
+    'other' => 'Cits'
+];
+$position_label = isset($position_labels[$data['companyPosition']]) ? $position_labels[$data['companyPosition']] : 'Nav norādīts';
+$note_content .= "Jūsu pozīcija uzņēmumā: " . $position_label . "\n";
 
-    $note_data = array(
-        'content' => $note_content,
-        'lead_id' => $lead_id
-    );
+// Map company age to Latvian
+$age_labels = [
+    '0-6' => 'Līdz 6 mēnešiem',
+    '6-12' => '6-12 mēneši',
+    '1-2' => '1-2 gadi',
+    '2-3' => '2-3 gadi',
+    '3+' => 'Vairāk kā 3 gadi'
+];
+$age_label = isset($age_labels[$data['companyAge']]) ? $age_labels[$data['companyAge']] : 'Nav norādīts';
+$note_content .= "Uzņēmuma vecums: " . $age_label . "\n";
 
-    // Add note to the lead
-    $note_response = wp_remote_post('https://api.pipedrive.com/v1/notes?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
-        'headers' => array(
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ),
-        'body' => json_encode($note_data),
-        'timeout' => 30
-    ));
+// Map annual turnover to Latvian
+$turnover_labels = [
+    'lt200k' => '< 200 000',
+    '200k-500k' => '200 001 – 500 000',
+    '500k-1m' => '500 001 – 1 000 000',
+    'gt1m' => '> 1 000 000'
+];
+$turnover_label = isset($turnover_labels[$data['annualTurnover']]) ? $turnover_labels[$data['annualTurnover']] : 'Nav norādīts';
+$note_content .= "Apgrozījums pēdējā gadā (EUR): " . $turnover_label . "\n";
 
-    if (is_wp_error($note_response)) {
-        error_log('Pipedrive Note API Error: ' . $note_response->get_error_message());
-        // Don't return error here as the lead was created successfully
-    } else {
-        $note_status = wp_remote_retrieve_response_code($note_response);
-        error_log('Pipedrive Note API response code: ' . $note_status);
-    }
+// Map profit/loss status to Latvian
+$profit_loss_labels = [
+    'profit' => 'Peļņa',
+    'loss' => 'Zaudējumi',
+    'noData' => 'Nav pieejamu datu'
+];
+$profit_loss_label = isset($profit_loss_labels[$data['profitLossStatus']]) ? $profit_loss_labels[$data['profitLossStatus']] : 'Nav norādīts';
+$note_content .= "Peļņa vai zaudējumi pēdējā gadā: " . $profit_loss_label . "\n";
 
-    return array(
-        'success' => true,
-        'message' => 'Application submitted successfully',
-        'data' => array(
-            'lead_id' => $lead_id
-        )
-    );
+$note_content .= "Pamata darbība: " . (!empty($data['coreActivity']) ? $data['coreActivity'] : 'Nav norādīts') . "\n\n";
 
+// Loan information
+$note_content .= "Aizdevuma summa (EUR): " . (!empty($data['loanAmount']) ? $data['loanAmount'] : 'Nav norādīts') . "\n";
+$note_content .= "Aizdevuma termiņš: " . (!empty($data['loanTerm']) ? $data['loanTerm'] . ' mēneši' : 'Nav norādīts') . "\n";
 
+// Map loan purpose to Latvian
+$purpose_labels = [
+    'apgrozamie' => 'Apgrozāmie līdzekļi',
+    'pamatlidzekli' => 'Pamatlīdzekļu iegāde',
+    'refinansesana' => 'Kredītu refinansēšana',
+    'projekti' => 'Projektu finansēšana',
+    'cits' => 'Cits'
+];
+$purpose_label = isset($purpose_labels[$data['loanPurpose']]) ? $purpose_labels[$data['loanPurpose']] : 'Nav norādīts';
+$note_content .= "Aizdevuma mērķis: " . $purpose_label . "\n";
 
-    
+// Map financial product to Latvian
+$product_labels = [
+    'Aizdevums uzņēmumiem' => 'Aizdevums uzņēmumiem',
+    'Aizdevums pret ķīlu' => 'Aizdevums pret ķīlu',
+    'Auto līzings uznēmumiem' => 'Auto līzings uznēmumiem',
+    'Faktorings' => 'Faktorings',
+    'Pārkreditācija' => 'Pārkreditācija',
+    'Cits mērķis' => 'Cits mērķis',
+    'Cits finanšu produkts' => 'Cits finanšu produkts'
+];
+$product_label = isset($product_labels[$data['financialProduct']]) ? $product_labels[$data['financialProduct']] : 'Nav norādīts';
+$note_content .= "Nepieciešamais finanšu produkts: " . $product_label . "\n\n";
+
+// Tax and financial status
+$tax_debt_labels = [
+    'no' => 'Nav',
+    'withSchedule' => 'Ir, ar VID grafiku',
+    'withoutSchedule' => 'Ir, bez VID grafika'
+];
+$tax_debt_label = isset($tax_debt_labels[$data['taxDebtStatus']]) ? $tax_debt_labels[$data['taxDebtStatus']] : 'Nav norādīts';
+$note_content .= "Nodokļu parāda statuss: " . $tax_debt_label . "\n";
+
+if (!empty($data['taxDebtAmount']) && isset($data['taxDebtStatus']) && $data['taxDebtStatus'] !== 'no') {
+    $note_content .= "Nodokļu parāda summa: " . $data['taxDebtAmount'] . " EUR\n";
+}
+
+$payment_delays_labels = [
+    'yes' => 'Jā',
+    'no' => 'Nē'
+];
+$payment_delays_label = isset($payment_delays_labels[$data['hadPaymentDelays']]) ? $payment_delays_labels[$data['hadPaymentDelays']] : 'Nav norādīts';
+$note_content .= "Kavētas maksājumu saistības: " . $payment_delays_label . "\n\n";
+
+// Collateral information
+$collateral_labels = [
+    'real-estate' => 'Nekustamais īpašums',
+    'vehicles' => 'Transportlīdzekļi',
+    'commercial-pledge' => 'Komercķīla',
+    'none' => 'Nav nodrošinājuma',
+    'other' => 'Cits'
+];
+$collateral_label = isset($collateral_labels[$data['collateralType']]) ? $collateral_labels[$data['collateralType']] : 'Nav norādīts';
+$note_content .= "Piedāvātais nodrošinājums: " . $collateral_label . "\n";
+
+if (!empty($data['collateralDescription']) && $data['collateralType'] !== 'none') {
+    $note_content .= "Nodrošinājuma apraksts: " . $data['collateralDescription'] . "\n";
+}
+
+// Additional information
+$applied_elsewhere_labels = [
+    'yes' => 'Jā',
+    'no' => 'Nē'
+];
+$applied_elsewhere_label = isset($applied_elsewhere_labels[$data['hasAppliedElsewhere']]) ? $applied_elsewhere_labels[$data['hasAppliedElsewhere']] : 'Nav norādīts';
+$note_content .= "Vērsies citā finanšu iestādē: " . $applied_elsewhere_label;
+
+$note_data = array(
+    'content' => $note_content,
+    'lead_id' => $lead_id
+);
 }
