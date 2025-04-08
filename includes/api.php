@@ -364,8 +364,9 @@ $note_content .= "Reģistrācijas numurs: " . (!empty($data['regNumber']) ? $dat
 
 // Map company position to Latvian
 $position_labels = [
-    'owner' => 'Īpašnieks / valdes loceklis',
+    'owner' => 'Īpašnieks',
     'board' => 'Valdes loceklis',
+    'finance' => 'Finanšu direktors',
     'other' => 'Cits'
 ];
 $position_label = !empty($data['companyPosition']) && isset($position_labels[$data['companyPosition']]) 
@@ -482,9 +483,15 @@ $applied_elsewhere_label = !empty($data['hasAppliedElsewhere']) && isset($applie
     : 'Nav norādīts';
 $note_content .= "Vērsies citā finanšu iestādē: " . $applied_elsewhere_label;
 
-// Add this right after creating the note_data array
+// Log the note content
 error_log('Note content: ' . $note_content);
-    
+
+// Create the note data
+$note_data = array(
+    'content' => $note_content,
+    'lead_id' => $lead_id
+);
+
 // Add note to the lead
 $note_response = wp_remote_post('https://api.pipedrive.com/v1/notes?' . http_build_query(['api_token' => $pipedrive_api_key]), array(
     'headers' => array(
@@ -505,8 +512,7 @@ if (is_wp_error($note_response)) {
     error_log('Pipedrive Note API response body: ' . $note_body);
 }
 
-$note_data = array(
-    'content' => $note_content,
-    'lead_id' => $lead_id
-);
+// Return success response
+return new WP_REST_Response(array('success' => true), 200);
+
 }
