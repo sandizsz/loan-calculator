@@ -353,6 +353,9 @@ function handle_loan_submission($request) {
 
     $lead_id = $lead_body['data']['id'];
 
+
+
+
 // Create note for the lead with additional details in Latvian
 $note_content = "Aizdevuma pieteikuma detaļas:\n\n";
     
@@ -365,7 +368,9 @@ $position_labels = [
     'board' => 'Valdes loceklis',
     'other' => 'Cits'
 ];
-$position_label = isset($position_labels[$data['companyPosition']]) ? $position_labels[$data['companyPosition']] : 'Nav norādīts';
+$position_label = !empty($data['companyPosition']) && isset($position_labels[$data['companyPosition']]) 
+    ? $position_labels[$data['companyPosition']] 
+    : 'Nav norādīts';
 $note_content .= "Jūsu pozīcija uzņēmumā: " . $position_label . "\n";
 
 // Map company age to Latvian
@@ -376,7 +381,9 @@ $age_labels = [
     '2-3' => '2-3 gadi',
     '3+' => 'Vairāk kā 3 gadi'
 ];
-$age_label = isset($age_labels[$data['companyAge']]) ? $age_labels[$data['companyAge']] : 'Nav norādīts';
+$age_label = !empty($data['companyAge']) && isset($age_labels[$data['companyAge']]) 
+    ? $age_labels[$data['companyAge']] 
+    : 'Nav norādīts';
 $note_content .= "Uzņēmuma vecums: " . $age_label . "\n";
 
 // Map annual turnover to Latvian
@@ -386,7 +393,9 @@ $turnover_labels = [
     '500k-1m' => '500 001 – 1 000 000',
     'gt1m' => '> 1 000 000'
 ];
-$turnover_label = isset($turnover_labels[$data['annualTurnover']]) ? $turnover_labels[$data['annualTurnover']] : 'Nav norādīts';
+$turnover_label = !empty($data['annualTurnover']) && isset($turnover_labels[$data['annualTurnover']]) 
+    ? $turnover_labels[$data['annualTurnover']] 
+    : 'Nav norādīts';
 $note_content .= "Apgrozījums pēdējā gadā (EUR): " . $turnover_label . "\n";
 
 // Map profit/loss status to Latvian
@@ -395,7 +404,9 @@ $profit_loss_labels = [
     'loss' => 'Zaudējumi',
     'noData' => 'Nav pieejamu datu'
 ];
-$profit_loss_label = isset($profit_loss_labels[$data['profitLossStatus']]) ? $profit_loss_labels[$data['profitLossStatus']] : 'Nav norādīts';
+$profit_loss_label = !empty($data['profitLossStatus']) && isset($profit_loss_labels[$data['profitLossStatus']]) 
+    ? $profit_loss_labels[$data['profitLossStatus']] 
+    : 'Nav norādīts';
 $note_content .= "Peļņa vai zaudējumi pēdējā gadā: " . $profit_loss_label . "\n";
 
 $note_content .= "Pamata darbība: " . (!empty($data['coreActivity']) ? $data['coreActivity'] : 'Nav norādīts') . "\n\n";
@@ -412,21 +423,13 @@ $purpose_labels = [
     'projekti' => 'Projektu finansēšana',
     'cits' => 'Cits'
 ];
-$purpose_label = isset($purpose_labels[$data['loanPurpose']]) ? $purpose_labels[$data['loanPurpose']] : 'Nav norādīts';
+$purpose_label = !empty($data['loanPurpose']) && isset($purpose_labels[$data['loanPurpose']]) 
+    ? $purpose_labels[$data['loanPurpose']] 
+    : 'Nav norādīts';
 $note_content .= "Aizdevuma mērķis: " . $purpose_label . "\n";
 
-// Map financial product to Latvian
-$product_labels = [
-    'Aizdevums uzņēmumiem' => 'Aizdevums uzņēmumiem',
-    'Aizdevums pret ķīlu' => 'Aizdevums pret ķīlu',
-    'Auto līzings uznēmumiem' => 'Auto līzings uznēmumiem',
-    'Faktorings' => 'Faktorings',
-    'Pārkreditācija' => 'Pārkreditācija',
-    'Cits mērķis' => 'Cits mērķis',
-    'Cits finanšu produkts' => 'Cits finanšu produkts'
-];
-$product_label = isset($product_labels[$data['financialProduct']]) ? $product_labels[$data['financialProduct']] : 'Nav norādīts';
-$note_content .= "Nepieciešamais finanšu produkts: " . $product_label . "\n\n";
+// Map financial product to Latvian (using direct value as it should already be in Latvian)
+$note_content .= "Nepieciešamais finanšu produkts: " . (!empty($data['financialProduct']) ? $data['financialProduct'] : 'Nav norādīts') . "\n\n";
 
 // Tax and financial status
 $tax_debt_labels = [
@@ -434,10 +437,12 @@ $tax_debt_labels = [
     'withSchedule' => 'Ir, ar VID grafiku',
     'withoutSchedule' => 'Ir, bez VID grafika'
 ];
-$tax_debt_label = isset($tax_debt_labels[$data['taxDebtStatus']]) ? $tax_debt_labels[$data['taxDebtStatus']] : 'Nav norādīts';
+$tax_debt_label = !empty($data['taxDebtStatus']) && isset($tax_debt_labels[$data['taxDebtStatus']]) 
+    ? $tax_debt_labels[$data['taxDebtStatus']] 
+    : 'Nav norādīts';
 $note_content .= "Nodokļu parāda statuss: " . $tax_debt_label . "\n";
 
-if (!empty($data['taxDebtAmount']) && isset($data['taxDebtStatus']) && $data['taxDebtStatus'] !== 'no') {
+if (!empty($data['taxDebtAmount']) && !empty($data['taxDebtStatus']) && $data['taxDebtStatus'] !== 'no') {
     $note_content .= "Nodokļu parāda summa: " . $data['taxDebtAmount'] . " EUR\n";
 }
 
@@ -445,7 +450,9 @@ $payment_delays_labels = [
     'yes' => 'Jā',
     'no' => 'Nē'
 ];
-$payment_delays_label = isset($payment_delays_labels[$data['hadPaymentDelays']]) ? $payment_delays_labels[$data['hadPaymentDelays']] : 'Nav norādīts';
+$payment_delays_label = !empty($data['hadPaymentDelays']) && isset($payment_delays_labels[$data['hadPaymentDelays']]) 
+    ? $payment_delays_labels[$data['hadPaymentDelays']] 
+    : 'Nav norādīts';
 $note_content .= "Kavētas maksājumu saistības: " . $payment_delays_label . "\n\n";
 
 // Collateral information
@@ -456,10 +463,12 @@ $collateral_labels = [
     'none' => 'Nav nodrošinājuma',
     'other' => 'Cits'
 ];
-$collateral_label = isset($collateral_labels[$data['collateralType']]) ? $collateral_labels[$data['collateralType']] : 'Nav norādīts';
+$collateral_label = !empty($data['collateralType']) && isset($collateral_labels[$data['collateralType']]) 
+    ? $collateral_labels[$data['collateralType']] 
+    : 'Nav norādīts';
 $note_content .= "Piedāvātais nodrošinājums: " . $collateral_label . "\n";
 
-if (!empty($data['collateralDescription']) && $data['collateralType'] !== 'none') {
+if (!empty($data['collateralDescription']) && !empty($data['collateralType']) && $data['collateralType'] !== 'none') {
     $note_content .= "Nodrošinājuma apraksts: " . $data['collateralDescription'] . "\n";
 }
 
@@ -468,7 +477,9 @@ $applied_elsewhere_labels = [
     'yes' => 'Jā',
     'no' => 'Nē'
 ];
-$applied_elsewhere_label = isset($applied_elsewhere_labels[$data['hasAppliedElsewhere']]) ? $applied_elsewhere_labels[$data['hasAppliedElsewhere']] : 'Nav norādīts';
+$applied_elsewhere_label = !empty($data['hasAppliedElsewhere']) && isset($applied_elsewhere_labels[$data['hasAppliedElsewhere']]) 
+    ? $applied_elsewhere_labels[$data['hasAppliedElsewhere']] 
+    : 'Nav norādīts';
 $note_content .= "Vērsies citā finanšu iestādē: " . $applied_elsewhere_label;
 
 $note_data = array(
