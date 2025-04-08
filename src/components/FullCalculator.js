@@ -56,45 +56,59 @@ const FullCalculator = () => {
     setError(null);
 
     try {
-      // Prepare basic data for Pipedrive
-      // Log all form data for debugging
+      // Prepare data for Pipedrive
       console.log('Form data before submission:', data);
-      console.log('Financial product value:', data.financialProduct);
       
+      // Create a formatted data object to send to Pipedrive
       const pipedriveData = {
-        title: `Aizdevuma pieteikums - ${data.companyName}`,
-        company_name: data.companyName,
-        reg_number: data.regNumber,
-        contact_name: data.contactName,
+        // Basic information
+        companyName: data.companyName,
+        regNumber: data.regNumber,
+        contactName: data.contactName,
         email: data.email,
         phone: data.phone,
-        company_position: data.companyPosition,
-        company_age: data.companyAge,
-        annual_turnover: data.annualTurnover,
-        profit_loss_status: data.profitLossStatus,
-        core_activity: data.coreActivity,
-        loan_amount: parseFloat(data.loanAmount.replace(/[^0-9.]/g, '')), // Clean and convert to number
-        loan_term: `${data.loanTerm} mēneši`,
-        loan_purpose: data.loanPurpose,
-        collateral_type: data.collateralType,
-        collateral_description: data.collateralDescription,
-        has_applied_elsewhere: data.hasAppliedElsewhere ? 'Jā' : 'Nē',
-        financial_product: data.financialProduct || ''
+        
+        // Company information
+        companyPosition: data.companyPosition,
+        companyAge: data.companyAge,
+        annualTurnover: data.annualTurnover,
+        profitLossStatus: data.profitLossStatus,
+        coreActivity: data.coreActivity,
+        
+        // Loan information
+        loanAmount: data.loanAmount.toString().replace(/[^0-9.]/g, ''),
+        loanTerm: data.loanTerm,
+        loanPurpose: data.loanPurpose,
+        financialProduct: data.financialProduct || 'Aizdevums uzņēmumiem',
+        
+        // Collateral information
+        collateralType: data.collateralType,
+        collateralDescription: data.collateralDescription || '',
+        
+        // Financial status
+        taxDebtStatus: data.taxDebtStatus || 'no',
+        taxDebtAmount: data.taxDebtStatus && data.taxDebtStatus !== 'no' ? data.taxDebtAmount : '',
+        hadPaymentDelays: data.hadPaymentDelays || 'no',
+        
+        // Additional information
+        hasAppliedElsewhere: data.hasAppliedElsewhere || 'no'
       };
       
-      // Double check the financial product is being included
-      if (!pipedriveData.financial_product) {
+      // Double check that all required fields are present
+      if (!pipedriveData.financialProduct) {
         console.warn('Financial product is empty in submission data');
+        pipedriveData.financialProduct = 'Aizdevums uzņēmumiem'; // Set default value if empty
       }
 
+      // Log the data we're about to send
       console.log('Sending data to backend:', pipedriveData);
       
+      // Send the data to our API endpoint
       const response = await axios.post('/wp-json/loan-calculator/v1/submit', pipedriveData);
 
       if (response.data.success) {
         setIsSuccess(true);
         reset();
-        // Show success message
         setError(null);
       } else {
         throw new Error(response.data.message || 'Failed to submit application');
