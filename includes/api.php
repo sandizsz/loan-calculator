@@ -512,7 +512,6 @@ if (is_wp_error($note_response)) {
     error_log('Pipedrive Note API response body: ' . $note_body);
 }
 
-// Return success response
-return new WP_REST_Response(array('success' => true), 200);
+
 
 }
