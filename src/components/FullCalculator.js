@@ -7,6 +7,12 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { ChevronRight, ChevronLeft, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
+
+// In FullCalculator.js
+const translate = (text) => {
+  return window.formTranslate ? window.formTranslate(text) : text;
+};
+
 // Fixed SelectItem component with proper ref handling
 const SelectItem = React.forwardRef(({ children, className, ...props }, forwardedRef) => {
   return (
@@ -1672,7 +1678,7 @@ const FullCalculator = () => {
         
         {/* Heading */}
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Finansējuma vajadzības'}
+          {step === 1 ? translate("Biznesa finansējuma pieteikums") : translate("Finansējuma vajadzības")}
         </h2>
         
         {/* Subtitle */}

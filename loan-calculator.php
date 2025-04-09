@@ -223,10 +223,22 @@ function full_calculator_shortcode() {
     ?>
     <div id="full-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
-            Sagatavojam finansējuma kalkulatoru...
+            Sagatavojam pieteikuma anketu...
         </div>
     </div>
+    
     <?php
+    // Add the strings div for translation but hide it with CSS
+    // This lets TranslatePress detect the strings for translation, but they won't be visible to users
+    ?>
+    <div class="loan-form-strings" style="display: none;">
+        <!-- All your strings here -->
+        <p>Biznesa finansējuma pieteikums</p>
+        <p>Finansējuma vajadzības</p>
+        <!-- ... all other strings ... -->
+    </div>
+    <?php
+    
     return ob_get_clean();
 }
 add_shortcode('full_calculator', 'full_calculator_shortcode');
