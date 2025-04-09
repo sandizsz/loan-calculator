@@ -7,12 +7,6 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { ChevronRight, ChevronLeft, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
-
-// In FullCalculator.js
-const translate = (text) => {
-  return window.formTranslate ? window.formTranslate(text) : text;
-};
-
 // Fixed SelectItem component with proper ref handling
 const SelectItem = React.forwardRef(({ children, className, ...props }, forwardedRef) => {
   return (
@@ -38,50 +32,6 @@ const FullCalculator = () => {
   const [kredits, setKredits] = useState([]);
   const [isSuccess, setIsSuccess] = useState(false);
 
-
-   // Add the changeStep function here
-   const changeStep = (newStep) => {
-    // Save current translations before changing steps
-    if (window.persistTranslations) {
-      window.persistTranslations();
-    }
-    setStep(newStep);
-  };
-
-
-  // In your FullCalculator component
-useEffect(() => {
-  // After step changes, check for translation updates
-  const captureTranslations = () => {
-    // Find any new translations on the page
-    document.querySelectorAll('[data-trpgettextoriginal]').forEach(el => {
-      translationCache[el.getAttribute('data-trpgettextoriginal')] = el.textContent;
-    });
-  };
-  
-  // Capture on step change
-  captureTranslations();
-  
-  // Set up observer to detect new translations
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && 
-          mutation.attributeName === 'data-trpgettextoriginal') {
-        captureTranslations();
-      }
-    });
-  });
-  
-  // Start observing the document
-  observer.observe(document.body, { 
-    attributes: true, 
-    attributeFilter: ['data-trpgettextoriginal'],
-    subtree: true 
-  });
-  
-  return () => observer.disconnect();
-}, [step]);
-
   // Load WordPress data for kredits
   useEffect(() => {
     const wpData = window.loanCalculatorData || {};
@@ -97,7 +47,7 @@ useEffect(() => {
 
   const onSubmit = async (data) => {
     if (step === 1) {
-      changeStep(2);
+      setStep(2);
       return;
     }
 
@@ -862,7 +812,7 @@ useEffect(() => {
 
       // Reset form and show success message
       alert('Paldies! Jūsu pieteikums ir veiksmīgi nosūtīts.');
-      changeStep(1);
+      setStep(1);
       reset();
     } catch (error) {
       throw new Error('Neizdevās nosūtīt pieteikumu: ' + error.message);
@@ -1690,15 +1640,15 @@ useEffect(() => {
           <p className="text-gray-600 mb-2 max-w-md mx-auto">Jūsu pieteikums ir veiksmīgi nosūtīts un tiks izskatīts tuvākajā laikā.</p>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.</p>
           <button
-  onClick={() => {
-    setIsSuccess(false);
-    changeStep(1);
-    reset();
-  }}
-  className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all !border-none"
->
-  Iesniegt jaunu pieteikumu
-</button>
+            onClick={() => {
+              setIsSuccess(false);
+              setStep(1);
+              reset();
+            }}
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all !border-none"
+          >
+            Iesniegt jaunu pieteikumu
+          </button>
         </div>
       </div>
     );
@@ -1722,7 +1672,7 @@ useEffect(() => {
         
         {/* Heading */}
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          {step === 1 ? translate("Biznesa finansējuma pieteikums") : translate("Finansējuma vajadzības")}
+          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Finansējuma vajadzības'}
         </h2>
         
         {/* Subtitle */}
@@ -1749,14 +1699,14 @@ useEffect(() => {
   
         <div className="flex flex-col space-y-4 pt-6">
           {step > 1 && (
-           <button
-           type="button"
-           onClick={() => changeStep(step - 1)}
-           className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
-         >
-           <ChevronLeft className="w-5 h-5 mr-2" />
-           Atpakaļ
-         </button>
+            <button
+              type="button"
+              onClick={() => setStep(step - 1)}
+              className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              Atpakaļ
+            </button>
           )}
           
           <button
