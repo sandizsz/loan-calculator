@@ -220,6 +220,8 @@ add_shortcode('loan_calculator', 'loan_calculator_shortcode');
 
 function full_calculator_shortcode() {
     ob_start();
+    // Check if in TranslatePress edit mode
+    $is_trp_edit = isset($_GET['trp-edit-translation']) || isset($_GET['trp-view-as']);
     ?>
     <div id="full-calculator-root">
         <div class="loading-message" style="padding: 20px; text-align: center;">
@@ -228,15 +230,41 @@ function full_calculator_shortcode() {
     </div>
     
     <?php
-    // Add the strings div for translation but hide it with CSS
-    // This lets TranslatePress detect the strings for translation, but they won't be visible to users
+    // Always include the strings div, but hide it with display:none
+    // This way TranslatePress can find and translate the strings,
+    // but they won't be visible to users
     ?>
     <div class="loan-form-strings" style="display: none;">
-        <!-- All your strings here -->
+        <!-- All strings from your form -->
         <p>Biznesa finansējuma pieteikums</p>
         <p>Finansējuma vajadzības</p>
-        <!-- ... all other strings ... -->
+        <!-- ...all other strings... -->
     </div>
+    
+    <!-- Add a script to persist translations between step changes -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create a global persist function that React can call
+        window.persistTranslations = function() {
+            if (window.translationCache) {
+                // Store in sessionStorage to persist between renders
+                sessionStorage.setItem('form_translations', 
+                    JSON.stringify(window.translationCache));
+            }
+        };
+        
+        // Load any saved translations
+        try {
+            const saved = sessionStorage.getItem('form_translations');
+            if (saved && window.translationCache) {
+                Object.assign(window.translationCache, JSON.parse(saved));
+                console.log('Loaded saved translations');
+            }
+        } catch (e) {
+            console.error('Error loading saved translations', e);
+        }
+    });
+    </script>
     <?php
     
     return ob_get_clean();

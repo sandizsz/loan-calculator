@@ -3,28 +3,57 @@ import { createRoot } from 'react-dom/client';
 import FullCalculator from './components/FullCalculator';
 import './styles/main.css';
 
-// At the top of full-calculator.js, after imports
-document.addEventListener('DOMContentLoaded', function() {
-  // Get all translations from the hidden div and store them
-  const translationStore = {};
-  
-  document.querySelectorAll('.loan-form-strings > p').forEach(element => {
-    const original = element.textContent.trim();
-    // If this is already translated by TranslatePress server-side
-    if (element.hasAttribute('data-trpgettextoriginal')) {
-      const originalText = element.getAttribute('data-trpgettextoriginal');
-      translationStore[originalText] = element.textContent;
-    } else {
-      // Keep the original text for fallback
-      translationStore[original] = original;
+// Add at the top of full-calculator.js, after imports
+// Override React's createElement to preserve translations
+const originalCreateElement = React.createElement;
+
+// Keep a cache of translations
+const translationCache = {};
+
+// Function to gather all translations from the page
+function cacheAllTranslations() {
+  // Get translations from the hidden div
+  document.querySelectorAll('.loan-form-strings > p').forEach(el => {
+    const original = el.textContent.trim();
+    // If translated by TranslatePress
+    if (el.hasAttribute('data-trpgettextoriginal')) {
+      translationCache[el.getAttribute('data-trpgettextoriginal')] = el.textContent;
     }
+    // Store the original as well
+    translationCache[original] = el.textContent;
+  });
+
+  // Get any translated elements on the page
+  document.querySelectorAll('[data-trpgettextoriginal]').forEach(el => {
+    translationCache[el.getAttribute('data-trpgettextoriginal')] = el.textContent;
   });
   
-  // Create a global translation function
-  window.formTranslate = function(text) {
-    return translationStore[text] || text;
-  };
-});
+  console.log('Translation cache populated:', Object.keys(translationCache).length, 'entries');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', cacheAllTranslations);
+
+// Override React.createElement to handle translations
+React.createElement = function() {
+  let args = Array.from(arguments);
+  
+  // Only process string children of DOM elements (not components)
+  if (typeof args[0] === 'string' && args[1] != null && args.length > 2) {
+    // Check children for strings to translate
+    for (let i = 2; i < args.length; i++) {
+      if (typeof args[i] === 'string') {
+        const original = args[i].trim();
+        if (translationCache[original]) {
+          args[i] = translationCache[original];
+        }
+      }
+    }
+  }
+  
+  // Call the original function with possibly translated children
+  return originalCreateElement.apply(this, args);
+};
 
 
 
