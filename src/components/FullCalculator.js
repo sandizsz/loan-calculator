@@ -1337,7 +1337,7 @@ const FullCalculator = () => {
                                 onError={(e) => e.target.style.display = 'none'}
                               />
                             )}
-                            {kredit.title}
+                            {translate(kredit.title)}
                           </div>
                         </SelectItem>
                       ))}

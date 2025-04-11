@@ -1,5 +1,17 @@
 // Russian translations for loan calculator
 export const ruTranslations = {
+  // Kredits translations mapping
+  kredits: {
+    // Map Latvian kredit titles to Russian translations
+    // These should match exactly with the titles from window.loanCalculatorData.kredits
+    'Aizdevums uzņēmumiem': 'Кредит для предприятий',
+    'Kredītlīnija': 'Кредитная линия',
+    'Līzings': 'Лизинг',
+    'Faktorings': 'Факторинг',
+    'Garantijas': 'Гарантии',
+    'Cits finanšu produkts': 'Другой финансовый продукт',
+  },
+  
   // Form steps
   'Biznesa finansējuma pieteikums': 'Заявка на бизнес-финансирование',
   'Finansējuma vajadzības': 'Потребности в финансировании',

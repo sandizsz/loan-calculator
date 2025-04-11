@@ -18,7 +18,12 @@ export const translate = (text) => {
   // If not Russian, return original Latvian text
   if (!isRussianLanguage()) return text;
   
-  // Return Russian translation if available, otherwise return original text
+  // First check if it's a kredit name
+  if (ruTranslations.kredits && ruTranslations.kredits[text]) {
+    return ruTranslations.kredits[text];
+  }
+  
+  // Then check regular translations
   return ruTranslations[text] || text;
 };
 
