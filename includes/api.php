@@ -90,7 +90,7 @@ function handle_loan_submission($request) {
     // Prepare Pipedrive lead data with custom fields
     // Base lead data
     $lead_data = array(
-        'title' => 'Aizdevuma pieteikums - ' . $data['companyName'],
+        'title' => $data['companyName'],
         'owner_id' => $owner_id,
         'value' => array(
             'amount' => floatval(str_replace(array(' ', ','), array('', '.'), $data['loanAmount'])),
@@ -364,9 +364,8 @@ $note_content .= "Reģistrācijas numurs: " . (!empty($data['regNumber']) ? $dat
 
 // Map company position to Latvian
 $position_labels = [
-    'owner' => 'Īpašnieks',
+    'owner' => 'Īpašnieks / valdes loceklis',
     'board' => 'Valdes loceklis',
-    'finance' => 'Finanšu direktors',
     'other' => 'Cits'
 ];
 $position_label = !empty($data['companyPosition']) && isset($position_labels[$data['companyPosition']]) 

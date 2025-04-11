@@ -6,6 +6,7 @@ import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { ChevronRight, ChevronLeft, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { translate, translateValidation } from '../translations';
 
 // Fixed SelectItem component with proper ref handling
 const SelectItem = React.forwardRef(({ children, className, ...props }, forwardedRef) => {
@@ -97,7 +98,7 @@ const FullCalculator = () => {
       // Double check that all required fields are present
       if (!pipedriveData.financialProduct) {
         console.warn('Financial product is empty in submission data');
-        pipedriveData.financialProduct = 'Aizdevums uzņēmumiem'; // Set default value if empty
+        pipedriveData.financialProduct = translate('Aizdevums uzņēmumiem'); // Set default value if empty
       }
 
       // Log the data we're about to send
@@ -151,7 +152,7 @@ const FullCalculator = () => {
       }
       
       // Otherwise handle as a real error
-      let errorMessage = 'Kļūda iesniedzot formu. Lūdzu, mēģiniet vēlreiz.';
+      let errorMessage = translate('Kļūda iesniedzot formu. Lūdzu, mēģiniet vēlreiz.');
       
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
@@ -853,14 +854,14 @@ const FullCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            Kontaktinformācija
+            {translate('Kontaktinformācija')}
           </h4>
           
           <div className="grid grid-cols-1 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 name="contactName"
-                label="Kontaktpersonas vārds, uzvārds"
+                label={translate('Kontaktpersonas vārds, uzvārds')}
                 required
               >
                 <input
@@ -873,7 +874,7 @@ const FullCalculator = () => {
 
               <FormField
                 name="phone"
-                label="Telefona numurs"
+                label={translate('Telefona numurs')}
                 required
               >
                 <input
@@ -883,10 +884,10 @@ const FullCalculator = () => {
                   placeholder="12345678"
                   aria-invalid={errors.phone ? 'true' : 'false'}
                   {...register('phone', {
-                    required: 'Šis lauks ir obligāts',
+                    required: translate('Šis lauks ir obligāts'),
                     pattern: {
                       value: /^[0-9]{8}$/,
-                      message: 'Lūdzu, ievadiet 8 ciparu telefona numuru'
+                      message: translate('Lūdzu, ievadiet 8 ciparu telefona numuru')
                     }
                   })}
                 />
@@ -895,7 +896,7 @@ const FullCalculator = () => {
             
             <FormField
               name="email"
-              label="E-pasta adrese"
+              label={translate('E-pasta adrese')}
               required
             >
               <input
@@ -904,10 +905,10 @@ const FullCalculator = () => {
                 placeholder="example@domain.com"
                 aria-invalid={errors.email ? 'true' : 'false'}
                 {...register('email', {
-                  required: 'Šis lauks ir obligāts',
+                  required: translate('Šis lauks ir obligāts'),
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Lūdzu, ievadiet derīgu e-pasta adresi'
+                    message: translate('Lūdzu, ievadiet derīgu e-pasta adresi')
                   }
                 })}
               />
@@ -923,39 +924,39 @@ const FullCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            Uzņēmuma dati
+            {translate('Uzņēmuma dati')}
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               name="companyName"
-              label="Uzņēmuma nosaukums"
+              label={translate('Uzņēmuma nosaukums')}
               required
             >
               <input
                 type="text"
                 className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 aria-invalid={errors.companyName ? 'true' : 'false'}
-                {...register('companyName', { required: 'Šis lauks ir obligāts' })}
+                {...register('companyName', { required: translate('Šis lauks ir obligāts') })}
               />
             </FormField>
   
             <FormField
               name="regNumber"
-              label="Reģistrācijas numurs"
+              label={translate('Reģistrācijas numurs')}
               required
             >
               <input
                 type="text"
                 className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 aria-invalid={errors.regNumber ? 'true' : 'false'}
-                {...register('regNumber', { required: 'Šis lauks ir obligāts' })}
+                {...register('regNumber', { required: translate('Šis lauks ir obligāts') })}
               />
             </FormField>
             
             <FormField
               name="companyAge"
-              label="Uzņēmuma vecums"
+              label={translate('Uzņēmuma vecums')}
               required
             >
               <div className="w-full relative">
@@ -968,9 +969,9 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.companyAge ? 'true' : 'false'}
-                    {...register('companyAge', { required: 'Šis lauks ir obligāts' })}
+                    {...register('companyAge', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties uzņēmuma vecumu" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties uzņēmuma vecumu')} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -987,11 +988,11 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="0-6">Līdz 6 mēnešiem</SelectItem>
-                        <SelectItem value="6-12">6-12 mēneši</SelectItem>
-                        <SelectItem value="1-2">1-2 gadi</SelectItem>
-                        <SelectItem value="2-3">2-3 gadi</SelectItem>
-                        <SelectItem value="3+">Vairāk kā 3 gadi</SelectItem>
+                        <SelectItem value="0-6">{translate('Līdz 6 mēnešiem')}</SelectItem>
+                        <SelectItem value="6-12">{translate('6-12 mēneši')}</SelectItem>
+                        <SelectItem value="1-2">{translate('1-2 gadi')}</SelectItem>
+                        <SelectItem value="2-3">{translate('2-3 gadi')}</SelectItem>
+                        <SelectItem value="3+">{translate('Vairāk kā 3 gadi')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1005,7 +1006,7 @@ const FullCalculator = () => {
             
             <FormField
               name="annualTurnover"
-              label="Apgrozījums pēdējā gadā (EUR)"
+              label={translate('Apgrozījums pēdējā gadā (EUR)')}
               required
             >
               <div className="w-full relative">
@@ -1018,9 +1019,9 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.annualTurnover ? 'true' : 'false'}
-                    {...register('annualTurnover', { required: 'Šis lauks ir obligāts' })}
+                    {...register('annualTurnover', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties apgrozījumu" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties apgrozījumu')} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -1037,10 +1038,10 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="lt200k">&lt; 200 000</SelectItem>
-                        <SelectItem value="200k-500k">200 001 – 500 000</SelectItem>
-                        <SelectItem value="500k-1m">500 001 – 1 000 000</SelectItem>
-                        <SelectItem value="gt1m">&gt; 1 000 000</SelectItem>
+                        <SelectItem value="lt200k">{translate('< 200 000')}</SelectItem>
+                        <SelectItem value="200k-500k">{translate('200 001 – 500 000')}</SelectItem>
+                        <SelectItem value="500k-1m">{translate('500 001 – 1 000 000')}</SelectItem>
+                        <SelectItem value="gt1m">{translate('> 1 000 000')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1054,7 +1055,7 @@ const FullCalculator = () => {
             
             <FormField
               name="profitLossStatus"
-              label="Peļņa vai zaudējumi pēdējā gadā"
+              label={translate('Peļņa vai zaudējumi pēdējā gadā')}
               required
             >
               <div className="w-full relative">
@@ -1067,7 +1068,7 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
-                    {...register('profitLossStatus', { required: 'Šis lauks ir obligāts' })}
+                    {...register('profitLossStatus', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
                     <Select.Icon>
@@ -1086,9 +1087,9 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="profit">Peļņa</SelectItem>
-                        <SelectItem value="loss">Zaudējumi</SelectItem>
-                        <SelectItem value="noData">Nav pieejamu datu</SelectItem>
+                        <SelectItem value="profit">{translate('Peļņa')}</SelectItem>
+                        <SelectItem value="loss">{translate('Zaudējumi')}</SelectItem>
+                        <SelectItem value="noData">{translate('Nav pieejamu datu')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1102,7 +1103,7 @@ const FullCalculator = () => {
             
             <FormField
               name="companyPosition"
-              label="Jūsu pozīcija uzņēmumā"
+              label={translate('Jūsu pozīcija uzņēmumā')}
               required
             >
               <div className="w-full relative">
@@ -1115,9 +1116,9 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.companyPosition ? 'true' : 'false'}
-                    {...register('companyPosition', { required: 'Šis lauks ir obligāts' })}
+                    {...register('companyPosition', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties pozīciju" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties pozīciju')} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -1134,9 +1135,9 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="owner">Īpašnieks / valdes loceklis</SelectItem>
-                        <SelectItem value="board">Valdes loceklis</SelectItem>
-                        <SelectItem value="other">Cits</SelectItem>
+                        <SelectItem value="owner">{translate('Īpašnieks / valdes loceklis')}</SelectItem>
+                        <SelectItem value="board">{translate('Valdes loceklis')}</SelectItem>
+                        <SelectItem value="other">{translate('Cits')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1151,14 +1152,14 @@ const FullCalculator = () => {
             <div className="col-span-1 md:col-span-2">
               <FormField
                 name="coreActivity"
-                label="Pamata darbība (īss apraksts)"
+                label={translate('Pamata darbība (īss apraksts)')}
                 required
               >
                 <textarea
                   className="loan-form-input min-h-[100px] resize-none w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  placeholder="(piemēram: būvniecība, tirdzniecība, ražošana utt.)"
+                  placeholder={translate('(piemēram: būvniecība, tirdzniecība, ražošana utt.)')}
                   aria-invalid={errors.coreActivity ? 'true' : 'false'}
-                  {...register('coreActivity', { required: 'Šis lauks ir obligāts' })}
+                  {...register('coreActivity', { required: translate('Šis lauks ir obligāts') })}
                 />
               </FormField>
             </div>
@@ -1179,13 +1180,13 @@ const FullCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            Aizdevuma informācija
+            {translate('Aizdevuma informācija')}
           </h4>
           
           <div className="grid grid-cols-1 gap-4">
             <FormField
               name="loanAmount"
-              label="Nepieciešamā aizdevuma summa (EUR)"
+              label={translate('Nepieciešamā aizdevuma summa (EUR)')}
               required
             >
               <input
@@ -1195,14 +1196,14 @@ const FullCalculator = () => {
                 max="1000000"
                 aria-invalid={errors.loanAmount ? 'true' : 'false'}
                 {...register('loanAmount', { 
-                  required: 'Šis lauks ir obligāts',
+                  required: translate('Šis lauks ir obligāts'),
                   min: {
                     value: 1000,
-                    message: 'Minimālā summa ir €1,000'
+                    message: translate('Minimālā summa ir €1,000')
                   },
                   max: {
                     value: 1000000,
-                    message: 'Maksimālā summa ir €1,000,000'
+                    message: translate('Maksimālā summa ir €1,000,000')
                   }
                 })}
               />
@@ -1210,7 +1211,7 @@ const FullCalculator = () => {
 
             <FormField
               name="loanTerm"
-              label="Vēlamais aizdevuma termiņš (mēneši)"
+              label={translate('Vēlamais aizdevuma termiņš (mēneši)')}
               required
             >
               <div className="flex">
@@ -1220,19 +1221,19 @@ const FullCalculator = () => {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                    placeholder="Ievadiet termiņu mēnešos"
+                    placeholder={translate('Ievadiet termiņu mēnešos')}
                     aria-invalid={errors.loanTerm ? 'true' : 'false'}
                     {...register('loanTerm', { 
-                      required: 'Šis lauks ir obligāts',
+                      required: translate('Šis lauks ir obligāts'),
                       validate: (value) => {
                         const num = parseFloat(value);
-                        if (isNaN(num)) return 'Lūdzu, ievadiet skaitli';
+                        if (isNaN(num)) return translate('Lūdzu, ievadiet skaitli');
                         
                         const min = 1;
                         const max = 120;
                         
-                        if (num < min) return 'Minimālais termiņš ir 1 mēnesis';
-                        if (num > max) return 'Maksimālais termiņš ir 120 mēneši';
+                        if (num < min) return translate('Minimālais termiņš ir 1 mēnesis');
+                        if (num > max) return translate('Maksimālais termiņš ir 120 mēneši');
                         return true;
                       }
                     })}
@@ -1243,7 +1244,7 @@ const FullCalculator = () => {
 
             <FormField
               name="loanPurpose"
-              label="Aizdevuma mērķis"
+              label={translate('Aizdevuma mērķis')}
               required
             >
               <div className="w-full relative">
@@ -1256,9 +1257,9 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.loanPurpose ? 'true' : 'false'}
-                    {...register('loanPurpose', { required: 'Šis lauks ir obligāts' })}
+                    {...register('loanPurpose', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties mērķi" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties mērķi')} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -1275,11 +1276,11 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="apgrozamie">Apgrozāmie līdzekļi</SelectItem>
-                        <SelectItem value="pamatlidzekli">Pamatlīdzekļu iegāde</SelectItem>
-                        <SelectItem value="refinansesana">Kredītu refinansēšana</SelectItem>
-                        <SelectItem value="projekti">Projektu finansēšana</SelectItem>
-                        <SelectItem value="cits">Cits mērķis</SelectItem>
+                        <SelectItem value="workingCapital">{translate('Apgrozāmie līdzekļi')}</SelectItem>
+                        <SelectItem value="fixedAssets">{translate('Pamatlīdzekļu iegāde')}</SelectItem>
+                        <SelectItem value="refinancing">{translate('Kredītu refinansēšana')}</SelectItem>
+                        <SelectItem value="projectFinancing">{translate('Projektu finansēšana')}</SelectItem>
+                        <SelectItem value="other">{translate('Cits mērķis')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1290,146 +1291,23 @@ const FullCalculator = () => {
                 </Select.Root>
               </div>
             </FormField>
-
-            <FormField
-              name="financialProduct"
-              label="Nepieciešamais finanšu produkts"
-              required
-            >
-              <div className="w-full relative">
-                <Select.Root 
-                  value={watch('financialProduct')} 
-                  onValueChange={(value) => {
-                    setValue('financialProduct', value, { shouldValidate: true, shouldDirty: true });
-                  }}
-                >
-                  <Select.Trigger 
-                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                    aria-invalid={errors.financialProduct ? 'true' : 'false'}
-                    {...register('financialProduct', { required: 'Šis lauks ir obligāts' })}
-                  >
-                    <Select.Value placeholder="Izvēlieties produktu" className="text-gray-400" />
-                    <Select.Icon>
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </Select.Icon>
-                  </Select.Trigger>
-                  
-                  <Select.Portal>
-                    <Select.Content 
-                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                      position="popper" 
-                      sideOffset={8}
-                    >
-                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                        <ChevronUp className="w-4 h-4" />
-                      </Select.ScrollUpButton>
-                      
-                      <Select.Viewport className="p-2">
-                      {window.loanCalculatorData?.kredits?.map((kredit) => (
-                        <SelectItem key={kredit.id} value={kredit.title}>
-                          <div className="flex items-center gap-2">
-                            {kredit.icon && (
-                              <img 
-                                src={kredit.icon} 
-                                alt=""
-                                className="w-4 h-4 object-contain"
-                                onError={(e) => e.target.style.display = 'none'}
-                              />
-                            )}
-                            {kredit.title}
-                          </div>
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="Cits finanšu produkts">Cits finanšu produkts</SelectItem>
-                    </Select.Viewport>
-                      
-                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                        <ChevronDown className="w-4 h-4" />
-                      </Select.ScrollDownButton>
-                    </Select.Content>
-                  </Select.Portal>
-                </Select.Root>
-              </div>
-            </FormField>
-          </div>
-        </div>
-
-        {/* Financial Status Section */}
-        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
-            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            Finanšu statuss
-          </h4>
-          
-          <div className="grid grid-cols-1 gap-4">
-            <FormField
-              name="taxDebtStatus"
-              label="Vai uzņēmumam ir nodokļu parāds?"
-              required
-            >
-              <div className="w-full relative">
-                <Select.Root 
-                  value={watch('taxDebtStatus')} 
-                  onValueChange={(value) => {
-                    setValue('taxDebtStatus', value, { shouldValidate: true, shouldDirty: true });
-                  }}
-                >
-                  <Select.Trigger 
-                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                    aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
-                    {...register('taxDebtStatus', { required: 'Šis lauks ir obligāts' })}
-                  >
-                    <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
-                    <Select.Icon>
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </Select.Icon>
-                  </Select.Trigger>
-                  
-                  <Select.Portal>
-                    <Select.Content 
-                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
-                      position="popper" 
-                      sideOffset={8}
-                    >
-                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                        <ChevronUp className="w-4 h-4" />
-                      </Select.ScrollUpButton>
-                      
-                      <Select.Viewport className="p-2">
-                        <SelectItem value="no">Nav</SelectItem>
-                        <SelectItem value="withSchedule">Ir, ar VID grafiku</SelectItem>
-                        <SelectItem value="withoutSchedule">Ir, bez VID grafika</SelectItem>
-                      </Select.Viewport>
-                      
-                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
-                        <ChevronDown className="w-4 h-4" />
-                      </Select.ScrollDownButton>
-                    </Select.Content>
-                  </Select.Portal>
-                </Select.Root>
-              </div>
-            </FormField>
-
+            
             {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
               <FormField
                 name="taxDebtAmount"
-                label="Nodokļu parāda summa (EUR)"
+                label={translate('Nodokļu parāda summa (EUR)')}
                 required
               >
                 <input
                   type="number"
                   className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                  placeholder="Ievadiet summu"
+                  placeholder={translate('Ievadiet summu')}
                   aria-invalid={errors.taxDebtAmount ? 'true' : 'false'}
                   {...register('taxDebtAmount', { 
-                    required: 'Šis lauks ir obligāts',
+                    required: translate('Šis lauks ir obligāts'),
                     min: {
                       value: 0,
-                      message: 'Summai jābūt lielākai par 0'
+                      message: translate('Summai jābūt lielākai par 0')
                     }
                   })}
                 />
@@ -1438,7 +1316,7 @@ const FullCalculator = () => {
 
             <FormField
               name="hadPaymentDelays"
-              label="Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?"
+              label={translate('Vai pēdējo 12 mēnešu laikā ir bijušas kavētas kredītmaksājumu vai nodokļu maksājumu saistības?')}
               required
             >
               <RadioGroup.Root 
@@ -1454,7 +1332,7 @@ const FullCalculator = () => {
                   >
                     <RadioGroup.Indicator className="loan-form-radio-indicator" />
                   </RadioGroup.Item>
-                  <label className="pl-2" htmlFor="hadPaymentDelays-yes">Jā</label>
+                  <label className="pl-2" htmlFor="hadPaymentDelays-yes">{translate('Jā')}</label>
                 </div>
                 <div className="flex items-center">
                   <RadioGroup.Item 
@@ -1464,7 +1342,7 @@ const FullCalculator = () => {
                   >
                     <RadioGroup.Indicator className="loan-form-radio-indicator" />
                   </RadioGroup.Item>
-                  <label className="pl-2" htmlFor="hadPaymentDelays-no">Nē</label>
+                  <label className="pl-2" htmlFor="hadPaymentDelays-no">{translate('Nē')}</label>
                 </div>
               </RadioGroup.Root>
             </FormField>
@@ -1479,13 +1357,13 @@ const FullCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
             </div>
-            Nodrošinājuma informācija
+            {translate('Nodrošinājuma informācija')}
           </h4>
           
           <div className="grid grid-cols-1 gap-4">
             <FormField
               name="collateralType"
-              label="Piedāvātais nodrošinājums"
+              label={translate('Piedāvātais nodrošinājums')}
               required
             >
               <div className="w-full relative">
@@ -1496,9 +1374,9 @@ const FullCalculator = () => {
                   <Select.Trigger 
                     className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                     aria-invalid={errors.collateralType ? 'true' : 'false'}
-                    {...register('collateralType', { required: 'Šis lauks ir obligāts' })}
+                    {...register('collateralType', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties nodrošinājuma veidu" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties nodrošinājuma veidu')} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -1515,11 +1393,11 @@ const FullCalculator = () => {
                 </Select.ScrollUpButton>
                 
                 <Select.Viewport className="p-2">
-                  <SelectItem value="real-estate">Nekustamais īpašums</SelectItem>
-                  <SelectItem value="vehicles">Transportlīdzekļi</SelectItem>
-                  <SelectItem value="commercial-pledge">Komercķīla</SelectItem>
-                  <SelectItem value="none">Nav nodrošinājuma</SelectItem>
-                  <SelectItem value="other">Cits</SelectItem>
+                  <SelectItem value="real-estate">{translate('Nekustamais īpašums')}</SelectItem>
+                  <SelectItem value="vehicles">{translate('Transportlīdzekļi')}</SelectItem>
+                  <SelectItem value="commercial-pledge">{translate('Komercķīla')}</SelectItem>
+                  <SelectItem value="none">{translate('Nav nodrošinājuma')}</SelectItem>
+                  <SelectItem value="other">{translate('Cits')}</SelectItem>
                 </Select.Viewport>
                 
                 <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1534,18 +1412,18 @@ const FullCalculator = () => {
       {watch('collateralType') && watch('collateralType') !== 'none' && (
         <FormField
           name="collateralDescription"
-          label="Aprakstiet piedāvāto nodrošinājumu"
+          label={translate('Aprakstiet piedāvāto nodrošinājumu')}
           required
         >
           <textarea
             className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all min-h-[100px] resize-none"
-            placeholder="Lūdzu, sniedziet detalizētu informāciju par piedāvāto nodrošinājumu"
+            placeholder={translate('Lūdzu, sniedziet detalizētu informāciju par piedāvāto nodrošinājumu')}
             aria-invalid={errors.collateralDescription ? 'true' : 'false'}
             {...register('collateralDescription', { 
-              required: 'Šis lauks ir obligāts',
+              required: translate('Šis lauks ir obligāts'),
               minLength: {
                 value: 10,
-                message: 'Lūdzu, sniedziet detalizētāku aprakstu'
+                message: translate('Lūdzu, sniedziet detalizētāku aprakstu')
               }
             })}
           />
@@ -1562,13 +1440,13 @@ const FullCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            Papildu informācija
+            {translate('Papildu informācija')}
           </h4>
           
           <div className="grid grid-cols-1 gap-4">
             <FormField
               name="hasAppliedElsewhere"
-              label="Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?"
+              label={translate('Vai pēdējo 3 mēnešu laikā esat vērušies citā finanšu iestādē?')}
               required
             >
               <RadioGroup.Root 
@@ -1584,7 +1462,7 @@ const FullCalculator = () => {
                   >
                     <RadioGroup.Indicator className="loan-form-radio-indicator" />
                   </RadioGroup.Item>
-                  <label className="pl-2" htmlFor="hasAppliedElsewhere-yes">Jā</label>
+                  <label className="pl-2" htmlFor="hasAppliedElsewhere-yes">{translate('Jā')}</label>
                 </div>
                 <div className="flex items-center">
                   <RadioGroup.Item 
@@ -1594,14 +1472,14 @@ const FullCalculator = () => {
                   >
                     <RadioGroup.Indicator className="loan-form-radio-indicator" />
                   </RadioGroup.Item>
-                  <label className="pl-2" htmlFor="hasAppliedElsewhere-no">Nē</label>
+                  <label className="pl-2" htmlFor="hasAppliedElsewhere-no">{translate('Nē')}</label>
                 </div>
               </RadioGroup.Root>
             </FormField>
 
             <FormField
               name="gdprConsent"
-              label="Piekrītu personas datu apstrādei"
+              label={translate('Piekrītu personas datu apstrādei')}
               required
             >
               <div className="flex items-center">
@@ -1610,14 +1488,14 @@ const FullCalculator = () => {
                   id="gdprConsent"
                   checked={watch('gdprConsent')}
                   onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
-                  {...register('gdprConsent', { required: 'Šis lauks ir obligāts' })}
+                  {...register('gdprConsent', { required: translate('Šis lauks ir obligāts') })}
                 >
                   <Checkbox.Indicator className="loan-form-checkbox-indicator">
                     <Check className="w-4 h-4" />
                   </Checkbox.Indicator>
                 </Checkbox.Root>
                 <label className="pl-2 text-sm text-gray-600">
-                  Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo <a href="https://findexo.lv/datu-apstrades-noteikumi/" target="_blank" rel="noopener noreferrer" className=" hover:underline">datu apstrādes noteikumiem</a>.
+                  {translate('Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo')} <a href="https://findexo.lv/datu-apstrades-noteikumi/" target="_blank" rel="noopener noreferrer" className=" hover:underline">{translate('datu apstrādes noteikumiem')}</a>.
                 </label>
               </div>
             </FormField>
@@ -1636,9 +1514,11 @@ const FullCalculator = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Paldies par pieteikumu!</h2>
-          <p className="text-gray-600 mb-2 max-w-md mx-auto">Jūsu pieteikums ir veiksmīgi nosūtīts un tiks izskatīts tuvākajā laikā.</p>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">{translate('Paldies par pieteikumu!')}</h2>
+
+          <p className="text-gray-600 mb-2 max-w-md mx-auto">{translate('Jūsu pieteikums ir veiksmīgi nosūtīts un tiks izskatīts tuvākajā laikā.')}</p>
+          <div className="text-sm text-gray-500 mt-2">{translate('Atbilde uz šo jautājumu neietekmēs jūsu pieteikuma izskatīšanu.')}</div>
+          <p className="text-gray-600 mb-8 max-w-md mx-auto">{translate('Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.')}</p>
           <button
             onClick={() => {
               setIsSuccess(false);
@@ -1647,7 +1527,7 @@ const FullCalculator = () => {
             }}
             className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all !border-none"
           >
-            Iesniegt jaunu pieteikumu
+            {translate('Iesniegt jaunu pieteikumu')}
           </button>
         </div>
       </div>
@@ -1672,14 +1552,14 @@ const FullCalculator = () => {
         
         {/* Heading */}
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          {step === 1 ? 'Biznesa finansējuma pieteikums' : 'Finansējuma vajadzības'}
+          {step === 1 ? translate('Biznesa finansējuma pieteikums') : translate('Finansējuma vajadzības')}
         </h2>
         
         {/* Subtitle */}
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
           {step === 1 
-            ? 'Aizpildiet informāciju par jūsu uzņēmumu, lai mēs varētu sagatavot personalizētu finansējuma piedāvājumu.' 
-            : 'Pastāstiet mums par jūsu finansējuma vajadzībām, lai mēs varētu piedāvāt piemērotāko risinājumu.'}
+            ? translate('Aizpildiet informāciju par jūsu uzņēmumu, lai mēs varētu sagatavot personalizētu finansējuma piedāvājumu.') 
+            : translate('Pastāstiet mums par jūsu finansējuma vajadzībām, lai mēs varētu piedāvāt piemērotāko risinājumu.')}
         </p>
       </div>
   
@@ -1705,7 +1585,7 @@ const FullCalculator = () => {
               className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />
-              Atpakaļ
+              {translate('Atpakaļ')}
             </button>
           )}
           
@@ -1724,11 +1604,11 @@ const FullCalculator = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Apstrādā...
+                {translate('Apstrādā...')}
               </>
             ) : (
               <>
-                {step === 2 ? 'Iesniegt pieteikumu' : 'Turpināt'}
+                {step === 2 ? translate('Iesniegt pieteikumu') : translate('Turpināt')}
                 <ChevronRight className="w-5 h-5 ml-2" />
               </>
             )}
