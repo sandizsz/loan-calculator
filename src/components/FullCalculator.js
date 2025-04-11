@@ -48,9 +48,12 @@ const FullCalculator = () => {
 
   const onSubmit = async (data) => {
     if (step === 1) {
-      setStep(2);
-      // Scroll to top when moving to step 2
+      // First scroll to top, then change step
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Use setTimeout to ensure scroll happens before state change
+      setTimeout(() => {
+        setStep(2);
+      }, 100);
       return;
     }
 
@@ -1705,9 +1708,12 @@ const FullCalculator = () => {
             <button
               type="button"
               onClick={() => {
-                setStep(step - 1);
-                // Scroll to top when going back
+                // First scroll to top, then change step
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Use setTimeout to ensure scroll happens before state change
+                setTimeout(() => {
+                  setStep(step - 1);
+                }, 100);
               }}
               className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
