@@ -131,6 +131,7 @@ export const ruTranslations = {
   'Piekrītu personas datu apstrādei': 'Я согласен на обработку персональных данных',
   'Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo': 'Я согласен, что мои персональные данные будут обрабатываться в соответствии с Findexo',
   'datu apstrādes noteikumiem': 'правилами обработки данных',
+  'https://findexo.lv/datu-apstrades-noteikumi/': 'https://findexo.lv/ru/datu-apstrades-noteikumi/',
   
   // Step 2 - Input placeholders
   'Ievadiet termiņu mēnešos': 'Введите срок в месяцах',

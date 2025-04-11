@@ -1623,7 +1623,7 @@ const FullCalculator = () => {
                   </Checkbox.Indicator>
                 </Checkbox.Root>
                 <label className="pl-2 text-sm text-gray-600">
-                  {translate('Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo')} <a href="https://findexo.lv/datu-apstrades-noteikumi/" target="_blank" rel="noopener noreferrer" className=" hover:underline">{translate('datu apstrādes noteikumiem')}</a>.
+                  {translate('Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo')} <a href={translate('https://findexo.lv/datu-apstrades-noteikumi/')} target="_blank" rel="noopener noreferrer" className=" hover:underline">{translate('datu apstrādes noteikumiem')}</a>.
                 </label>
               </div>
             </FormField>
