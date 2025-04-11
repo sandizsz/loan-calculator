@@ -30,7 +30,7 @@ export const ruTranslations = {
   
   // Step 1 - Contact Information
   'Kontaktinformācija': 'Контактная информация',
-  'Kontaktpersonas vārds, uzvārds': 'ФИО контактного лица',
+  'Kontaktpersonas vārds, uzvārds': 'Имя и фамилия контактного лица',
   'Telefona numurs': 'Номер телефона',
   'E-pasta adrese': 'Адрес электронной почты',
   
