@@ -1352,6 +1352,68 @@ const FullCalculator = () => {
                 </Select.Root>
               </div>
             </FormField>
+          </div>
+        </div>
+
+        {/* Financial Status Section */}
+        <div className="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h4 className="text-lg font-medium text-gray-700 mb-6 flex items-center">
+            <div className="bg-[#FFC600] p-1.5 rounded-lg mr-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            {translate('Finanšu statuss')}
+          </h4>
+          
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              name="taxDebtStatus"
+              label={translate('Vai uzņēmumam ir nodokļu parāds?')}
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('taxDebtStatus')} 
+                  onValueChange={(value) => {
+                    setValue('taxDebtStatus', value, { shouldValidate: true, shouldDirty: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
+                    {...register('taxDebtStatus', { required: translate('Šis lauks ir obligāts') })}
+                  >
+                    <Select.Value placeholder={translate('Izvēlieties statusu')} className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                        <SelectItem value="no">{translate('Nav')}</SelectItem>
+                        <SelectItem value="withSchedule">{translate('Ir, ar VID grafiku')}</SelectItem>
+                        <SelectItem value="withoutSchedule">{translate('Ir, bez VID grafika')}</SelectItem>
+                      </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
             
             {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
               <FormField
@@ -1578,7 +1640,6 @@ const FullCalculator = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-4">{translate('Paldies par pieteikumu!')}</h2>
 
           <p className="text-gray-600 mb-2 max-w-md mx-auto">{translate('Jūsu pieteikums ir veiksmīgi nosūtīts un tiks izskatīts tuvākajā laikā.')}</p>
-          <div className="text-sm text-gray-500 mt-2">{translate('Atbilde uz šo jautājumu neietekmēs jūsu pieteikuma izskatīšanu.')}</div>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">{translate('Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.')}</p>
           <button
             onClick={() => {
