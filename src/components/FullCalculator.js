@@ -1291,6 +1291,67 @@ const FullCalculator = () => {
                 </Select.Root>
               </div>
             </FormField>
+
+            <FormField
+              name="financialProduct"
+              label={translate('Nepieciešamais finanšu produkts')}
+              required
+            >
+              <div className="w-full relative">
+                <Select.Root 
+                  value={watch('financialProduct')} 
+                  onValueChange={(value) => {
+                    setValue('financialProduct', value, { shouldValidate: true, shouldDirty: true });
+                  }}
+                >
+                  <Select.Trigger 
+                    className="loan-form-select-trigger w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
+                    aria-invalid={errors.financialProduct ? 'true' : 'false'}
+                    {...register('financialProduct', { required: translate('Šis lauks ir obligāts') })}
+                  >
+                    <Select.Value placeholder={translate('Izvēlieties produktu')} className="text-gray-400" />
+                    <Select.Icon>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Icon>
+                  </Select.Trigger>
+                  
+                  <Select.Portal>
+                    <Select.Content 
+                      className="loan-form-select-content rounded-lg shadow-lg border border-gray-100" 
+                      position="popper" 
+                      sideOffset={8}
+                    >
+                      <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronUp className="w-4 h-4" />
+                      </Select.ScrollUpButton>
+                      
+                      <Select.Viewport className="p-2">
+                      {window.loanCalculatorData?.kredits?.map((kredit) => (
+                        <SelectItem key={kredit.id} value={kredit.title}>
+                          <div className="flex items-center gap-2">
+                            {kredit.icon && (
+                              <img 
+                                src={kredit.icon} 
+                                alt=""
+                                className="w-4 h-4 object-contain"
+                                onError={(e) => e.target.style.display = 'none'}
+                              />
+                            )}
+                            {kredit.title}
+                          </div>
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Cits finanšu produkts">{translate('Cits finanšu produkts')}</SelectItem>
+                    </Select.Viewport>
+                      
+                      <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
+                        <ChevronDown className="w-4 h-4" />
+                      </Select.ScrollDownButton>
+                    </Select.Content>
+                  </Select.Portal>
+                </Select.Root>
+              </div>
+            </FormField>
             
             {watch('taxDebtStatus') && watch('taxDebtStatus') !== 'no' && (
               <FormField
