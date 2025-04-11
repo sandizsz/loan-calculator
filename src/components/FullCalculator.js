@@ -49,6 +49,8 @@ const FullCalculator = () => {
   const onSubmit = async (data) => {
     if (step === 1) {
       setStep(2);
+      // Scroll to top when moving to step 2
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -1276,11 +1278,11 @@ const FullCalculator = () => {
                       </Select.ScrollUpButton>
                       
                       <Select.Viewport className="p-2">
-                        <SelectItem value="workingCapital">{translate('Apgrozāmie līdzekļi')}</SelectItem>
-                        <SelectItem value="fixedAssets">{translate('Pamatlīdzekļu iegāde')}</SelectItem>
-                        <SelectItem value="refinancing">{translate('Kredītu refinansēšana')}</SelectItem>
-                        <SelectItem value="projectFinancing">{translate('Projektu finansēšana')}</SelectItem>
-                        <SelectItem value="other">{translate('Cits mērķis')}</SelectItem>
+                        <SelectItem value="apgrozamie">{translate('Apgrozāmie līdzekļi')}</SelectItem>
+                        <SelectItem value="pamatlidzekli">{translate('Pamatlīdzekļu iegāde')}</SelectItem>
+                        <SelectItem value="refinansesana">{translate('Kredītu refinansēšana')}</SelectItem>
+                        <SelectItem value="projekti">{translate('Projektu finansēšana')}</SelectItem>
+                        <SelectItem value="cits">{translate('Cits mērķis')}</SelectItem>
                       </Select.Viewport>
                       
                       <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-gray-700 cursor-default">
@@ -1643,13 +1645,12 @@ const FullCalculator = () => {
           <p className="text-gray-600 mb-8 max-w-md mx-auto">{translate('Mūsu speciālists sazināsies ar jums 1-2 darba dienu laikā.')}</p>
           <button
             onClick={() => {
-              setIsSuccess(false);
-              setStep(1);
-              reset();
+              // Navigate to the website home page
+              window.location.href = '/';
             }}
             className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-all !border-none"
           >
-            {translate('Iesniegt jaunu pieteikumu')}
+            {translate('Doties uz sākumu')}
           </button>
         </div>
       </div>
@@ -1703,7 +1704,11 @@ const FullCalculator = () => {
           {step > 1 && (
             <button
               type="button"
-              onClick={() => setStep(step - 1)}
+              onClick={() => {
+                setStep(step - 1);
+                // Scroll to top when going back
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
               <ChevronLeft className="w-5 h-5 mr-2" />

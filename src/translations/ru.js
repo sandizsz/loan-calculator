@@ -26,6 +26,7 @@ export const ruTranslations = {
   'Iesniegt pieteikumu': 'Отправить заявку',
   'Apstrādā...': 'Обработка...',
   'Iesniegt jaunu pieteikumu': 'Отправить новую заявку',
+  'Doties uz sākumu': 'Перейти на главную',
   
   // Step 1 - Contact Information
   'Kontaktinformācija': 'Контактная информация',
