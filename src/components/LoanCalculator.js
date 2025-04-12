@@ -30,7 +30,6 @@ const combinedStyles = `
     .loan-calculator input[type=tel]:focus,
     .loan-calculator input[type=text]:focus {
         border-color: #ffc600 !important;
-        box-shadow: 0 0 0 1px #ffc600 !important;
     }
     
     /* Preserve specific Tailwind styles */
