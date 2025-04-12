@@ -420,7 +420,7 @@ const LoanCalculator = () => {
     };
 
     if (isLoading) {
-        return <div className="p-4 text-center">Loading calculator...</div>;
+        return <div className="p-4 text-center"></div>;
     }
 
     return (
