@@ -123,6 +123,7 @@ const LoanCalculator = () => {
 
     // State declarations
     const [kredits, setKredits] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [amount, setAmount] = useState(20000); // Starting amount, now with min 5000 and step 100
     const [term, setTerm] = useState(48);
     const [monthlyPayment, setMonthlyPayment] = useState(92.49);
@@ -418,7 +419,9 @@ const LoanCalculator = () => {
         return <div className="kredit-icon-placeholder" />;
     };
 
-   
+    if (isLoading) {
+        return <div className="p-4 text-center">Loading calculator...</div>;
+    }
 
     return (
         <div className="loan-calculator bg-white/90 backdrop-blur-md rounded-lg border border-white/20 p-6 max-w-full mx-auto">
