@@ -210,7 +210,7 @@ function loan_calculator_shortcode($atts = []) {
     ?>
     <div id="loan-calculator-root">
         <div class="loading-container" style="padding: 20px; text-align: center;">
-            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 0, 0, 0.1); border-radius: 50%; border-top-color: #3498db; animation: spin 1s ease-in-out infinite;"></div>
+            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 0, 0, 0.1); border-radius: 50%; border-top-color: #FFC600; animation: spin 1s ease-in-out infinite;"></div>
         </div>
     </div>
     <style>
@@ -228,7 +228,7 @@ function full_calculator_shortcode() {
     ?>
     <div id="full-calculator-root">
         <div class="loading-container" style="padding: 20px; text-align: center;">
-            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 0, 0, 0.1); border-radius: 50%; border-top-color: #3498db; animation: spin 1s ease-in-out infinite;"></div>
+            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 0, 0, 0.1); border-radius: 50%; border-top-color: #FFC600; animation: spin 1s ease-in-out infinite;"></div>
         </div>
     </div>
     <?php
