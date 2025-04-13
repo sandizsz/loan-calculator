@@ -855,8 +855,8 @@ const FullCalculator = () => {
                   type="text"
                   className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                   aria-invalid={errors.contactName ? 'true' : 'false'}
-                  placeholder={translate('Ievadiet kontaktpersonas vārdu un uzvārdu') || 'Введите имя и фамилию контактного лица'}
-                  {...register('contactName', { required: 'Šis lauks ir obligāts' })}
+                  placeholder={translate('Ievadiet savu vārdu un uzvārdu') || 'Введите имя и фамилию '}
+                  {...register('contactName', { required: translate('Šis lauks ir obligāts') })}
                 />
               </FormField>
 

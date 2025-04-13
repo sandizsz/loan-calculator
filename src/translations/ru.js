@@ -137,6 +137,9 @@ export const ruTranslations = {
   'Ievadiet termiņu mēnešos': 'Введите срок в месяцах',
   'Ievadiet summu': 'Введите сумму',
   'Lūdzu, sniedziet detalizētu informāciju par piedāvāto nodrošinājumu': 'Пожалуйста, предоставьте подробную информацию о предлагаемом обеспечении',
+  'Ievadiet uzņēmuma nosaukumu': 'Введите название компании',
+  'Ievadiet reģistrācijas numuru': 'Введите регистрационный номер',
+  'Ievadiet savu vārdu un uzvārdu': 'Введите имя и фамилию',
   
   // Step 2 - Success message
   'Paldies par pieteikumu!': 'Спасибо за заявку!',
