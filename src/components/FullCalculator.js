@@ -454,6 +454,14 @@ const FullCalculator = () => {
         box-sizing: border-box !important;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
         transition: all 0.2s ease-in-out !important;
+        position: relative !important;
+      }
+      
+      .loan-form-select-trigger [data-icon] {
+        position: absolute !important;
+        right: 1rem !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
       }
 
       .loan-form-select-trigger:hover {
@@ -959,7 +967,7 @@ const FullCalculator = () => {
                     {...register('companyAge', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties uzņēmuma vecumu')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1009,7 +1017,7 @@ const FullCalculator = () => {
                     {...register('annualTurnover', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties apgrozījumu')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1058,7 +1066,7 @@ const FullCalculator = () => {
                     {...register('profitLossStatus', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1106,7 +1114,7 @@ const FullCalculator = () => {
                     {...register('companyPosition', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties pozīciju')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1247,7 +1255,7 @@ const FullCalculator = () => {
                     {...register('loanPurpose', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties mērķi')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1297,7 +1305,7 @@ const FullCalculator = () => {
                     {...register('financialProduct', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties produktu')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1372,7 +1380,7 @@ const FullCalculator = () => {
                     {...register('taxDebtStatus', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties statusu')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
@@ -1487,7 +1495,7 @@ const FullCalculator = () => {
                     {...register('collateralType', { required: translate('Šis lauks ir obligāts') })}
                   >
                     <Select.Value placeholder={translate('Izvēlieties nodrošinājuma veidu')} className="text-gray-400" />
-                    <Select.Icon>
+                    <Select.Icon data-icon="true">
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
                   </Select.Trigger>
