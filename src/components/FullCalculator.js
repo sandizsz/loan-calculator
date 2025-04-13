@@ -855,6 +855,7 @@ const FullCalculator = () => {
                   type="text"
                   className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                   aria-invalid={errors.contactName ? 'true' : 'false'}
+                  placeholder={translate('Ievadiet kontaktpersonas vārdu un uzvārdu') || 'Введите имя и фамилию контактного лица'}
                   {...register('contactName', { required: 'Šis lauks ir obligāts' })}
                 />
               </FormField>
@@ -868,7 +869,7 @@ const FullCalculator = () => {
                   type="tel"
                   className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                   maxLength="8"
-                  placeholder="12345678"
+                  placeholder="22154678"
                   aria-invalid={errors.phone ? 'true' : 'false'}
                   {...register('phone', {
                     required: translate('Šis lauks ir obligāts'),
@@ -889,7 +890,7 @@ const FullCalculator = () => {
               <input
                 type="email"
                 className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
-                placeholder="example@domain.com"
+                placeholder="epasts@gmail.com"
                 aria-invalid={errors.email ? 'true' : 'false'}
                 {...register('email', {
                   required: translate('Šis lauks ir obligāts'),
@@ -924,6 +925,7 @@ const FullCalculator = () => {
                 type="text"
                 className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 aria-invalid={errors.companyName ? 'true' : 'false'}
+                placeholder={translate('Ievadiet uzņēmuma nosaukumu') || 'Введите название компании'}
                 {...register('companyName', { required: translate('Šis lauks ir obligāts') })}
               />
             </FormField>
@@ -937,6 +939,7 @@ const FullCalculator = () => {
                 type="text"
                 className="loan-form-input w-full text-base md:text-lg rounded-lg border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
                 aria-invalid={errors.regNumber ? 'true' : 'false'}
+                placeholder={translate('Ievadiet reģistrācijas numuru') || 'Введите регистрационный номер'}
                 {...register('regNumber', { required: translate('Šis lauks ir obligāts') })}
               />
             </FormField>
@@ -1053,7 +1056,7 @@ const FullCalculator = () => {
                     aria-invalid={errors.profitLossStatus ? 'true' : 'false'}
                     {...register('profitLossStatus', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder="Izvēlieties statusu" className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties statusu') || 'Выберите статус'} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
@@ -1262,7 +1265,7 @@ const FullCalculator = () => {
                         <SelectItem value="cits">{translate('Cits mērķis')}</SelectItem>
                       </Select.Viewport>
                       
-                   
+                  
                     </Select.Content>
                   </Select.Portal>
                 </Select.Root>
@@ -1359,7 +1362,7 @@ const FullCalculator = () => {
                     aria-invalid={errors.taxDebtStatus ? 'true' : 'false'}
                     {...register('taxDebtStatus', { required: translate('Šis lauks ir obligāts') })}
                   >
-                    <Select.Value placeholder={translate('Izvēlieties statusu')} className="text-gray-400" />
+                    <Select.Value placeholder={translate('Izvēlieties statusu') || 'Выберите статус'} className="text-gray-400" />
                     <Select.Icon>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Icon>
