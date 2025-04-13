@@ -1610,19 +1610,21 @@ const FullCalculator = () => {
               label={translate('Piekrītu personas datu apstrādei')}
               required
             >
-              <div className="flex items-center">
-                <Checkbox.Root 
-                  className="loan-form-checkbox-root"
-                  id="gdprConsent"
-                  checked={watch('gdprConsent')}
-                  onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
-                  {...register('gdprConsent', { required: translate('Šis lauks ir obligāts') })}
-                >
-                  <Checkbox.Indicator className="loan-form-checkbox-indicator">
-                    <Check className="w-4 h-4" />
-                  </Checkbox.Indicator>
-                </Checkbox.Root>
-                <label className="pl-2 text-sm text-gray-600">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <Checkbox.Root 
+                    className="loan-form-checkbox-root"
+                    id="gdprConsent"
+                    checked={watch('gdprConsent')}
+                    onCheckedChange={(checked) => setValue('gdprConsent', checked, { shouldValidate: true, shouldDirty: true })}
+                    {...register('gdprConsent', { required: translate('Šis lauks ir obligāts') })}
+                  >
+                    <Checkbox.Indicator className="loan-form-checkbox-indicator">
+                      <Check className="w-4 h-4" />
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+                </div>
+                <label className="pl-3 text-sm text-gray-600">
                   {translate('Piekrītu, ka mani personas dati tiks apstrādāti saskaņā ar SIA Findexo')} <a href={translate('https://findexo.lv/datu-apstrades-noteikumi/')} target="_blank" rel="noopener noreferrer" className=" hover:underline">{translate('datu apstrādes noteikumiem')}</a>.
                 </label>
               </div>
@@ -1633,9 +1635,16 @@ const FullCalculator = () => {
     </div>
   );
 
+  // Scroll to top when success message is shown
+  useEffect(() => {
+    if (isSuccess) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [isSuccess]);
+
   if (isSuccess) {
     return (
-      <div className="loan-form-container bg-white rounded-2xl shadow-xl border border-gray-100">
+      <div className="loan-form-container bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
         <div className="text-center py-12">
           <div className="mb-6 bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto">
             <svg className="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
