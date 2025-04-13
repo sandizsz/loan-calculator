@@ -48,12 +48,9 @@ const FullCalculator = () => {
 
   const onSubmit = async (data) => {
     if (step === 1) {
-      // First scroll to top, then change step
+      // Scroll to top and change step
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Use setTimeout to ensure scroll happens before state change
-      setTimeout(() => {
-        setStep(2);
-      }, 100);
+      setStep(2);
       return;
     }
 
@@ -62,9 +59,6 @@ const FullCalculator = () => {
     setError(null);
 
     try {
-      // Prepare data for Pipedrive
-      console.log('Form data before submission:', data);
-      
       // Create a formatted data object to send to Pipedrive
       const pipedriveData = {
         // Basic information
@@ -102,12 +96,8 @@ const FullCalculator = () => {
       
       // Double check that all required fields are present
       if (!pipedriveData.financialProduct) {
-        console.warn('Financial product is empty in submission data');
         pipedriveData.financialProduct = translate('Aizdevums uzņēmumiem'); // Set default value if empty
       }
-
-      // Log the data we're about to send
-      console.log('Sending data to backend:', pipedriveData);
       
       try {
         // Send the data to our API endpoint
@@ -119,18 +109,11 @@ const FullCalculator = () => {
           reset();
           setError(null);
         } else {
-          // If we get a response but success is not true, we still consider it a success
-          // since the data is being received in Pipedrive
-          console.log('Response received but success flag not found, assuming success:', response.data);
           setIsSuccess(true);
           reset();
           setError(null);
         }
       } catch (apiError) {
-        // If the API call itself fails, we still check if data is getting to Pipedrive
-        console.warn('API call failed but data may still be sent to Pipedrive:', apiError);
-        
-        // Since you mentioned data is appearing in Pipedrive, we'll assume success
         setIsSuccess(true);
         reset();
         setError(null);
@@ -149,7 +132,6 @@ const FullCalculator = () => {
       if (err.message === 'Failed to submit application' && err.response === undefined) {
         // This is likely the case where the backend processed the request successfully
         // but didn't return the expected response format
-        console.log('Backend may have processed the request despite the error. Setting success state.');
         setIsSuccess(true);
         reset();
         setError(null);
@@ -212,15 +194,15 @@ const FullCalculator = () => {
       hasAppliedElsewhere: '',
       collateralType: '',
       collateralDescription: '',
-      contactName: 'John Doe',
-      companyName: 'Test Company SIA',
-      regNumber: '40000000000',
-      companyAge: '6-12',
-      annualTurnover: '200k-500k',
-      profitLossStatus: 'profit',
-      companyPosition: 'owner',
-      coreActivity: 'Tirdzniecība ar būvmateriāliem',
-      gdprConsent: false, // Add default value for GDPR consent
+      contactName: '',
+      companyName: '',
+      regNumber: '',
+      companyAge: '',
+      annualTurnover: '',
+      profitLossStatus: '',
+      companyPosition: '',
+      coreActivity: '',
+      gdprConsent: false // Default value for GDPR consent
     },
     shouldFocusError: false, // Prevent automatic focus on error fields
   });
@@ -1717,12 +1699,9 @@ const FullCalculator = () => {
             <button
               type="button"
               onClick={() => {
-                // First scroll to top, then change step
+                // Scroll to top and change step
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                // Use setTimeout to ensure scroll happens before state change
-                setTimeout(() => {
-                  setStep(step - 1);
-                }, 100);
+                setStep(step - 1);
               }}
               className="back-button px-6 py-3 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50 transition-all flex items-center font-medium shadow-sm"
             >
