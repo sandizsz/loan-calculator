@@ -69,29 +69,38 @@ const ConsumerLoanCalculator = () => {
       ? 'https://prelive.accountscoring.com/static/asc-embed-v2.js'
       : 'https://accountscoring.com/static/asc-embed-v2.js';
     script.async = true;
+    
+    // Create a container div for AccountScoring if it doesn't exist
+    let ascContainer = document.getElementById('asc-container');
+    if (!ascContainer) {
+      ascContainer = document.createElement('div');
+      ascContainer.id = 'asc-container';
+      document.body.appendChild(ascContainer);
+    }
+    
+    // Create button for modal version and add it to the container
+    let modalButton = document.getElementById('ascModal');
+    if (!modalButton) {
+      modalButton = document.createElement('button');
+      modalButton.id = 'ascModal';
+      modalButton.textContent = 'Savienot ar banku';
+      modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
+      modalButton.style.display = 'none';
+      ascContainer.appendChild(modalButton);
+    }
+    
+    // Add the script after container and button are in the DOM
     document.body.appendChild(script);
     
     console.log(`Loading AccountScoring script from: ${script.src} (Dev mode: ${isDev ? 'Yes' : 'No'})`);
-    
-    // Create button for modal version
-    if (!document.getElementById('ascModal')) {
-      const modalButton = document.createElement('button');
-      modalButton.id = 'ascModal';
-      modalButton.textContent = 'Savienot banku';
-      modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
-      // We'll add it to the bank connection section later
-      modalButton.style.display = 'none';
-      document.body.appendChild(modalButton);
-    }
     
     return () => {
       // Clean up
       if (document.body.contains(script)) {
         document.body.removeChild(script);
       }
-      const modalButton = document.getElementById('ascModal');
-      if (modalButton && document.body.contains(modalButton)) {
-        document.body.removeChild(modalButton);
+      if (ascContainer && document.body.contains(ascContainer)) {
+        document.body.removeChild(ascContainer);
       }
     };
   }, []);
@@ -106,6 +115,7 @@ const ConsumerLoanCalculator = () => {
     
     // Check client ID
     const clientId = window.loanCalculatorData?.accountScoringClientId || '';
+    console.log('AccountScoring Client ID:', clientId);
     if (!clientId) {
       console.error('No AccountScoring client ID provided');
       setError('Kļūda: Nav norādīts AccountScoring klienta ID. Lūdzu, sazinieties ar administratoru.');
@@ -113,24 +123,40 @@ const ConsumerLoanCalculator = () => {
     }
     
     // Following the exact format from the AccountScoring documentation
-    setTimeout(function() {
+    const initializeASC = function() {
       if (window.ASCEMBED) {
         console.log('Initializing AccountScoring modal with:');
         console.log('- invitation_id:', invitationId);
         console.log('- client_id:', clientId);
         console.log('- locale: lv_LV');
         
-        // Create or get the modal button
+        // Get the container and button
+        const ascContainer = document.getElementById('asc-container');
         let modalButton = document.getElementById('ascModal');
-        if (!modalButton) {
-          modalButton = document.createElement('button');
-          modalButton.id = 'ascModal';
-          modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
-          document.body.appendChild(modalButton);
+        
+        if (!modalButton || !ascContainer) {
+          console.error('AccountScoring container or button not found');
+          setError('Kļūda: Nevar atrast AccountScoring pogu. Lūdzu, atsvaidziniet lapu.');
+          return;
         }
         
+        // Make sure the button is visible
         modalButton.style.display = 'block';
         modalButton.textContent = 'Savienot ar banku';
+        
+        // Move the button to the bank connection section if it exists
+        const bankConnectionSection = document.getElementById('bank-connection-section');
+        if (bankConnectionSection) {
+          // First check if the button is already a child of the section
+          if (!bankConnectionSection.contains(modalButton)) {
+            // Remove from current parent
+            if (modalButton.parentNode) {
+              modalButton.parentNode.removeChild(modalButton);
+            }
+            // Add to the bank connection section
+            bankConnectionSection.appendChild(modalButton);
+          }
+        }
         
         // Initialize the modal as per documentation
         try {
@@ -159,11 +185,8 @@ const ConsumerLoanCalculator = () => {
           console.log('AccountScoring config:', config);
           window.ASCEMBED.initialize(config);
           
-          // Trigger the modal by clicking the button
-          setTimeout(() => {
-            console.log('Clicking modal button');
-            modalButton.click();
-          }, 500);
+          // Don't automatically click the button, let the user do it
+          console.log('Modal button is ready for user interaction');
         } catch (error) {
           console.error('Error initializing AccountScoring:', error);
           setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
@@ -172,7 +195,29 @@ const ConsumerLoanCalculator = () => {
         console.error("ASCEMBED not loaded");
         setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
       }
-    }, 1500); // Increased timeout to ensure script is loaded
+    };
+    
+    // Check if ASCEMBED is already loaded
+    if (window.ASCEMBED) {
+      initializeASC();
+    } else {
+      // Wait for the script to load
+      const checkScriptLoaded = setInterval(() => {
+        if (window.ASCEMBED) {
+          clearInterval(checkScriptLoaded);
+          initializeASC();
+        }
+      }, 300);
+      
+      // Set a timeout to stop checking after 5 seconds
+      setTimeout(() => {
+        clearInterval(checkScriptLoaded);
+        if (!window.ASCEMBED) {
+          console.error("ASCEMBED failed to load after timeout");
+          setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
+        }
+      }, 5000);
+    }
   }, [setStep, setIsBankConnected, setError]);
 
   // Watch form values for calculations
@@ -195,6 +240,38 @@ const ConsumerLoanCalculator = () => {
     setError(null);
     
     if (step === 1) {
+      // Create bank connection section if it doesn't exist
+      let bankConnectionSection = document.getElementById('bank-connection-section');
+      if (!bankConnectionSection) {
+        bankConnectionSection = document.createElement('div');
+        bankConnectionSection.id = 'bank-connection-section';
+        bankConnectionSection.className = 'mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100';
+        
+        const title = document.createElement('h3');
+        title.className = 'text-lg font-medium text-blue-800 mb-3';
+        title.textContent = 'Savienojiet savu bankas kontu';
+        
+        const description = document.createElement('p');
+        description.className = 'text-sm text-blue-700 mb-4';
+        description.textContent = 'Lai turpinātu pieteikumu, lūdzu, savienojiet savu bankas kontu, izmantojot drošo AccountScoring pakalpojumu.';
+        
+        bankConnectionSection.appendChild(title);
+        bankConnectionSection.appendChild(description);
+        
+        // Add the section to the form
+        const form = document.querySelector('form');
+        if (form) {
+          const submitButton = form.querySelector('button[type="submit"]');
+          if (submitButton) {
+            form.insertBefore(bankConnectionSection, submitButton.parentNode);
+          } else {
+            form.appendChild(bankConnectionSection);
+          }
+        } else {
+          // Fallback - add to the body
+          document.body.appendChild(bankConnectionSection);
+        }
+      }
       
       try {
         // Create invitation in AccountScoring
@@ -216,16 +293,9 @@ const ConsumerLoanCalculator = () => {
           console.log('Received invitation ID:', response.data.invitation_id);
           initializeAccountScoring(response.data.invitation_id);
           
-          // Move the modal button to our form section for better visibility
-          const modalButton = document.getElementById('ascModal');
-          const bankConnectionSection = document.getElementById('bank-connection-section');
-          if (modalButton && bankConnectionSection) {
-            // First remove the button if it's already in the DOM elsewhere
-            if (modalButton.parentNode) {
-              modalButton.parentNode.removeChild(modalButton);
-            }
-            // Add it to our form section
-            bankConnectionSection.appendChild(modalButton);
+          // Make sure the bank connection section is visible
+          if (bankConnectionSection) {
+            bankConnectionSection.style.display = 'block';
           }
         } else {
           setError('Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');

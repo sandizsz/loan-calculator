@@ -98,7 +98,7 @@ function create_accountscoring_invitation($request) {
         // Required fields from the documentation
         'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
         'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-        'language' => 'lv', // Latvian language code
+        'locale' => 'lv_LV', // Latvian locale as specified in documentation
         'send_email' => false, // We'll handle the flow in our app
     );
     
