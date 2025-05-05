@@ -72,36 +72,100 @@ function create_accountscoring_invitation($request) {
     ), true));
     
     // Make API request to AccountScoring
-    // Based on the modal documentation for the invitation endpoint
-    $api_url = 'https://accountscoring.com/api/v3/invitation';
+    // Try the API endpoint format from the documentation
+    // Check if we're in test mode
+    $is_test_mode = defined('WP_DEBUG') && WP_DEBUG;
+    $api_url = $is_test_mode ? 'https://prelive.accountscoring.com/api/v3/invitation' : 'https://accountscoring.com/api/v3/invitation';
     
+    error_log('Using API URL: ' . $api_url . ' (Test mode: ' . ($is_test_mode ? 'Yes' : 'No') . ')');
+    
+    // Format phone number to international format if needed
+    $phone = sanitize_text_field($params['phone']);
+    if (substr($phone, 0, 1) !== '+') {
+        // Add Latvian country code if not present
+        $phone = '+371' . preg_replace('/[^0-9]/', '', $phone);
+    }
+    
+    // Prepare request body according to AccountScoring documentation
     $request_body = array(
         'email' => sanitize_email($params['email']),
-        'phone' => sanitize_text_field($params['phone']),
-        // Using the field names as specified in the AccountScoring API documentation
+        'phone' => $phone,
         'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
         'personal_id' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
         'amount' => isset($params['loanAmount']) ? floatval($params['loanAmount']) : 0,
         'term' => isset($params['loanTerm']) ? intval($params['loanTerm']) : 0,
         'locale' => 'lv_LV', // Latvian locale
-        'client_id' => $client_id, // Add client_id to the request body
+        'client_id' => $client_id, // Client ID from settings
         'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
         'postback_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback')
     );
+    
+    // Try alternative field names if needed
+    if (isset($params['monthlyIncome']) && !empty($params['monthlyIncome'])) {
+        $request_body['monthly_income'] = floatval($params['monthlyIncome']);
+    }
     
     // Log the full request for debugging
     error_log('AccountScoring API request URL: ' . $api_url);
     error_log('AccountScoring API request body: ' . json_encode($request_body));
     
-    $response = wp_remote_post($api_url, array(
-        'headers' => array(
-            'Authorization' => 'Bearer ' . $api_key,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json'
-        ),
-        'body' => json_encode($request_body),
-        'timeout' => 30 // Increase timeout to 30 seconds
-    ));
+    // Try different authorization formats based on AccountScoring documentation
+    $auth_attempts = [
+        // Attempt 1: API Key in header
+        function($url, $body, $key) {
+            return wp_remote_post($url, [
+                'headers' => [
+                    'X-Api-Key' => $key,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ],
+                'body' => json_encode($body),
+                'timeout' => 30
+            ]);
+        },
+        // Attempt 2: Bearer token
+        function($url, $body, $key) {
+            return wp_remote_post($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $key,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ],
+                'body' => json_encode($body),
+                'timeout' => 30
+            ]);
+        },
+        // Attempt 3: API Key in URL
+        function($url, $body, $key) {
+            $url_with_key = add_query_arg(['api_key' => $key], $url);
+            return wp_remote_post($url_with_key, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ],
+                'body' => json_encode($body),
+                'timeout' => 30
+            ]);
+        },
+    ];
+    
+    $response = null;
+    $success = false;
+    
+    // Try each authentication method until one works
+    foreach ($auth_attempts as $index => $attempt_func) {
+        error_log("Trying authentication method {$index}");
+        $response = $attempt_func($api_url, $request_body, $api_key);
+        
+        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) !== 401) {
+            $success = true;
+            error_log("Authentication method {$index} succeeded");
+            break;
+        }
+        
+        error_log("Authentication method {$index} failed with status: " . 
+                 (is_wp_error($response) ? $response->get_error_message() : wp_remote_retrieve_response_code($response)));
+    }
     
     if (is_wp_error($response)) {
         return new WP_Error('api_error', $response->get_error_message(), array('status' => 500));

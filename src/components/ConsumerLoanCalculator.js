@@ -59,12 +59,19 @@ const ConsumerLoanCalculator = () => {
       existingScript.remove();
     }
     
-    // Add the script as per documentation
+    // Check if we're in development mode
+    const isDev = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
+    
+    // Add the script as per documentation - use prelive for development
     const script = document.createElement('script');
     script.id = 'accountscoring-script';
-    script.src = 'https://accountscoring.com/static/asc-embed-v2.js';
+    script.src = isDev 
+      ? 'https://prelive.accountscoring.com/static/asc-embed-v2.js'
+      : 'https://accountscoring.com/static/asc-embed-v2.js';
     script.async = true;
     document.body.appendChild(script);
+    
+    console.log(`Loading AccountScoring script from: ${script.src} (Dev mode: ${isDev ? 'Yes' : 'No'})`);
     
     // Create button for modal version
     if (!document.getElementById('ascModal')) {
@@ -91,47 +98,82 @@ const ConsumerLoanCalculator = () => {
 
   // Initialize AccountScoring modal
   const initializeAccountScoring = useCallback((invitationId) => {
-    if (!invitationId) return;
+    if (!invitationId) {
+      console.error('No invitation ID provided');
+      setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
+      return;
+    }
+    
+    // Check client ID
+    const clientId = window.loanCalculatorData?.accountScoringClientId || '';
+    if (!clientId) {
+      console.error('No AccountScoring client ID provided');
+      setError('Kļūda: Nav norādīts AccountScoring klienta ID. Lūdzu, sazinieties ar administratoru.');
+      return;
+    }
     
     // Following the exact format from the AccountScoring documentation
     setTimeout(function() {
       if (window.ASCEMBED) {
-        console.log('Initializing AccountScoring modal with invitation_id:', invitationId);
+        console.log('Initializing AccountScoring modal with:');
+        console.log('- invitation_id:', invitationId);
+        console.log('- client_id:', clientId);
+        console.log('- locale: lv_LV');
         
-        // Make sure the button is visible
-        const modalButton = document.getElementById('ascModal');
-        if (modalButton) {
-          modalButton.style.display = 'block';
+        // Create or get the modal button
+        let modalButton = document.getElementById('ascModal');
+        if (!modalButton) {
+          modalButton = document.createElement('button');
+          modalButton.id = 'ascModal';
+          modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
+          document.body.appendChild(modalButton);
         }
         
-        // Initialize the modal as per documentation
-        window.ASCEMBED.initialize({
-          btn_id: 'ascModal', // Use the button ID for modal version
-          invitation_id: invitationId,
-          client_id: window.loanCalculatorData?.accountScoringClientId || '', // From WordPress settings
-          locale: 'lv_LV', // Latvian locale as requested
-          is_modal: true, // Modal version only
-          onConfirmAllDone: function(status) {
-            console.log("Bank connection completed", status);
-            setIsBankConnected(true);
-            // Move to next step after bank connection
-            setStep(2);
-          },
-          onClose: function() {
-            console.log("Modal closed");
-          },
-        });
+        modalButton.style.display = 'block';
+        modalButton.textContent = 'Savienot ar banku';
         
-        // Trigger the modal by clicking the button
-        if (modalButton) {
-          modalButton.click();
+        // Initialize the modal as per documentation
+        try {
+          // Clear any previous initialization
+          if (window.ASCEMBED.clear) {
+            window.ASCEMBED.clear();
+          }
+          
+          const config = {
+            btn_id: 'ascModal', // Use the button ID for modal version
+            invitation_id: invitationId,
+            client_id: clientId, 
+            locale: 'lv_LV', // Latvian locale as requested
+            is_modal: true, // Modal version only
+            onConfirmAllDone: function(status) {
+              console.log("Bank connection completed", status);
+              setIsBankConnected(true);
+              // Move to next step after bank connection
+              setStep(2);
+            },
+            onClose: function() {
+              console.log("Modal closed");
+            },
+          };
+          
+          console.log('AccountScoring config:', config);
+          window.ASCEMBED.initialize(config);
+          
+          // Trigger the modal by clicking the button
+          setTimeout(() => {
+            console.log('Clicking modal button');
+            modalButton.click();
+          }, 500);
+        } catch (error) {
+          console.error('Error initializing AccountScoring:', error);
+          setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
         }
       } else {
         console.error("ASCEMBED not loaded");
-        setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, mēģiniet vēlreiz.');
+        setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
       }
-    }, 500); // Increased timeout to ensure script is loaded
-  }, [setStep, setIsBankConnected]);
+    }, 1500); // Increased timeout to ensure script is loaded
+  }, [setStep, setIsBankConnected, setError]);
 
   // Watch form values for calculations
   const loanAmount = watch('loanAmount');
