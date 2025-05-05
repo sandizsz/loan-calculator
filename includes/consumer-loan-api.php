@@ -76,11 +76,13 @@ function create_accountscoring_invitation($request) {
     // Check if we're in test mode
     $is_test_mode = defined('WP_DEBUG') && WP_DEBUG;
     
-    // Try both v2 and v3 endpoints - v2 might be required for some accounts
-    $api_version = 'v2'; // Start with v2 as default
+    // Use the exact endpoint from the documentation
     $api_url = $is_test_mode 
-        ? "https://prelive.accountscoring.com/api/{$api_version}/invitation" 
-        : "https://accountscoring.com/api/{$api_version}/invitation";
+        ? 'https://prelive.accountscoring.com/api/v3/invitation' 
+        : 'https://accountscoring.com/api/v3/invitation';
+        
+    // Log which endpoint we're using
+    error_log("Using API endpoint from documentation: {$api_url}");
     
     error_log('Using API URL: ' . $api_url . ' (Test mode: ' . ($is_test_mode ? 'Yes' : 'No') . ')');
     
@@ -91,22 +93,46 @@ function create_accountscoring_invitation($request) {
         $phone = '+371' . preg_replace('/[^0-9]/', '', $phone);
     }
     
-    // Prepare request body according to AccountScoring documentation
-    // Based on the exact API specification from AccountScoring
+    // Prepare request body according to the exact AccountScoring API documentation
     $request_body = array(
-        // Required fields
-        'client_id' => $client_id,
-        'email' => sanitize_email($params['email']),
-        'phone' => $phone,
+        // Required fields from the documentation
         'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
-        'locale' => 'lv_LV', // Latvian locale
+        'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
+        'language' => 'lv', // Latvian language code
+        'send_email' => false, // We'll handle the flow in our app
     );
     
-    // Optional fields - only add if they have values
-    if (!empty($params['personalCode'])) {
-        $request_body['personal_id'] = sanitize_text_field($params['personalCode']);
+    // Add email (required if send_email is true)
+    if (!empty($params['email'])) {
+        $request_body['email'] = sanitize_email($params['email']);
     }
     
+    // Add phone (not required by API but useful for our records)
+    if (!empty($phone)) {
+        $request_body['phone'] = $phone;
+    }
+    
+    // Add client_id (may be required for authentication)
+    $request_body['client_id'] = $client_id;
+    
+    // Add redirect and webhook URLs
+    $request_body['redirect_url'] = home_url('/pateriņa-kredīts/paldies/');
+    $request_body['webhook_url'] = home_url('/wp-json/loan-calculator/v1/accountscoring-callback');
+    
+    // Optional: Add transaction days (default is usually 90)
+    $request_body['transaction_days'] = 90;
+    
+    // Optional: Add allowed banks for Latvia (LV)
+    $request_body['allowed_banks'] = array(
+        'HABALV22', // Swedbank
+        'UNLALV2X', // SEB
+        'PARXLV22', // Citadele
+        'NDEALV2X', // Luminor
+        'REVOGB21XXX', // Revolut
+        'N26' // N26
+    );
+    
+    // Add loan-specific data as custom fields
     if (isset($params['loanAmount']) && $params['loanAmount'] > 0) {
         $request_body['amount'] = floatval($params['loanAmount']);
     }
@@ -119,71 +145,22 @@ function create_accountscoring_invitation($request) {
         $request_body['monthly_income'] = floatval($params['monthlyIncome']);
     }
     
-    // Add callback URLs
-    $request_body['redirect_url'] = home_url('/pateriņa-kredīts/paldies/');
-    $request_body['postback_url'] = home_url('/wp-json/loan-calculator/v1/accountscoring-callback');
-    
     // Log the full request for debugging
     error_log('AccountScoring API request URL: ' . $api_url);
     error_log('AccountScoring API request body: ' . json_encode($request_body));
     
-    // Try different authorization formats based on AccountScoring documentation
-    $auth_attempts = [
-        // Attempt 1: API Key in header
-        function($url, $body, $key) {
-            return wp_remote_post($url, [
-                'headers' => [
-                    'X-Api-Key' => $key,
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ],
-                'body' => json_encode($body),
-                'timeout' => 30
-            ]);
-        },
-        // Attempt 2: Bearer token
-        function($url, $body, $key) {
-            return wp_remote_post($url, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $key,
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ],
-                'body' => json_encode($body),
-                'timeout' => 30
-            ]);
-        },
-        // Attempt 3: API Key in URL
-        function($url, $body, $key) {
-            $url_with_key = add_query_arg(['api_key' => $key], $url);
-            return wp_remote_post($url_with_key, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ],
-                'body' => json_encode($body),
-                'timeout' => 30
-            ]);
-        },
-    ];
+    // Use Bearer token authentication as specified in the documentation
+    error_log("Using Bearer token authentication with API key: " . substr($api_key, 0, 4) . '...');
     
-    $response = null;
-    $success = false;
-    
-    // Try each authentication method until one works
-    foreach ($auth_attempts as $index => $attempt_func) {
-        error_log("Trying authentication method {$index}");
-        $response = $attempt_func($api_url, $request_body, $api_key);
-        
-        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) !== 401) {
-            $success = true;
-            error_log("Authentication method {$index} succeeded");
-            break;
-        }
-        
-        error_log("Authentication method {$index} failed with status: " . 
-                 (is_wp_error($response) ? $response->get_error_message() : wp_remote_retrieve_response_code($response)));
-    }
+    $response = wp_remote_post($api_url, [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $api_key,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ],
+        'body' => json_encode($request_body),
+        'timeout' => 30
+    ]);
     
     if (is_wp_error($response)) {
         return new WP_Error('api_error', $response->get_error_message(), array('status' => 500));

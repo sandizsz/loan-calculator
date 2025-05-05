@@ -212,10 +212,8 @@ const ConsumerLoanCalculator = () => {
           // Store the invitation ID
           setInvitationId(response.data.invitation_id);
           
-          // Initialize and open AccountScoring modal
-          initializeAccountScoring(response.data.invitation_id);
-          
-          // Initialize AccountScoring modal with the invitation ID
+          // Initialize and open AccountScoring modal with the invitation ID
+          console.log('Received invitation ID:', response.data.invitation_id);
           initializeAccountScoring(response.data.invitation_id);
           
           // Move the modal button to our form section for better visibility
