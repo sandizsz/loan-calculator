@@ -4,7 +4,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: {
     main: './src/index.js',
-    fullCalculator: './src/full-calculator.js'
+    fullCalculator: './src/full-calculator.js',
+    consumerLoan: './src/consumer-loan.js'
   },
   output: {
     path: path.resolve(__dirname, 'build'),

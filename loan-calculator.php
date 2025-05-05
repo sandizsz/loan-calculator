@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 
 // Include API functions
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
+require_once plugin_dir_path(__FILE__) . 'includes/consumer-loan-api.php';
 
 require_once(plugin_dir_path(__FILE__) . 'pipedrive-admin.php');
 
@@ -80,6 +81,15 @@ function loan_calculator_enqueue_scripts() {
         filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.js'),
         true
     );
+    
+    // Register consumer loan calculator script
+    wp_register_script(
+        'consumer-loan-calculator', 
+        plugins_url('build/consumerLoan.js', __FILE__),
+        ['react', 'react-dom', 'wp-element', 'wp-components', 'loan-calculator'],
+        filemtime(plugin_dir_path(__FILE__) . 'build/consumerLoan.js'),
+        true
+    );
 
     // Get all kredits posts
     $kredits = get_posts([
@@ -136,10 +146,12 @@ function loan_calculator_enqueue_scripts() {
     global $post;
     $should_load_calculator = false;
     $should_load_full_calculator = false;
+    $should_load_consumer_loan = false;
     
     if ($post && $post->post_content) {
         $should_load_calculator = has_shortcode($post->post_content, 'loan_calculator');
         $should_load_full_calculator = has_shortcode($post->post_content, 'full_calculator');
+        $should_load_consumer_loan = has_shortcode($post->post_content, 'consumer_loan_calculator');
     }
     
     // Also check for shortcodes in widgets
@@ -154,6 +166,9 @@ function loan_calculator_enqueue_scripts() {
                     if (strpos($widget['text'], '[full_calculator]') !== false) {
                         $should_load_full_calculator = true;
                     }
+                    if (strpos($widget['text'], '[consumer_loan_calculator]') !== false) {
+                        $should_load_consumer_loan = true;
+                    }
                 }
             }
         }
@@ -165,6 +180,9 @@ function loan_calculator_enqueue_scripts() {
     }
     if ($should_load_full_calculator) {
         wp_enqueue_script('full-calculator');
+    }
+    if ($should_load_consumer_loan) {
+        wp_enqueue_script('consumer-loan-calculator');
     }
 
     // Enqueue styles
@@ -182,6 +200,16 @@ function loan_calculator_enqueue_scripts() {
             plugins_url('build/fullCalculator.css', __FILE__),
             [],
             filemtime(plugin_dir_path(__FILE__) . 'build/fullCalculator.css')
+        );
+    }
+    
+    // Enqueue consumer loan calculator styles if needed
+    if ($should_load_consumer_loan) {
+        wp_enqueue_style(
+            'consumer-loan-style',
+            plugins_url('build/consumerLoan.css', __FILE__),
+            [],
+            filemtime(plugin_dir_path(__FILE__) . 'build/consumerLoan.css')
         );
     }
 
@@ -209,7 +237,12 @@ function loan_calculator_shortcode($atts = []) {
         noRedirect: {$atts['no_redirect']},
         consumerLoan: {$atts['consumer_loan']},
         redirectUrl: '{$atts['redirect_url']}'
-    };</script>";
+    };
+    
+    // Add AccountScoring client ID if available
+    window.loanCalculatorData = window.loanCalculatorData || {};
+    window.loanCalculatorData.accountScoringClientId = '" . get_option('loan_calculator_accountscoring_client_id', '') . "';
+    </script>";
     
     ob_start();
     echo $script;
@@ -241,3 +274,60 @@ function full_calculator_shortcode() {
     return ob_get_clean();
 }
 add_shortcode('full_calculator', 'full_calculator_shortcode');
+
+function consumer_loan_calculator_shortcode() {
+    ob_start();
+    ?>
+    <div id="consumer-loan-calculator-root">
+        <div class="loading-container" style="padding: 20px; text-align: center;">
+            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 0, 0, 0.1); border-radius: 50%; border-top-color: #FFC600; animation: spin 1s ease-in-out infinite;"></div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('consumer_loan_calculator', 'consumer_loan_calculator_shortcode');
+
+// Add settings for AccountScoring API
+function loan_calculator_register_settings() {
+    register_setting('loan_calculator_settings', 'loan_calculator_accountscoring_api_key');
+    register_setting('loan_calculator_settings', 'loan_calculator_accountscoring_client_id');
+}
+add_action('admin_init', 'loan_calculator_register_settings');
+
+// Add settings page
+function loan_calculator_add_settings_page() {
+    add_submenu_page(
+        'options-general.php',
+        'Loan Calculator Settings',
+        'Loan Calculator',
+        'manage_options',
+        'loan-calculator-settings',
+        'loan_calculator_settings_page'
+    );
+}
+add_action('admin_menu', 'loan_calculator_add_settings_page');
+
+// Settings page content
+function loan_calculator_settings_page() {
+    ?>
+    <div class="wrap">
+        <h1>Loan Calculator Settings</h1>
+        <form method="post" action="options.php">
+            <?php settings_fields('loan_calculator_settings'); ?>
+            <?php do_settings_sections('loan_calculator_settings'); ?>
+            <table class="form-table">
+                <tr valign="top">
+                    <th scope="row">AccountScoring API Key</th>
+                    <td><input type="text" name="loan_calculator_accountscoring_api_key" value="<?php echo esc_attr(get_option('loan_calculator_accountscoring_api_key')); ?>" class="regular-text" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">AccountScoring Client ID</th>
+                    <td><input type="text" name="loan_calculator_accountscoring_client_id" value="<?php echo esc_attr(get_option('loan_calculator_accountscoring_client_id')); ?>" class="regular-text" /></td>
+                </tr>
+            </table>
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <?php
+}
