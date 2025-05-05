@@ -100,6 +100,7 @@ function create_accountscoring_invitation($request) {
         'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
         'locale' => 'lv_LV', // Latvian locale as specified in documentation
         'send_email' => false, // We'll handle the flow in our app
+        'type' => 'personal', // Specify this is for a personal/consumer loan, not a business loan
     );
     
     // Add email (required if send_email is true)

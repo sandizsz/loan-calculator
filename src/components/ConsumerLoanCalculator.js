@@ -221,6 +221,8 @@ const ConsumerLoanCalculator = () => {
             client_id: clientId, 
             locale: 'lv_LV', // Latvian locale as requested
             is_modal: true, // Modal version only
+            type: 'personal', // Specify this is for a personal/consumer loan
+            skip_company_selection: true, // Skip company selection for consumer loans
             onConfirmAllDone: function(status) {
               console.log("Bank connection completed", status);
               setIsBankConnected(true);
@@ -236,7 +238,26 @@ const ConsumerLoanCalculator = () => {
           window.ASCEMBED.initialize(config);
           
           // Don't automatically click the button, let the user do it
-          console.log('Modal button is ready for user interaction');
+          // Manually attach a click handler to the button
+          modalButton.onclick = function() {
+            console.log('Modal button clicked, opening AccountScoring modal');
+            try {
+              if (window.ASCEMBED && window.ASCEMBED.open) {
+                window.ASCEMBED.open();
+              } else {
+                console.error('ASCEMBED.open method not found');
+                alert('Kļūda atverot bankas savienojuma logu. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
+              }
+            } catch (error) {
+              console.error('Error opening AccountScoring modal:', error);
+            }
+          };
+          
+          // Automatically trigger the click after a short delay
+          setTimeout(() => {
+            console.log('Auto-triggering modal button click');
+            modalButton.click();
+          }, 1000);
         } catch (error) {
           console.error('Error initializing AccountScoring:', error);
           setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
