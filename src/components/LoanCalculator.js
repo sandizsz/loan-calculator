@@ -400,9 +400,26 @@ const LoanCalculator = () => {
                 // Continue with default fallback
             }
             
+            // Get configuration
+            const config = window.loanCalculatorConfig || {};
+            const isConsumerLoan = config.consumerLoan === 'true' || config.consumerLoan === true;
+            const customRedirectUrl = config.redirectUrl;
+            
             // Clean the URL and redirect
             const cleanBaseUrl = baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
-            const redirectUrl = `${cleanBaseUrl}/forma/?${params}`;
+            
+            // Determine the redirect URL based on configuration
+            let redirectUrl;
+            if (customRedirectUrl) {
+                // Use custom redirect URL if provided
+                redirectUrl = `${customRedirectUrl}?${params}`;
+            } else if (isConsumerLoan) {
+                // Redirect to consumer loan page
+                redirectUrl = `${cleanBaseUrl}/pateriņa-kredīts/?${params}`;
+            } else {
+                // Default business loan redirect
+                redirectUrl = `${cleanBaseUrl}/forma/?${params}`;
+            }
             
             // Perform the redirect
             try {

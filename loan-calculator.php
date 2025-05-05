@@ -197,13 +197,19 @@ function loan_calculator_shortcode($atts = []) {
     // Parse attributes
     $atts = shortcode_atts([
         'no_redirect' => 'false', // Default to allowing redirects
+        'consumer_loan' => 'false', // Default to business loan
+        'redirect_url' => '', // Custom redirect URL
     ], $atts);
     
     // Enqueue the script
     wp_enqueue_script('loan-calculator');
     
-    // Add the no_redirect attribute to the data passed to JavaScript
-    $script = "<script>window.loanCalculatorConfig = { noRedirect: {$atts['no_redirect']} };</script>";
+    // Add the attributes to the data passed to JavaScript
+    $script = "<script>window.loanCalculatorConfig = { 
+        noRedirect: {$atts['no_redirect']},
+        consumerLoan: {$atts['consumer_loan']},
+        redirectUrl: '{$atts['redirect_url']}'
+    };</script>";
     
     ob_start();
     echo $script;
