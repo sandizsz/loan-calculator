@@ -75,7 +75,12 @@ function create_accountscoring_invitation($request) {
     // Try the API endpoint format from the documentation
     // Check if we're in test mode
     $is_test_mode = defined('WP_DEBUG') && WP_DEBUG;
-    $api_url = $is_test_mode ? 'https://prelive.accountscoring.com/api/v3/invitation' : 'https://accountscoring.com/api/v3/invitation';
+    
+    // Try both v2 and v3 endpoints - v2 might be required for some accounts
+    $api_version = 'v2'; // Start with v2 as default
+    $api_url = $is_test_mode 
+        ? "https://prelive.accountscoring.com/api/{$api_version}/invitation" 
+        : "https://accountscoring.com/api/{$api_version}/invitation";
     
     error_log('Using API URL: ' . $api_url . ' (Test mode: ' . ($is_test_mode ? 'Yes' : 'No') . ')');
     
@@ -87,23 +92,36 @@ function create_accountscoring_invitation($request) {
     }
     
     // Prepare request body according to AccountScoring documentation
+    // Based on the exact API specification from AccountScoring
     $request_body = array(
+        // Required fields
+        'client_id' => $client_id,
         'email' => sanitize_email($params['email']),
         'phone' => $phone,
         'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
-        'personal_id' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-        'amount' => isset($params['loanAmount']) ? floatval($params['loanAmount']) : 0,
-        'term' => isset($params['loanTerm']) ? intval($params['loanTerm']) : 0,
         'locale' => 'lv_LV', // Latvian locale
-        'client_id' => $client_id, // Client ID from settings
-        'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
-        'postback_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback')
     );
     
-    // Try alternative field names if needed
-    if (isset($params['monthlyIncome']) && !empty($params['monthlyIncome'])) {
+    // Optional fields - only add if they have values
+    if (!empty($params['personalCode'])) {
+        $request_body['personal_id'] = sanitize_text_field($params['personalCode']);
+    }
+    
+    if (isset($params['loanAmount']) && $params['loanAmount'] > 0) {
+        $request_body['amount'] = floatval($params['loanAmount']);
+    }
+    
+    if (isset($params['loanTerm']) && $params['loanTerm'] > 0) {
+        $request_body['term'] = intval($params['loanTerm']);
+    }
+    
+    if (isset($params['monthlyIncome']) && $params['monthlyIncome'] > 0) {
         $request_body['monthly_income'] = floatval($params['monthlyIncome']);
     }
+    
+    // Add callback URLs
+    $request_body['redirect_url'] = home_url('/pateriņa-kredīts/paldies/');
+    $request_body['postback_url'] = home_url('/wp-json/loan-calculator/v1/accountscoring-callback');
     
     // Log the full request for debugging
     error_log('AccountScoring API request URL: ' . $api_url);
