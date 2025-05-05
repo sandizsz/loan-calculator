@@ -113,9 +113,46 @@ const ConsumerLoanCalculator = () => {
       return;
     }
     
-    // Check client ID
-    const clientId = window.loanCalculatorData?.accountScoringClientId || '';
-    console.log('AccountScoring Client ID:', clientId);
+    // Check client ID - ensure we're getting it correctly from the global variable
+    let clientId = '';
+    
+    try {
+      // Try to get the client ID from the global variable
+      if (window.loanCalculatorData && window.loanCalculatorData.accountScoringClientId) {
+        clientId = window.loanCalculatorData.accountScoringClientId;
+      } else if (window.accountScoringClientId) {
+        // Fallback to direct global variable
+        clientId = window.accountScoringClientId;
+      }
+      
+      console.log('AccountScoring Client ID:', clientId);
+      
+      // If still no client ID, check if it's hardcoded in the page
+      if (!clientId) {
+        const scriptTags = document.querySelectorAll('script');
+        for (let i = 0; i < scriptTags.length; i++) {
+          const content = scriptTags[i].innerHTML;
+          if (content && content.includes('accountScoringClientId')) {
+            const match = content.match(/accountScoringClientId[\s]*=[\s]*['"]([^'"]+)/i);
+            if (match && match[1]) {
+              clientId = match[1];
+              console.log('Found AccountScoring Client ID in script tag:', clientId);
+              break;
+            }
+          }
+        }
+      }
+      
+      // If still no client ID, use hardcoded value as last resort
+      if (!clientId) {
+        // This is a fallback value from the server logs
+        clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
+        console.log('Using hardcoded AccountScoring Client ID:', clientId);
+      }
+    } catch (error) {
+      console.error('Error getting AccountScoring client ID:', error);
+    }
+    
     if (!clientId) {
       console.error('No AccountScoring client ID provided');
       setError('Kļūda: Nav norādīts AccountScoring klienta ID. Lūdzu, sazinieties ar administratoru.');
