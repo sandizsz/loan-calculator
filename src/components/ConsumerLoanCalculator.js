@@ -53,33 +53,79 @@ const ConsumerLoanCalculator = () => {
 
   // Add AccountScoring script
   useEffect(() => {
+    // Remove any existing script to avoid duplicates
+    const existingScript = document.getElementById('accountscoring-script');
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    // Add the script as per documentation
     const script = document.createElement('script');
+    script.id = 'accountscoring-script';
     script.src = 'https://accountscoring.com/static/asc-embed-v2.js';
     script.async = true;
     document.body.appendChild(script);
     
+    // Create container div for non-modal version
+    const containerDiv = document.createElement('div');
+    containerDiv.id = 'ascContainer';
+    containerDiv.style.width = '100%';
+    containerDiv.style.minHeight = '500px';
+    containerDiv.style.marginTop = '20px';
+    document.body.appendChild(containerDiv);
+    
+    // Create button for modal version
+    const modalButton = document.createElement('button');
+    modalButton.id = 'ascModal';
+    modalButton.textContent = 'Savienot banku';
+    modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
+    modalButton.style.display = 'none'; // Hide initially
+    document.body.appendChild(modalButton);
+    
     return () => {
+      // Clean up
       if (document.body.contains(script)) {
         document.body.removeChild(script);
+      }
+      if (document.body.contains(containerDiv)) {
+        document.body.removeChild(containerDiv);
+      }
+      if (document.body.contains(modalButton)) {
+        document.body.removeChild(modalButton);
       }
     };
   }, []);
 
-  // Initialize AccountScoring modal
-  const initializeAccountScoring = useCallback((invitationId) => {
+  // Initialize AccountScoring
+  const initializeAccountScoring = useCallback((invitationId, useModal = false) => {
     if (!invitationId) return;
     
-    // Following the exact format from the AccountScoring modal documentation
-    setTimeout(() => {
+    // Following the exact format from the AccountScoring documentation
+    setTimeout(function() {
       if (window.ASCEMBED) {
-        console.log('Initializing AccountScoring modal with invitation_id:', invitationId);
+        console.log('Initializing AccountScoring with invitation_id:', invitationId);
+        
+        // Show the appropriate element based on mode
+        if (useModal) {
+          const modalButton = document.getElementById('ascModal');
+          if (modalButton) {
+            modalButton.style.display = 'block';
+          }
+        } else {
+          const containerDiv = document.getElementById('ascContainer');
+          if (containerDiv) {
+            containerDiv.style.display = 'block';
+          }
+        }
         
         window.ASCEMBED.initialize({
-          btn_id: 'open-bank-modal',
+          // Use either container_id or btn_id based on mode
+          container_id: useModal ? null : 'ascContainer',
+          btn_id: useModal ? 'ascModal' : null,
           invitation_id: invitationId,
           client_id: window.loanCalculatorData?.accountScoringClientId || '', // From WordPress settings
           locale: 'lv_LV', // Latvian locale
-          is_modal: true,
+          is_modal: useModal,
           onConfirmAllDone: function(status) {
             console.log("Bank connection completed", status);
             setIsBankConnected(true);
@@ -88,11 +134,18 @@ const ConsumerLoanCalculator = () => {
           },
           onClose: function() {
             console.log("Modal closed");
-            // Handle modal close if needed
+            // Handle modal close
+            if (useModal) {
+              const modalButton = document.getElementById('ascModal');
+              if (modalButton) {
+                modalButton.style.display = 'none';
+              }
+            }
           },
         });
       } else {
         console.error("ASCEMBED not loaded");
+        setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, mēģiniet vēlreiz.');
       }
     }, 100);
   }, []);
@@ -137,18 +190,19 @@ const ConsumerLoanCalculator = () => {
           // Initialize and open AccountScoring modal
           initializeAccountScoring(response.data.invitation_id);
           
-          // Create a visible button for the modal and click it
-          // The modal documentation requires a visible button element
-          if (!document.getElementById('open-bank-modal')) {
-            const modalButton = document.createElement('button');
-            modalButton.id = 'open-bank-modal';
-            modalButton.textContent = 'Savienot banku';
-            modalButton.className = 'hidden'; // Use CSS to hide it instead of inline style
-            document.body.appendChild(modalButton);
-          }
+          // Initialize AccountScoring with the invitation ID
+          // Using the non-modal version (container) as default
+          initializeAccountScoring(response.data.invitation_id, false);
           
-          // Click the button to open the modal
-          document.getElementById('open-bank-modal').click();
+          // Show the container in the form
+          const containerDiv = document.getElementById('ascContainer');
+          if (containerDiv) {
+            // Move the container into our form
+            const bankConnectionSection = document.getElementById('bank-connection-section');
+            if (bankConnectionSection) {
+              bankConnectionSection.appendChild(containerDiv);
+            }
+          }
         } else {
           setError('Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');
         }
@@ -319,7 +373,7 @@ const ConsumerLoanCalculator = () => {
             </div>
 
             {/* Monthly Payment Box */}
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg mb-6" id="bank-connection-section">
               <div className="flex items-center">
                 <span className="text-2xl font-medium">{monthlyPayment} €/mēn.</span>
                 <div className="relative ml-1">
@@ -583,25 +637,7 @@ const ConsumerLoanCalculator = () => {
         </div>
       </form>
       
-      {/* Button for AccountScoring modal - will be hidden with CSS but must exist in the DOM */}
-      <button id="open-bank-modal" className="hidden">Savienot banku</button>
-      
-      {/* Add CSS for hidden class */}
-      <style>
-        {`
-          .hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-          }
-        `}
-      </style>
+      {/* The AccountScoring container and button are added dynamically in useEffect */}
     </div>
   );
 };
