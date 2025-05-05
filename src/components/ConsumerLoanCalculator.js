@@ -316,10 +316,8 @@ const ConsumerLoanCalculator = () => {
           console.log('Received invitation ID:', response.data.invitation_id);
           initializeAccountScoring(response.data.invitation_id);
           
-          // Make sure the bank connection section is visible
-          if (bankConnectionSection) {
-            bankConnectionSection.style.display = 'block';
-          }
+          // Set the invitation ID which will trigger the bank connection section to render
+          setInvitationId(response.data.invitation_id);
         } else {
           setError('Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');
         }
