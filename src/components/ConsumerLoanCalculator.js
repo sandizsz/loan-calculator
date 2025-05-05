@@ -233,6 +233,24 @@ const ConsumerLoanCalculator = () => {
     return payment.toFixed(2);
   }, [loanAmount, loanTerm]);
 
+  // Render bank connection section directly in the component
+  const renderBankConnectionSection = () => {
+    if (invitationId) {
+      return (
+        <div id="bank-connection-section" className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <h3 className="text-lg font-medium text-blue-800 mb-3">
+            {translate('Savienojiet savu bankas kontu')}
+          </h3>
+          <p className="text-sm text-blue-700 mb-4">
+            {translate('Lai turpinātu pieteikumu, lūdzu, savienojiet savu bankas kontu, izmantojot drošo AccountScoring pakalpojumu.')}
+          </p>
+          {/* The button will be moved here by the initializeAccountScoring function */}
+        </div>
+      );
+    }
+    return null;
+  };
+  
   // Form submission handler
   const onSubmit = async (data) => {
     // Prevent validation errors from showing during submission
@@ -240,38 +258,6 @@ const ConsumerLoanCalculator = () => {
     setError(null);
     
     if (step === 1) {
-      // Create bank connection section if it doesn't exist
-      let bankConnectionSection = document.getElementById('bank-connection-section');
-      if (!bankConnectionSection) {
-        bankConnectionSection = document.createElement('div');
-        bankConnectionSection.id = 'bank-connection-section';
-        bankConnectionSection.className = 'mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100';
-        
-        const title = document.createElement('h3');
-        title.className = 'text-lg font-medium text-blue-800 mb-3';
-        title.textContent = 'Savienojiet savu bankas kontu';
-        
-        const description = document.createElement('p');
-        description.className = 'text-sm text-blue-700 mb-4';
-        description.textContent = 'Lai turpinātu pieteikumu, lūdzu, savienojiet savu bankas kontu, izmantojot drošo AccountScoring pakalpojumu.';
-        
-        bankConnectionSection.appendChild(title);
-        bankConnectionSection.appendChild(description);
-        
-        // Add the section to the form
-        const form = document.querySelector('form');
-        if (form) {
-          const submitButton = form.querySelector('button[type="submit"]');
-          if (submitButton) {
-            form.insertBefore(bankConnectionSection, submitButton.parentNode);
-          } else {
-            form.appendChild(bankConnectionSection);
-          }
-        } else {
-          // Fallback - add to the body
-          document.body.appendChild(bankConnectionSection);
-        }
-      }
       
       try {
         // Create invitation in AccountScoring
@@ -713,6 +699,9 @@ const ConsumerLoanCalculator = () => {
             </div>
           </div>
         )}
+        
+        {/* Bank connection section */}
+        {renderBankConnectionSection()}
   
         <div className="flex flex-col space-y-4 pt-6">
           {step > 1 && (

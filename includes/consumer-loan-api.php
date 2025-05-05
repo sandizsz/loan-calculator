@@ -187,10 +187,21 @@ function create_accountscoring_invitation($request) {
     error_log('AccountScoring API response: ' . print_r($body, true));
     
     // Return the invitation ID
-    // According to documentation: "it returns and id and invitation_id. id is a parameter that AccountScoring keeps in database as a hashed value and this can't be returned again. This is used to create links for PSU. invitation_id parameter is something that is can be user throughout the system as a unique identifier for an invitation."
+    // The API actually returns 'uuid' instead of 'invitation_id' in the prelive environment
+    // We'll use whichever one is available
+    $invitation_id = '';
+    if (isset($body['invitation_id'])) {
+        $invitation_id = $body['invitation_id'];
+    } elseif (isset($body['uuid'])) {
+        $invitation_id = $body['uuid'];
+        error_log('Using UUID as invitation_id: ' . $invitation_id);
+    } else {
+        error_log('WARNING: Neither invitation_id nor uuid found in response: ' . print_r($body, true));
+    }
+    
     return rest_ensure_response(array(
         'success' => true,
-        'invitation_id' => isset($body['invitation_id']) ? $body['invitation_id'] : '',
+        'invitation_id' => $invitation_id,
         'message' => 'Uzaicinājums veiksmīgi izveidots'
     ));
 }
@@ -230,45 +241,11 @@ function submit_consumer_loan_application($request) {
     );
     
     // Here you would typically:
-    // 1. Save to your database
-    // 2. Send to your CRM (e.g., Pipedrive)
-    // 3. Send notification emails
+    // 1. Send to your CRM (e.g., Pipedrive)
+    // 2. Process application data
     
-    // Example: Save to a custom table (you would need to create this table first)
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'loan_applications';
-    
-    // Check if table exists
-    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-        // Table doesn't exist, log error but continue
-        error_log('Loan applications table does not exist: ' . $table_name);
-    } else {
-        // Insert into database
-        $result = $wpdb->insert(
-            $table_name,
-            $application_data,
-            array('%s', '%s', '%s', '%s', '%s', '%f', '%d', '%f', '%s', '%s', '%d', '%s', '%s')
-        );
-        
-        if ($result === false) {
-            error_log('Failed to insert loan application: ' . $wpdb->last_error);
-        }
-    }
-    
-    // Log the application
+    // Log the application for debugging purposes only
     error_log('Consumer loan application submitted: ' . print_r($application_data, true));
-    
-    // Send email notification
-    $admin_email = get_option('admin_email');
-    $subject = 'Jauns patēriņa kredīta pieteikums';
-    $message = "Jauns patēriņa kredīta pieteikums no {$application_data['first_name']} {$application_data['last_name']}.\n\n";
-    $message .= "E-pasts: {$application_data['email']}\n";
-    $message .= "Tālrunis: {$application_data['phone']}\n";
-    $message .= "Summa: {$application_data['loan_amount']} EUR\n";
-    $message .= "Termiņš: {$application_data['loan_term']} mēneši\n";
-    $message .= "Bankas konts savienots: " . ($is_bank_connected ? 'Jā' : 'Nē') . "\n";
-    
-    wp_mail($admin_email, $subject, $message);
     
     // Return success response
     return rest_ensure_response(array(
