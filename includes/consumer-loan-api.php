@@ -22,6 +22,13 @@ function consumer_loan_register_api_routes() {
         'callback' => 'submit_consumer_loan_application',
         'permission_callback' => '__return_true'
     ));
+    
+    // Add callback endpoint for AccountScoring postbacks
+    register_rest_route('loan-calculator/v1', '/accountscoring-callback', array(
+        'methods' => 'POST',
+        'callback' => 'handle_accountscoring_callback',
+        'permission_callback' => '__return_true'
+    ));
 }
 add_action('rest_api_init', 'consumer_loan_register_api_routes');
 
@@ -46,7 +53,17 @@ function create_accountscoring_invitation($request) {
         return new WP_Error('missing_api_key', 'AccountScoring API atslēga nav konfigurēta', array('status' => 500));
     }
     
+    // Log request for debugging
+    error_log('AccountScoring API request: ' . print_r(array(
+        'email' => sanitize_email($params['email']),
+        'phone' => sanitize_text_field($params['phone']),
+        'first_name' => sanitize_text_field($params['firstName']),
+        'last_name' => sanitize_text_field($params['lastName']),
+        'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
+    ), true));
+    
     // Make API request to AccountScoring
+    // Based on the modal documentation for the invitation endpoint
     $response = wp_remote_post('https://accountscoring.com/api/v3/invitation', array(
         'headers' => array(
             'Authorization' => 'Bearer ' . $api_key,
@@ -55,12 +72,14 @@ function create_accountscoring_invitation($request) {
         'body' => json_encode(array(
             'email' => sanitize_email($params['email']),
             'phone' => sanitize_text_field($params['phone']),
-            'first_name' => sanitize_text_field($params['firstName']),
-            'last_name' => sanitize_text_field($params['lastName']),
-            'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-            'amount' => isset($params['amount']) ? floatval($params['amount']) : 0,
-            'term' => isset($params['term']) ? intval($params['term']) : 0,
-            // Add any other required parameters for your AccountScoring integration
+            // Using the field names as specified in the AccountScoring API documentation
+            'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
+            'personal_id' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
+            'amount' => isset($params['loanAmount']) ? floatval($params['loanAmount']) : 0,
+            'term' => isset($params['loanTerm']) ? intval($params['loanTerm']) : 0,
+            'locale' => 'lv_LV', // Latvian locale
+            'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
+            'postback_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback')
         ))
     ));
     
@@ -79,7 +98,11 @@ function create_accountscoring_invitation($request) {
     // Log the invitation
     error_log('AccountScoring invitation created: ' . print_r($body, true));
     
+    // Log response for debugging
+    error_log('AccountScoring API response: ' . print_r($body, true));
+    
     // Return the invitation ID
+    // According to documentation: "it returns and id and invitation_id. id is a parameter that AccountScoring keeps in database as a hashed value and this can't be returned again. This is used to create links for PSU. invitation_id parameter is something that is can be user throughout the system as a unique identifier for an invitation."
     return rest_ensure_response(array(
         'success' => true,
         'invitation_id' => isset($body['invitation_id']) ? $body['invitation_id'] : '',

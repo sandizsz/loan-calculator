@@ -42,9 +42,9 @@ const ConsumerLoanCalculator = () => {
       loanTerm: 36,
       firstName: 'Sandis',
       lastName: 'Sirmais',
-      personalCode: '16060022559',
+      personalCode: '160600-22559',
       email: 'sandis.sirmais@gmail.com',
-      phone: '222222222',
+      phone: '22222222',
       monthlyIncome: '1000',
       otherLoans: 'no',
       consentToTerms: true
@@ -69,21 +69,24 @@ const ConsumerLoanCalculator = () => {
   const initializeAccountScoring = useCallback((invitationId) => {
     if (!invitationId) return;
     
+    // Following the exact format from the AccountScoring modal documentation
     setTimeout(() => {
       if (window.ASCEMBED) {
+        console.log('Initializing AccountScoring modal with invitation_id:', invitationId);
+        
         window.ASCEMBED.initialize({
           btn_id: 'open-bank-modal',
           invitation_id: invitationId,
           client_id: window.loanCalculatorData?.accountScoringClientId || '', // From WordPress settings
           locale: 'lv_LV', // Latvian locale
           is_modal: true,
-          onConfirmAllDone: (status) => {
+          onConfirmAllDone: function(status) {
             console.log("Bank connection completed", status);
             setIsBankConnected(true);
             // Move to next step after bank connection
             setStep(2);
           },
-          onClose: () => {
+          onClose: function() {
             console.log("Modal closed");
             // Handle modal close if needed
           },
@@ -134,12 +137,18 @@ const ConsumerLoanCalculator = () => {
           // Initialize and open AccountScoring modal
           initializeAccountScoring(response.data.invitation_id);
           
-          // Create a hidden button for the modal and click it
-          const modalButton = document.createElement('button');
-          modalButton.id = 'open-bank-modal';
-          modalButton.style.display = 'none';
-          document.body.appendChild(modalButton);
-          modalButton.click();
+          // Create a visible button for the modal and click it
+          // The modal documentation requires a visible button element
+          if (!document.getElementById('open-bank-modal')) {
+            const modalButton = document.createElement('button');
+            modalButton.id = 'open-bank-modal';
+            modalButton.textContent = 'Savienot banku';
+            modalButton.className = 'hidden'; // Use CSS to hide it instead of inline style
+            document.body.appendChild(modalButton);
+          }
+          
+          // Click the button to open the modal
+          document.getElementById('open-bank-modal').click();
         } else {
           setError('Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');
         }
@@ -574,8 +583,25 @@ const ConsumerLoanCalculator = () => {
         </div>
       </form>
       
-      {/* Hidden button for AccountScoring modal */}
-      <button id="open-bank-modal" style={{ display: 'none' }}></button>
+      {/* Button for AccountScoring modal - will be hidden with CSS but must exist in the DOM */}
+      <button id="open-bank-modal" className="hidden">Savienot banku</button>
+      
+      {/* Add CSS for hidden class */}
+      <style>
+        {`
+          .hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+          }
+        `}
+      </style>
     </div>
   );
 };
