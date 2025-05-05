@@ -149,15 +149,25 @@ function create_accountscoring_invitation($request) {
     error_log('AccountScoring API request URL: ' . $api_url);
     error_log('AccountScoring API request body: ' . json_encode($request_body));
     
-    // Use Bearer token authentication as specified in the documentation
-    error_log("Using Bearer token authentication with API key: " . substr($api_key, 0, 4) . '...');
+    // Try multiple authentication methods as recommended in the documentation
+    error_log("Using multiple authentication methods with API key: " . substr($api_key, 0, 4) . '...');
     
-    $response = wp_remote_post($api_url, [
-        'headers' => [
-            'Authorization' => 'Bearer ' . $api_key,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json'
-        ],
+    // Prepare headers with multiple authentication methods
+    $headers = [
+        // Primary method: Bearer token in Authorization header
+        'Authorization' => 'Bearer ' . trim($api_key),
+        // Secondary method: X-Api-Key header
+        'X-Api-Key' => trim($api_key),
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json'
+    ];
+    
+    // Add client_id to URL as tertiary authentication method
+    $api_url_with_key = add_query_arg(['api_key' => trim($api_key)], $api_url);
+    error_log("Using API URL with key parameter as fallback: " . $api_url_with_key);
+    
+    $response = wp_remote_post($api_url_with_key, [
+        'headers' => $headers,
         'body' => json_encode($request_body),
         'timeout' => 30
     ]);

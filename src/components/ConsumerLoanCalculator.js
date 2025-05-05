@@ -192,6 +192,19 @@ const ConsumerLoanCalculator = () => {
             }
             // Add to the bank connection section
             bankConnectionSection.appendChild(modalButton);
+            
+            // Make sure the button is visible and styled correctly
+            modalButton.style.display = 'block';
+            modalButton.style.marginTop = '16px';
+            modalButton.style.width = '100%';
+            modalButton.style.padding = '16px';
+            modalButton.style.borderRadius = '8px';
+            modalButton.style.fontWeight = '500';
+            modalButton.style.backgroundColor = '#FFC600';
+            modalButton.style.color = '#000000';
+            modalButton.style.cursor = 'pointer';
+            modalButton.style.border = 'none';
+            modalButton.style.outline = 'none';
           }
         }
         
