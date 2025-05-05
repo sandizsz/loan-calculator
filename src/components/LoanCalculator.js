@@ -415,7 +415,7 @@ const LoanCalculator = () => {
                 redirectUrl = `${customRedirectUrl}?${params}`;
             } else if (isConsumerLoan) {
                 // Redirect to consumer loan page
-                redirectUrl = `${cleanBaseUrl}/pateriņa-kredīts/?${params}`;
+                redirectUrl = `${cleanBaseUrl}/forma-klientu/?${params}`;
             } else {
                 // Default business loan redirect
                 redirectUrl = `${cleanBaseUrl}/forma/?${params}`;
