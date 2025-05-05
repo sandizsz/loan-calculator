@@ -46,12 +46,21 @@ function create_accountscoring_invitation($request) {
         }
     }
     
-    // Get API key from options
+    // Get API key and client ID from options
     $api_key = get_option('loan_calculator_accountscoring_api_key', '');
+    $client_id = get_option('loan_calculator_accountscoring_client_id', '');
     
     if (empty($api_key)) {
         return new WP_Error('missing_api_key', 'AccountScoring API atslēga nav konfigurēta', array('status' => 500));
     }
+    
+    if (empty($client_id)) {
+        return new WP_Error('missing_client_id', 'AccountScoring klienta ID nav konfigurēts', array('status' => 500));
+    }
+    
+    // Log the API key (first 4 chars only for security) for debugging
+    error_log('Using AccountScoring API key: ' . substr($api_key, 0, 4) . '...');
+    error_log('Using AccountScoring client ID: ' . $client_id);
     
     // Log request for debugging
     error_log('AccountScoring API request: ' . print_r(array(
@@ -64,23 +73,34 @@ function create_accountscoring_invitation($request) {
     
     // Make API request to AccountScoring
     // Based on the modal documentation for the invitation endpoint
-    $response = wp_remote_post('https://accountscoring.com/api/v3/invitation', array(
+    $api_url = 'https://accountscoring.com/api/v3/invitation';
+    
+    $request_body = array(
+        'email' => sanitize_email($params['email']),
+        'phone' => sanitize_text_field($params['phone']),
+        // Using the field names as specified in the AccountScoring API documentation
+        'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
+        'personal_id' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
+        'amount' => isset($params['loanAmount']) ? floatval($params['loanAmount']) : 0,
+        'term' => isset($params['loanTerm']) ? intval($params['loanTerm']) : 0,
+        'locale' => 'lv_LV', // Latvian locale
+        'client_id' => $client_id, // Add client_id to the request body
+        'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
+        'postback_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback')
+    );
+    
+    // Log the full request for debugging
+    error_log('AccountScoring API request URL: ' . $api_url);
+    error_log('AccountScoring API request body: ' . json_encode($request_body));
+    
+    $response = wp_remote_post($api_url, array(
         'headers' => array(
             'Authorization' => 'Bearer ' . $api_key,
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
         ),
-        'body' => json_encode(array(
-            'email' => sanitize_email($params['email']),
-            'phone' => sanitize_text_field($params['phone']),
-            // Using the field names as specified in the AccountScoring API documentation
-            'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
-            'personal_id' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-            'amount' => isset($params['loanAmount']) ? floatval($params['loanAmount']) : 0,
-            'term' => isset($params['loanTerm']) ? intval($params['loanTerm']) : 0,
-            'locale' => 'lv_LV', // Latvian locale
-            'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
-            'postback_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback')
-        ))
+        'body' => json_encode($request_body),
+        'timeout' => 30 // Increase timeout to 30 seconds
     ));
     
     if (is_wp_error($response)) {
@@ -88,11 +108,17 @@ function create_accountscoring_invitation($request) {
     }
     
     $status_code = wp_remote_retrieve_response_code($response);
-    $body = json_decode(wp_remote_retrieve_body($response), true);
+    $response_body = wp_remote_retrieve_body($response);
+    $body = json_decode($response_body, true);
+    
+    // Log the full response for debugging
+    error_log('AccountScoring API response status: ' . $status_code);
+    error_log('AccountScoring API response body: ' . $response_body);
     
     if ($status_code !== 200 && $status_code !== 201) {
         $error_message = isset($body['message']) ? $body['message'] : 'Kļūda savienojoties ar AccountScoring API';
-        return new WP_Error('api_error', $error_message, array('status' => $status_code));
+        error_log('AccountScoring API error: ' . $error_message . ' (Status: ' . $status_code . ')');
+        return new WP_Error('api_error', $error_message, array('status' => $status_code, 'response' => $body));
     }
     
     // Log the invitation

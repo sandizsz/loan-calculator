@@ -275,8 +275,33 @@ function full_calculator_shortcode() {
 }
 add_shortcode('full_calculator', 'full_calculator_shortcode');
 
-function consumer_loan_calculator_shortcode() {
+function consumer_loan_calculator_shortcode($atts = []) {
+    // Parse attributes
+    $atts = shortcode_atts([
+        'redirect_url' => '',
+    ], $atts);
+    
+    // Enqueue the script
+    wp_enqueue_script('consumer-loan-calculator');
+    
+    // Get API credentials
+    $client_id = get_option('loan_calculator_accountscoring_client_id', '');
+    
+    // Add debug info if in development mode
+    $debug_info = '';
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        $debug_info = "console.log('AccountScoring Client ID: ' + (window.loanCalculatorData.accountScoringClientId || 'Not set'));"; 
+    }
+    
     ob_start();
+    
+    // Add the script with configuration
+    echo "<script>
+        window.loanCalculatorData = window.loanCalculatorData || {};
+        window.loanCalculatorData.accountScoringClientId = '{$client_id}';
+        window.loanCalculatorData.redirectUrl = '{$atts['redirect_url']}';
+        {$debug_info}
+    </script>";
     ?>
     <div id="consumer-loan-calculator-root">
         <div class="loading-container" style="padding: 20px; text-align: center;">

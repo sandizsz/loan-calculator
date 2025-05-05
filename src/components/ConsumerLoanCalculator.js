@@ -192,7 +192,28 @@ const ConsumerLoanCalculator = () => {
         }
       } catch (error) {
         console.error('Error creating invitation:', error);
-        setError(error.response?.data?.message || 'Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');
+        
+        // Provide more detailed error message based on the response
+        let errorMessage = 'Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.';
+        
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          
+          if (error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.response.status === 401) {
+            errorMessage = 'Autentifikācijas kļūda. Lūdzu, sazinieties ar administratoru.';
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error('Error request:', error.request);
+          errorMessage = 'Nav saņemta atbilde no servera. Lūdzu, pārbaudiet interneta savienojumu.';
+        }
+        
+        setError(errorMessage);
       } finally {
         setIsSubmitting(false);
       }
