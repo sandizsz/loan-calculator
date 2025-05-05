@@ -35,18 +35,19 @@ const ConsumerLoanCalculator = () => {
 
   // Form setup with React Hook Form
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
-    mode: 'onBlur',
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
     defaultValues: {
       loanAmount: 5000,
       loanTerm: 36,
-      firstName: '',
-      lastName: '',
-      personalCode: '',
-      email: '',
-      phone: '',
-      monthlyIncome: '',
+      firstName: 'Sandis',
+      lastName: 'Sirmais',
+      personalCode: '16060022559',
+      email: 'sandis.sirmais@gmail.com',
+      phone: '222222222',
+      monthlyIncome: '1000',
       otherLoans: 'no',
-      consentToTerms: false
+      consentToTerms: true
     }
   });
 
@@ -108,9 +109,11 @@ const ConsumerLoanCalculator = () => {
 
   // Form submission handler
   const onSubmit = async (data) => {
+    // Prevent validation errors from showing during submission
+    setIsSubmitting(true);
+    setError(null);
+    
     if (step === 1) {
-      setIsSubmitting(true);
-      setError(null);
       
       try {
         // Create invitation in AccountScoring
@@ -176,18 +179,23 @@ const ConsumerLoanCalculator = () => {
   };
   
   // Custom field component with error handling
-  const FormField = ({ name, label, required, children, hint }) => (
-    <div className="mb-6">
-      <Label.Root className="block text-sm font-medium text-gray-700 mb-2" htmlFor={name}>
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label.Root>
-      {children}
-      {hint && <p className="mt-1 text-sm text-gray-500">{hint}</p>}
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
-      )}
-    </div>
-  );
+  const FormField = ({ name, label, required, children, hint }) => {
+    // Only show errors after form submission attempt
+    const showError = errors[name] && isSubmitting;
+    
+    return (
+      <div className="mb-6">
+        <Label.Root className="block text-sm font-medium text-gray-700 mb-2" htmlFor={name}>
+          {label} {required && <span className="text-red-500">*</span>}
+        </Label.Root>
+        {children}
+        {hint && <p className="mt-1 text-sm text-gray-500">{hint}</p>}
+        {showError && (
+          <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
+        )}
+      </div>
+    );
+  };
 
   // Success message after form submission
   if (isSuccess) {
@@ -259,7 +267,8 @@ const ConsumerLoanCalculator = () => {
                     step="100"
                     {...register('loanAmount', { 
                       required: translate('Obligāti aizpildāms lauks'),
-                      valueAsNumber: true 
+                      valueAsNumber: true,
+                      shouldUnregister: false
                     })}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
@@ -287,7 +296,8 @@ const ConsumerLoanCalculator = () => {
                     step="1"
                     {...register('loanTerm', { 
                       required: translate('Obligāti aizpildāms lauks'),
-                      valueAsNumber: true 
+                      valueAsNumber: true,
+                      shouldUnregister: false
                     })}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
@@ -323,7 +333,8 @@ const ConsumerLoanCalculator = () => {
                   type="text"
                   id="firstName"
                   {...register('firstName', { 
-                    required: translate('Obligāti aizpildāms lauks') 
+                    required: translate('Obligāti aizpildāms lauks'),
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -338,7 +349,8 @@ const ConsumerLoanCalculator = () => {
                   type="text"
                   id="lastName"
                   {...register('lastName', { 
-                    required: translate('Obligāti aizpildāms lauks') 
+                    required: translate('Obligāti aizpildāms lauks'),
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -358,7 +370,8 @@ const ConsumerLoanCalculator = () => {
                     pattern: {
                       value: /^\d{6}-\d{5}$/,
                       message: translate('Nepareizs personas koda formāts (XXXXXX-XXXXX)')
-                    }
+                    },
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -377,7 +390,8 @@ const ConsumerLoanCalculator = () => {
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: translate('Nepareizs e-pasta formāts')
-                    }
+                    },
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -397,7 +411,8 @@ const ConsumerLoanCalculator = () => {
                     pattern: {
                       value: /^[2-6]\d{7}$/,
                       message: translate('Nepareizs tālruņa numura formāts')
-                    }
+                    },
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -419,7 +434,8 @@ const ConsumerLoanCalculator = () => {
                     min: {
                       value: 500,
                       message: translate('Ienākumiem jābūt vismaz 500€')
-                    }
+                    },
+                    shouldUnregister: false
                   })}
                   className="w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#ffc600] focus:border-[#ffc600]"
                 />
@@ -433,7 +449,8 @@ const ConsumerLoanCalculator = () => {
                   type="checkbox"
                   id="consentToTerms"
                   {...register('consentToTerms', { 
-                    required: translate('Jums jāpiekrīt noteikumiem, lai turpinātu') 
+                    required: translate('Jums jāpiekrīt noteikumiem, lai turpinātu'),
+                    shouldUnregister: false
                   })}
                   className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded"
                 />
@@ -473,7 +490,7 @@ const ConsumerLoanCalculator = () => {
                 <RadioGroup.Root 
                   className="flex flex-col space-y-2"
                   defaultValue="no"
-                  onValueChange={(value) => setValue('otherLoans', value, { shouldDirty: true })}
+                  onValueChange={(value) => setValue('otherLoans', value, { shouldDirty: true, shouldValidate: false })}
                 >
                   <div className="flex items-center">
                     <RadioGroup.Item
