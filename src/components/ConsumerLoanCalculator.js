@@ -51,116 +51,84 @@ const ConsumerLoanCalculator = () => {
     }
   });
 
-  // Initialize AccountScoring modal
-  const initializeAccountScoring = useCallback((invitationId) => {
-    if (!invitationId) {
-      console.error('No invitation ID provided');
-      setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
-      return;
-    }
-    
-    // Get client ID from window or use hardcoded value as fallback
-    let clientId = '';
-    
-    try {
-      if (window.loanCalculatorData && window.loanCalculatorData.accountScoringClientId) {
-        clientId = window.loanCalculatorData.accountScoringClientId;
-      } else {
-        // Fallback to hardcoded value (should be configured in WordPress admin)
-        clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-      }
-      
-      console.log('Using AccountScoring Client ID:', clientId);
-    } catch (error) {
-      console.error('Error getting AccountScoring client ID:', error);
-      // Fallback to hardcoded value
-      clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    }
-    
-    // Initialize the AccountScoring embed with a delay to ensure script is loaded
-    const initializeASC = function() {
-      if (window.ASCEMBED) {
-        console.log('Initializing AccountScoring modal with:');
-        console.log('- invitation_id:', invitationId);
-        console.log('- client_id:', clientId);
-        console.log('- locale: lv_LV');
-        
-        // Make sure the button is visible and properly styled
-        const modalButton = document.getElementById('ascModal');
-        if (modalButton) {
-          modalButton.style.display = 'block';
-          modalButton.textContent = 'Savienot ar banku';
-          modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
-          
-          // Move to the bank connection section if it exists
-          const bankConnectionSection = document.getElementById('bank-connection-section');
-          if (bankConnectionSection && !bankConnectionSection.contains(modalButton)) {
-            bankConnectionSection.appendChild(modalButton);
-          }
-        }
-        
-        try {
-          // Initialize the modal as per documentation
-          window.ASCEMBED.initialize({
-            btn_id: 'ascModal',           // Use btn_id for modal version
-            invitation_id: invitationId,
-            client_id: clientId,
-            locale: 'lv_LV',              // Latvian locale
-            is_modal: true,               // IMPORTANT: TRUE for modal version
-            onConfirmAllDone: function(status) {
-              console.log("Bank connection completed", status);
-              setIsBankConnected(true);
-              // Move to next step after bank connection
-              setStep(2);
-            },
-            onClose: function() {
-              console.log("Modal closed");
-            },
-          });
-          
-          // Automatically open the modal after initialization
-          setTimeout(() => {
-            if (window.ASCEMBED && window.ASCEMBED.open) {
-              console.log('Opening AccountScoring modal');
-              window.ASCEMBED.open();
-            } else {
-              console.error('ASCEMBED.open method not found');
-              setError('Kļūda atverot bankas savienojuma logu. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
-            }
-          }, 500);
-        } catch (error) {
-          console.error('Error initializing AccountScoring:', error);
-          setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
-        }
-      } else {
-        console.error("ASCEMBED not loaded");
-        setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
-      }
-    };
-    
-    // Check if ASCEMBED is already loaded or wait for it
+// Fix for the AccountScoring integration
+const initializeAccountScoring = useCallback((invitationId) => {
+  if (!invitationId) {
+    console.error('No invitation ID provided');
+    setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
+    return;
+  }
+  
+  // Ensure we're using the correct client ID
+  const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
+  
+  console.log('Using AccountScoring Client ID:', clientId);
+  
+  // Make sure the modal button exists
+  let modalButton = document.getElementById('ascModal');
+  if (!modalButton) {
+    modalButton = document.createElement('button');
+    modalButton.id = 'ascModal';
+    modalButton.textContent = 'Savienot ar banku';
+    modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
+    document.body.appendChild(modalButton);
+  }
+  
+  // Make the button visible
+  modalButton.style.display = 'block';
+  
+  // Move to bank connection section if it exists
+  const bankConnectionSection = document.getElementById('bank-connection-section');
+  if (bankConnectionSection) {
+    bankConnectionSection.appendChild(modalButton);
+  }
+  
+  // Important: Use setTimeout to ensure script is fully loaded
+  setTimeout(() => {
     if (window.ASCEMBED) {
-      initializeASC();
-    } else {
-      console.log('Waiting for ASCEMBED to load...');
-      // Wait for the script to load with timeout
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      const checkInterval = setInterval(() => {
-        attempts++;
-        if (window.ASCEMBED) {
-          clearInterval(checkInterval);
-          console.log('ASCEMBED loaded, initializing...');
-          initializeASC();
-        } else if (attempts >= maxAttempts) {
-          clearInterval(checkInterval);
-          console.error('ASCEMBED failed to load after multiple attempts');
-          setError('Kļūda ielādējot banku savienojuma rīku. Lūdzu, atsvaidziniet lapu un mēģiniet vēlreiz.');
+      try {
+        // Clear any previous initialization
+        if (typeof window.ASCEMBED.clear === 'function') {
+          window.ASCEMBED.clear();
         }
-      }, 500);
+        
+        // Initialize with the correct parameters
+        window.ASCEMBED.initialize({
+          btn_id: 'ascModal',
+          invitation_id: invitationId,
+          client_id: clientId,
+          locale: 'lv_LV',
+          is_modal: true,
+          onConfirmAllDone: function(status) {
+            console.log("Bank connection completed:", status);
+            setIsBankConnected(true);
+            setStep(2);
+          },
+          onClose: function() {
+            console.log("Modal closed");
+          }
+        });
+        
+        // Wait a bit to ensure initialization is complete before trying to open
+        setTimeout(() => {
+          if (typeof window.ASCEMBED.open === 'function') {
+            window.ASCEMBED.open();
+          } else {
+            console.error("ASCEMBED.open method not found after initialization");
+            // Alternative: Try clicking the button directly
+            modalButton.click();
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('Error initializing AccountScoring:', error);
+        setError('Kļūda inicializējot bankas savienojumu: ' + error.message);
+      }
+    } else {
+      console.error("ASCEMBED object not available");
+      setError('Kļūda ielādējot AccountScoring bibliotēku. Lūdzu, atsvaidziniet lapu.');
     }
-  }, [setStep, setIsBankConnected, setError]);
+  }, 1000); // Give time for script to load
+}, [setStep, setIsBankConnected, setError]);
 
   // Watch form values for calculations
   const loanAmount = watch('loanAmount');
