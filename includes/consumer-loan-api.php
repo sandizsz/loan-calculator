@@ -39,7 +39,7 @@ function create_accountscoring_invitation($request) {
     $params = $request->get_params();
     
     // Validate required parameters
-    $required_fields = ['email', 'phone', 'firstName', 'lastName'];
+    $required_fields = ['email', 'phone', 'firstName', 'lastName', 'personalCode'];
     foreach ($required_fields as $field) {
         if (empty($params[$field])) {
             return new WP_Error('missing_field', 'Trūkst obligāto lauku: ' . $field, array('status' => 400));
@@ -62,27 +62,13 @@ function create_accountscoring_invitation($request) {
     error_log('Using AccountScoring API key: ' . substr($api_key, 0, 4) . '...');
     error_log('Using AccountScoring client ID: ' . $client_id);
     
-    // Log request for debugging
-    error_log('AccountScoring API request: ' . print_r(array(
-        'email' => sanitize_email($params['email']),
-        'phone' => sanitize_text_field($params['phone']),
-        'first_name' => sanitize_text_field($params['firstName']),
-        'last_name' => sanitize_text_field($params['lastName']),
-        'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-    ), true));
-    
-    // Make API request to AccountScoring
-    // Try the API endpoint format from the documentation
     // Check if we're in test mode
     $is_test_mode = defined('WP_DEBUG') && WP_DEBUG;
     
-    // Use the exact endpoint from the documentation
+    // Use the correct API endpoint
     $api_url = $is_test_mode 
         ? 'https://prelive.accountscoring.com/api/v3/invitation' 
         : 'https://accountscoring.com/api/v3/invitation';
-        
-    // Log which endpoint we're using
-    error_log("Using API endpoint from documentation: {$api_url}");
     
     error_log('Using API URL: ' . $api_url . ' (Test mode: ' . ($is_test_mode ? 'Yes' : 'No') . ')');
     
@@ -93,47 +79,37 @@ function create_accountscoring_invitation($request) {
         $phone = '+371' . preg_replace('/[^0-9]/', '', $phone);
     }
     
-    // Prepare request body according to the exact AccountScoring API documentation
+    // Prepare request body according to the AccountScoring API documentation
     $request_body = array(
-        // Required fields from the documentation
+        // Required fields according to documentation
         'name' => sanitize_text_field($params['firstName'] . ' ' . $params['lastName']),
-        'personal_code' => isset($params['personalCode']) ? sanitize_text_field($params['personalCode']) : '',
-        'locale' => 'lv_LV', // Latvian locale as specified in documentation
+        'personal_code' => sanitize_text_field($params['personalCode']),
+        'locale' => 'lv_LV',  // Latvian locale
         'send_email' => false, // We'll handle the flow in our app
-        'type' => 'personal', // Specify this is for a personal/consumer loan, not a business loan
+        'transaction_days' => 90,
+        
+        // Add email (required if send_email is true)
+        'email' => sanitize_email($params['email']),
+        
+        // Add phone (not required by API but useful for our records)
+        'phone' => $phone,
+        
+        // Add redirect and webhook URLs
+        'redirect_url' => home_url('/pateriņa-kredīts/paldies/'),
+        'webhook_url' => home_url('/wp-json/loan-calculator/v1/accountscoring-callback'),
+        
+        // Latvian banks
+        'allowed_banks' => array(
+            'HABALV22', // Swedbank
+            'UNLALV2X', // SEB
+            'PARXLV22', // Citadele
+            'NDEALV2X', // Luminor
+            'REVOGB21XXX', // Revolut
+            'N26' // N26
+        ),
     );
     
-    // Add email (required if send_email is true)
-    if (!empty($params['email'])) {
-        $request_body['email'] = sanitize_email($params['email']);
-    }
-    
-    // Add phone (not required by API but useful for our records)
-    if (!empty($phone)) {
-        $request_body['phone'] = $phone;
-    }
-    
-    // Add client_id (may be required for authentication)
-    $request_body['client_id'] = $client_id;
-    
-    // Add redirect and webhook URLs
-    $request_body['redirect_url'] = home_url('/pateriņa-kredīts/paldies/');
-    $request_body['webhook_url'] = home_url('/wp-json/loan-calculator/v1/accountscoring-callback');
-    
-    // Optional: Add transaction days (default is usually 90)
-    $request_body['transaction_days'] = 90;
-    
-    // Optional: Add allowed banks for Latvia (LV)
-    $request_body['allowed_banks'] = array(
-        'HABALV22', // Swedbank
-        'UNLALV2X', // SEB
-        'PARXLV22', // Citadele
-        'NDEALV2X', // Luminor
-        'REVOGB21XXX', // Revolut
-        'N26' // N26
-    );
-    
-    // Add loan-specific data as custom fields
+    // Add loan-specific data
     if (isset($params['loanAmount']) && $params['loanAmount'] > 0) {
         $request_body['amount'] = floatval($params['loanAmount']);
     }
@@ -150,24 +126,14 @@ function create_accountscoring_invitation($request) {
     error_log('AccountScoring API request URL: ' . $api_url);
     error_log('AccountScoring API request body: ' . json_encode($request_body));
     
-    // Try multiple authentication methods as recommended in the documentation
-    error_log("Using multiple authentication methods with API key: " . substr($api_key, 0, 4) . '...');
-    
-    // Prepare headers with multiple authentication methods
+    // Prepare headers with Bearer token authentication
     $headers = [
-        // Primary method: Bearer token in Authorization header
         'Authorization' => 'Bearer ' . trim($api_key),
-        // Secondary method: X-Api-Key header
-        'X-Api-Key' => trim($api_key),
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'
     ];
     
-    // Add client_id to URL as tertiary authentication method
-    $api_url_with_key = add_query_arg(['api_key' => trim($api_key)], $api_url);
-    error_log("Using API URL with key parameter as fallback: " . $api_url_with_key);
-    
-    $response = wp_remote_post($api_url_with_key, [
+    $response = wp_remote_post($api_url, [
         'headers' => $headers,
         'body' => json_encode($request_body),
         'timeout' => 30
@@ -191,23 +157,13 @@ function create_accountscoring_invitation($request) {
         return new WP_Error('api_error', $error_message, array('status' => $status_code, 'response' => $body));
     }
     
-    // Log the invitation
-    error_log('AccountScoring invitation created: ' . print_r($body, true));
-    
-    // Log response for debugging
-    error_log('AccountScoring API response: ' . print_r($body, true));
-    
-    // Return the invitation ID
-    // The API actually returns 'uuid' instead of 'invitation_id' in the prelive environment
-    // We'll use whichever one is available
+    // Get the invitation ID (uuid) from the response
     $invitation_id = '';
-    if (isset($body['invitation_id'])) {
-        $invitation_id = $body['invitation_id'];
-    } elseif (isset($body['uuid'])) {
+    if (isset($body['uuid'])) {
         $invitation_id = $body['uuid'];
-        error_log('Using UUID as invitation_id: ' . $invitation_id);
     } else {
-        error_log('WARNING: Neither invitation_id nor uuid found in response: ' . print_r($body, true));
+        error_log('WARNING: uuid not found in response: ' . print_r($body, true));
+        return new WP_Error('api_error', 'Neizdevās izveidot AccountScoring uzaicinājumu', array('status' => 500));
     }
     
     return rest_ensure_response(array(
@@ -252,15 +208,150 @@ function submit_consumer_loan_application($request) {
     );
     
     // Here you would typically:
-    // 1. Send to your CRM (e.g., Pipedrive)
-    // 2. Process application data
+    // 1. Save application to database (custom post type)
+    $post_id = save_loan_application($application_data);
     
-    // Log the application for debugging purposes only
+    // 2. Send to your CRM (e.g., Pipedrive) if needed
+    $pipedrive_integration = get_option('loan_calculator_pipedrive_enabled', false);
+    if ($pipedrive_integration) {
+        send_to_pipedrive($application_data);
+    }
+    
+    // Log the application for debugging purposes
     error_log('Consumer loan application submitted: ' . print_r($application_data, true));
     
     // Return success response
     return rest_ensure_response(array(
         'success' => true,
-        'message' => 'Pieteikums veiksmīgi iesniegts'
+        'message' => 'Pieteikums veiksmīgi iesniegts',
+        'application_id' => $post_id
     ));
+}
+
+/**
+ * Handle AccountScoring callback/webhook
+ */
+function handle_accountscoring_callback($request) {
+    $params = $request->get_params();
+    $body = $request->get_body();
+    
+    // Log the callback for debugging
+    error_log('AccountScoring callback received: ' . $body);
+    
+    $data = json_decode($body, true);
+    
+    if (!$data || !isset($data['invitation_id'])) {
+        return new WP_Error('invalid_callback', 'Invalid callback data', array('status' => 400));
+    }
+    
+    // Process the callback based on its type
+    if (isset($data['type']) && $data['type'] === 'account_access_granted') {
+        // Bank account access has been granted
+        // Update application status and store statement ID if provided
+        if (isset($data['statement_id'])) {
+            update_application_by_invitation_id($data['invitation_id'], array(
+                'status' => 'bank_connected',
+                'statement_id' => $data['statement_id']
+            ));
+            
+            // Optionally trigger statement analysis here
+            trigger_statement_analysis($data['statement_id']);
+        }
+    }
+    
+    return rest_ensure_response(array(
+        'success' => true,
+        'message' => 'Webhook received'
+    ));
+}
+
+/**
+ * Save loan application to database
+ */
+function save_loan_application($data) {
+    // Create a new post for the loan application
+    $post_args = array(
+        'post_title'    => 'Loan Application - ' . $data['first_name'] . ' ' . $data['last_name'],
+        'post_status'   => 'publish',
+        'post_type'     => 'loan_application',
+    );
+    
+    $post_id = wp_insert_post($post_args);
+    
+    if (!is_wp_error($post_id)) {
+        // Save all application data as post meta
+        foreach ($data as $key => $value) {
+            update_post_meta($post_id, '_loan_' . $key, $value);
+        }
+        
+        // Set initial status
+        update_post_meta($post_id, '_loan_status', $data['is_bank_connected'] ? 'bank_connected' : 'submitted');
+    }
+    
+    return $post_id;
+}
+
+/**
+ * Update application by invitation ID
+ */
+function update_application_by_invitation_id($invitation_id, $data) {
+    // Query for loan applications with this invitation ID
+    $args = array(
+        'post_type' => 'loan_application',
+        'meta_query' => array(
+            array(
+                'key' => '_loan_invitation_id',
+                'value' => $invitation_id,
+                'compare' => '='
+            )
+        ),
+        'posts_per_page' => 1
+    );
+    
+    $query = new WP_Query($args);
+    
+    if ($query->have_posts()) {
+        $query->the_post();
+        $post_id = get_the_ID();
+        
+        // Update application data
+        foreach ($data as $key => $value) {
+            update_post_meta($post_id, '_loan_' . $key, $value);
+        }
+        
+        wp_reset_postdata();
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Trigger statement analysis (sample function)
+ */
+function trigger_statement_analysis($statement_id) {
+    // This would typically make an API call to get statement predictions
+    // For now, just log that we would do this
+    error_log('Would trigger analysis for statement ID: ' . $statement_id);
+    
+    // In a real implementation, you would:
+    // 1. Call the statement-predictions-v2 endpoint
+    // 2. Process the credit score
+    // 3. Update the application with the score and decision
+}
+
+/**
+ * Send application data to Pipedrive CRM (sample function)
+ */
+function send_to_pipedrive($data) {
+    // This is a placeholder for Pipedrive integration
+    // In a real implementation, you would make API calls to Pipedrive
+    error_log('Would send application to Pipedrive: ' . print_r($data, true));
+}
+
+/**
+ * Register callback for handling AccountScoring webhook
+ */
+function handle_accountscoring_callback_endpoint($request) {
+    return handle_accountscoring_callback($request);
 }
