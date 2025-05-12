@@ -327,7 +327,7 @@ const LoanCalculator = () => {
 
     // Calculate monthly payment - memoized calculation
     const calculateMonthlyPayment = useCallback(() => {
-        const annualRate = 0.069; // 12% annual interest rate
+        const annualRate = 0.0686; // 12% annual interest rate
         const monthlyRate = annualRate / 12;
         const payment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) / 
                        (Math.pow(1 + monthlyRate, term) - 1);
