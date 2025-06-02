@@ -9,6 +9,7 @@ const ConsumerLoanCalculator = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isBankConnected, setIsBankConnected] = useState(false);
   const [showBankContainer, setShowBankContainer] = useState(false);
+  const [selectedBank, setSelectedBank] = useState(null);
   const bankContainerRef = useRef(null);
   
   // Function to load the AccountScoring script
@@ -38,20 +39,22 @@ const ConsumerLoanCalculator = () => {
     });
   }, []);
   
-  // Function to initialize AccountScoring with container version
-  const initializeContainer = useCallback(async (invitationId) => {
+  // Function to handle bank selection from custom UI
+  const handleBankSelect = useCallback(async (bankCode) => {
+    // Rule: minimizing animations and refreshes when interacting with form elements
+    setSelectedBank(bankCode);
+    console.log('🏦 Selected bank:', bankCode);
+    
+    // Get the current invitation ID from state
+    const invitationId = window.currentInvitationId;
     if (!invitationId) {
-      console.error('❌ Missing invitation ID for container');
+      console.error('❌ No invitation ID available for bank selection');
+      setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
       return;
     }
     
-    // Get client ID from WordPress configuration or use fallback
-    // Rule: Security - Handle sensitive data properly
-    const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    console.log('🔑 Using AccountScoring Client ID for container:', clientId);
-    
     try {
-      // Load the script
+      // Load the AccountScoring script if not already loaded
       await loadScript();
       
       // Check if ASCEMBED is available
@@ -61,35 +64,82 @@ const ConsumerLoanCalculator = () => {
         return;
       }
       
-      console.log('✅ ASCEMBED is available, initializing container version...');
+      // Get client ID from WordPress configuration or use fallback
+      // Rule: Security - Handle sensitive data properly
+      const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
+      console.log('🔑 Using AccountScoring Client ID for bank selection:', clientId);
       
-      // Inicializējam AccountScoring ar container versiju (v3 API)
+      // Initialize AccountScoring with the selected bank
+      console.log('🏦 Initializing AccountScoring for bank:', bankCode);
+      
+      // Create a modal button for the selected bank
+      // This is needed because AccountScoring still requires a button click to open the bank auth flow
+      const buttonId = 'accountscoring-button-' + Date.now();
+      const button = document.createElement('button');
+      button.id = buttonId;
+      button.type = 'button';
+      button.textContent = 'Connect to ' + bankCode;
+      button.style.position = 'absolute';
+      button.style.opacity = '0';
+      button.style.pointerEvents = 'none';
+      document.body.appendChild(button);
+      
+      // Initialize AccountScoring with modal version for the selected bank
       window.ASCEMBED.initialize({
-        container_id: 'ascContainer',
-        invitation_id: invitationId, // uuid no API atbildes
+        btn_id: buttonId,
+        invitation_id: invitationId,
         client_id: clientId,
         locale: 'lv_LV',
-        is_modal: false,
+        is_modal: true, // Use modal for the actual bank connection
         environment: 'prelive',
+        bank_code: bankCode, // Specify the selected bank code
         onConfirmAllDone: function(status) {
           console.log('✅ Bankas savienojums pabeigts:', status);
           setIsBankConnected(true);
           setIsSuccess(true);
+          if (button) button.remove();
         },
         onClose: function() {
-          console.log('Banku saraksts aizvērts');
-          setShowBankContainer(false);
+          console.log('Banku savienojums aizvērts');
+          setSelectedBank(null);
+          if (button) button.remove();
         },
         onError: function(error) {
           console.error('❌ AccountScoring kļūda:', error);
           setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
+          if (button) button.remove();
         }
       });
+      
+      // Click the button automatically after a short delay
+      setTimeout(() => {
+        console.log('🔄 Triggering click on bank button');
+        button.click();
+      }, 300);
+      
     } catch (error) {
-      console.error('❌ Error initializing AccountScoring:', error);
+      console.error('❌ Error handling bank selection:', error);
       setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz vēlāk.');
     }
-  }, [loadScript, setError, setIsBankConnected, setIsSuccess, setShowBankContainer]);
+  }, [loadScript, setError, setIsBankConnected, setIsSuccess, setSelectedBank]);
+  
+  // Function to initialize AccountScoring with container version
+  const initializeContainer = useCallback(async (invitationId) => {
+    if (!invitationId) {
+      console.error('❌ Missing invitation ID for container');
+      return;
+    }
+    
+    // Store the invitation ID for later use with bank selection
+    window.currentInvitationId = invitationId;
+    
+    // Show the bank container with custom UI
+    setShowBankContainer(true);
+    
+    // No need to initialize AccountScoring here, as we'll do it when a bank is selected
+    console.log('✅ Ready for bank selection with invitation ID:', invitationId);
+    
+  }, [setShowBankContainer]);
 
   // Form setup with React Hook Form
   // Rule: minimizing animations and refreshes when interacting with form elements
@@ -115,23 +165,15 @@ const ConsumerLoanCalculator = () => {
       return;
     }
     
-    // Rule: Security - Handle sensitive data properly
-    // Iegūstam client_id no WordPress konfigurācijas (window.loanCalculatorData) vai izmantojam rezerves vērtību
-    const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    console.log('🔑 Izmantotais AccountScoring Client ID:', clientId);
-    console.log('🆔 Using Invitation ID:', invitationId);
+    console.log('🔄 Initializing AccountScoring with invitation ID:', invitationId);
     
-    // Rule: UI and Styling - Use Tailwind CSS for styling
-    // Show the bank container
+    // Store the invitation ID for later use
+    window.currentInvitationId = invitationId;
+    
+    // Show the bank container with custom UI
     setShowBankContainer(true);
-    
-    // Create a container ID for the AccountScoring banks
-    const containerId = 'ascContainer';
-    
-    // Start the initialization process
-    initializeContainer(invitationId);
-  }, [setError, setShowBankContainer, initializeContainer]);
-  
+  }, [setError, setShowBankContainer]);
+
   // Create a real invitation using AccountScoring API v3
   // Rule: Error Handling - Handle network failures gracefully
   const createInvitation = async (formData) => {
@@ -272,24 +314,64 @@ const ConsumerLoanCalculator = () => {
           </div>
         </div>
       ) : showBankContainer ? (
-        <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">Izvēlieties savu banku</h2>
-          <p className="text-gray-600 mb-4">Lai turpinātu, lūdzu, izvēlieties savu banku no saraksta zemāk.</p>
-          
-          {/* AccountScoring container for bank buttons */}
-          <div 
-            id="ascContainer" 
-            ref={bankContainerRef}
-            className="border border-gray-200 rounded-lg p-4 min-h-[300px] w-full"
-          ></div>
-          
-          <button
-            onClick={() => setShowBankContainer(false)}
-            className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
-          >
-            Atpakaļ
-          </button>
-        </div>
+        <section className="section border form-auth-bank mb-6" style={{borderTop: '4px solid #E3E5EB'}}>
+          <div className="section--wrap">
+            <div className="small-content-block">
+              <h2 className="text-xl font-bold mb-6">Vēl tikai 1 minūte Tava laika. Lūdzu, autorizējies, lai lēmums tiktu saņemts uzreiz un varam pārliecināties, ka iesniegtie dati pieder Tev!</h2>
+              <p className="mb-6">Izskatīšanas procesā tiks izmantots Krediidiregister OU pakalpojums, kurš tiks izmantots mana bankas konta pārskata iegūšanai, kurš iekļaus visus ienākošos un izejošos darījumus par pilniem pēdējiem 6 kalendārajiem mēnešiem. Vairāk informācijas par datu apstrādi Krediidiregister OU privātuma politika.</p>
+              
+              {/* Custom bank buttons with logos */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <button 
+                  type="button" 
+                  className="bank-button flex items-center justify-center border border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-all"
+                  data-bank-code="HABALV22"
+                  onClick={() => handleBankSelect('HABALV22')}
+                >
+                  <img src="https://www.lkpp.lv/images/banks/swedbank-logo.jpg" alt="Swedbank" className="h-8" />
+                </button>
+                <button 
+                  type="button" 
+                  className="bank-button flex items-center justify-center border border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-all"
+                  data-bank-code="UNLALV2X"
+                  onClick={() => handleBankSelect('UNLALV2X')}
+                >
+                  <img src="https://www.lkpp.lv/images/banks/seb-logo.jpg" alt="SEB" className="h-8" />
+                </button>
+                <button 
+                  type="button" 
+                  className="bank-button flex items-center justify-center border border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-all"
+                  data-bank-code="NDEALV2X"
+                  onClick={() => handleBankSelect('NDEALV2X')}
+                >
+                  <img src="https://www.lkpp.lv/images/banks/luminor-logo.jpg" alt="Luminor" className="h-8" />
+                </button>
+                <button 
+                  type="button" 
+                  className="bank-button flex items-center justify-center border border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-all"
+                  data-bank-code="PARXLV22"
+                  onClick={() => handleBankSelect('PARXLV22')}
+                >
+                  <img src="https://www.lkpp.lv/images/banks/citadele-logo.jpg" alt="Citadele" className="h-8" />
+                </button>
+              </div>
+              
+              {/* Hidden container for AccountScoring */}
+              <div 
+                id="ascContainer" 
+                ref={bankContainerRef}
+                className="hidden"
+              ></div>
+              
+              <button
+                onClick={() => setShowBankContainer(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
+              >
+                Atpakaļ
+              </button>
+            </div>
+          </div>
+        </section>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Rule: more space below section titles (mb-6) */}
