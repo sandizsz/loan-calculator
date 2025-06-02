@@ -55,7 +55,7 @@ const ConsumerLoanCalculator = () => {
     });
   }, []);
   
-  // Function to handle bank selection from custom UI
+  // Function to handle bank selection from custom UI - using LKPP approach
   const handleBankSelect = useCallback(async (bankCode) => {
     // Rule: minimizing animations and refreshes when interacting with form elements
     setSelectedBank(bankCode);
@@ -67,7 +67,6 @@ const ConsumerLoanCalculator = () => {
     
     if (!invitationId) {
       console.error('❌ No invitation ID available for bank selection');
-      // Try to create a new invitation
       setError('Nav pieejams ielūguma ID. Lūdzu, mēģiniet vēlreiz sākt procesu.');
       return;
     }
@@ -91,63 +90,96 @@ const ConsumerLoanCalculator = () => {
       const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
       console.log('🔑 Using AccountScoring Client ID for bank selection:', clientId);
       
-      // Create a visible button for debugging purposes
-      const buttonId = 'accountscoring-button-' + Date.now();
-      const button = document.createElement('button');
-      button.id = buttonId;
-      button.type = 'button';
-      button.textContent = 'Connect to ' + bankCode;
-      button.style.position = 'fixed';
-      button.style.bottom = '10px';
-      button.style.right = '10px';
-      button.style.zIndex = '9999';
-      button.style.padding = '10px';
-      button.style.background = '#007bff';
-      button.style.color = 'white';
-      button.style.border = 'none';
-      button.style.borderRadius = '4px';
-      document.body.appendChild(button);
+      // Create a hidden button for AccountScoring to use
+      const buttonId = 'accountscoring-button';
+      let button = document.getElementById(buttonId);
       
-      console.log('🔍 Created button with ID:', buttonId);
+      // If button doesn't exist, create it
+      if (!button) {
+        button = document.createElement('button');
+        button.id = buttonId;
+        button.type = 'button';
+        button.style.position = 'absolute';
+        button.style.opacity = '0';
+        button.style.pointerEvents = 'none';
+        button.style.width = '1px';
+        button.style.height = '1px';
+        button.style.overflow = 'hidden';
+        document.body.appendChild(button);
+        console.log('🔍 Created hidden AccountScoring button with ID:', buttonId);
+      }
       
-      // Initialize AccountScoring with modal version for the selected bank
-      console.log('🏦 Initializing AccountScoring for bank:', bankCode);
+      // Initialize AccountScoring with the invitation ID
+      console.log('🏦 Initializing AccountScoring for bank selection');
       
-      // Add a click handler to the button for manual testing
-      button.addEventListener('click', function() {
-        console.log('🔍 Button clicked manually');
-        
-        // Initialize AccountScoring with modal version for the selected bank
-        window.ASCEMBED.initialize({
-          btn_id: buttonId,
-          invitation_id: invitationId,
-          client_id: clientId,
-          locale: 'lv_LV',
-          is_modal: true, // Use modal for the actual bank connection
-          environment: 'prelive',
-          bank_code: bankCode, // Specify the selected bank code
-          onConfirmAllDone: function(status) {
-            console.log('✅ Bankas savienojums pabeigts:', status);
-            setIsBankConnected(true);
-            setIsSuccess(true);
-            button.remove();
-          },
-          onClose: function() {
-            console.log('Banku savienojums aizvērts');
-            setSelectedBank(null);
-          },
-          onError: function(error) {
-            console.error('❌ AccountScoring kļūda:', error);
-            setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
+      // Using the LKPP approach with MutationObserver to detect when the modal is ready
+      let lock = true;
+      const observer = new MutationObserver((mutationsList) => {
+        mutationsList.forEach(mutation => {
+          // Look for the specific bank button in the AccountScoring modal
+          const bankButton = document.querySelector(`.asc-container-banks-btn__${bankCode}`);
+          
+          if (bankButton && lock) {
+            console.log('✅ Found bank button for', bankCode, 'clicking it automatically');
+            // Show the AccountScoring modal
+            const ascModal = document.getElementById('ascMainModalId');
+            if (ascModal) {
+              ascModal.style.display = 'flex';
+            }
+            
+            // Click the bank button
+            bankButton.click();
+            lock = false;
+            
+            // We can stop observing once we've clicked the button
+            setTimeout(() => observer.disconnect(), 1000);
+          }
+          
+          // Handle the case when bank selection is shown
+          const bankContainer = document.querySelector('.asc-container-banks');
+          if (bankContainer) {
+            const ascModal = document.getElementById('ascMainModalId');
+            if (ascModal) {
+              ascModal.style.display = 'flex';
+            }
           }
         });
       });
       
-      // Click the button automatically after a short delay
+      // Start observing the document body for changes
+      observer.observe(document.body, { childList: true, subtree: true });
+      
+      // Initialize AccountScoring with modal version
+      window.ASCEMBED.initialize({
+        btn_id: buttonId,
+        invitation_id: invitationId,
+        client_id: clientId,
+        locale: 'lv_LV',
+        is_modal: true,
+        environment: 'prelive',
+        onConfirmAllDone: function(status) {
+          console.log('✅ Bankas savienojums pabeigts:', status);
+          setIsBankConnected(true);
+          setIsSuccess(true);
+          observer.disconnect();
+        },
+        onClose: function() {
+          console.log('Banku savienojums aizvērts');
+          setSelectedBank(null);
+          observer.disconnect();
+        },
+        onError: function(error) {
+          console.error('❌ AccountScoring kļūda:', error);
+          setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
+          observer.disconnect();
+        }
+      });
+      
+      // Click the button to open the AccountScoring modal
       setTimeout(() => {
-        console.log('🔄 Triggering click on bank button');
+        console.log('🔄 Triggering click on AccountScoring button');
         button.click();
-      }, 1000);
+      }, 300);
       
     } catch (error) {
       console.error('❌ Error handling bank selection:', error);
