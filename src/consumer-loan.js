@@ -35,20 +35,21 @@ function addAccountScoringScript() {
 
 function initApp() {
   const rootElement = document.getElementById('consumer-loan-calculator-root');
-
+  
   if (rootElement) {
-    console.log('✅ Found #consumer-loan-calculator-root, initializing...');
+    // First add the AccountScoring script
     addAccountScoringScript();
+    
+    // Wait a bit to ensure script is loaded
     setTimeout(() => {
       createRoot(rootElement).render(<ConsumerLoanCalculator />);
     }, 200);
   } else {
-    console.error('❌ consumer-loan-calculator-root element not found');
+    console.error('Consumer loan calculator root element not found');
   }
 }
 
-
 // Initialize once page is fully loaded
-document.addEventListener('load', function() {
+window.addEventListener('load', function() {
   initApp();
 });
