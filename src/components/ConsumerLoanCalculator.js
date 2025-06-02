@@ -41,39 +41,16 @@ const ConsumerLoanCalculator = () => {
     console.log('🆔 Using Invitation ID:', invitationId);
     
     // Rule: UI and Styling - Use Tailwind CSS for styling
-    // Create a container div for the AccountScoring modal with very high z-index
-    const containerId = 'accountscoring-container-' + Date.now();
-    const container = document.createElement('div');
-    container.id = containerId;
-    container.style.position = 'fixed';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '100vw'; // Use viewport width to ensure full coverage
-    container.style.height = '100vh'; // Use viewport height to ensure full coverage
-    container.style.zIndex = '2147483647'; // Maximum possible z-index
-    container.style.display = 'flex';
-    container.style.justifyContent = 'center';
-    container.style.alignItems = 'center';
-    container.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Darker overlay for better contrast
-    container.style.backdropFilter = 'blur(2px)'; // Slight blur effect
-    container.style.transition = 'none'; // Rule: Minimize animations
-    document.body.appendChild(container);
-    
-    // Create a visible button inside the container
+    // Create a hidden button that will be used by AccountScoring to trigger the modal
     const buttonId = 'accountscoring-button-' + Date.now();
     const button = document.createElement('button');
     button.id = buttonId;
-    button.textContent = 'Savienot banku';
-    button.style.padding = '12px 24px';
-    button.style.backgroundColor = '#4CAF50';
-    button.style.color = 'white';
-    button.style.border = 'none';
-    button.style.borderRadius = '4px';
-    button.style.fontSize = '16px';
-    button.style.cursor = 'pointer';
-    button.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-    button.style.transition = 'none'; // Rule: Minimize animations
-    container.appendChild(button);
+    button.textContent = 'Savienot banku'; // This text won't be visible
+    button.style.position = 'fixed';
+    button.style.opacity = '0';
+    button.style.pointerEvents = 'none';
+    button.style.zIndex = '-1';
+    document.body.appendChild(button);
     
     // Function to load the AccountScoring script
     const loadScript = () => {
@@ -112,7 +89,7 @@ const ConsumerLoanCalculator = () => {
         if (!window.ASCEMBED) {
           console.error('❌ ASCEMBED not available after script load');
           setError('Kļūda ielādējot bankas savienojuma skriptu. Lūdzu, mēģiniet vēlreiz vēlāk.');
-          if (container) container.remove();
+          if (button) button.remove();
           return;
         }
         
@@ -130,13 +107,13 @@ const ConsumerLoanCalculator = () => {
             console.log('✅ Bank connection completed:', status);
             setIsBankConnected(true);
             setIsSuccess(true);
-            // Remove the container
-            if (container) container.remove();
+            // Remove the button
+            if (button) button.remove();
           },
           onClose: function() {
             console.log('Modal closed');
-            // Remove the container
-            if (container) container.remove();
+            // Remove the button
+            if (button) button.remove();
           },
           onError: function(error) {
             console.error('❌ AccountScoring error callback:', error);
@@ -145,8 +122,8 @@ const ConsumerLoanCalculator = () => {
             } else {
               setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
             }
-            // Remove the container
-            if (container) container.remove();
+            // Remove the button
+            if (button) button.remove();
           }
         });
         
@@ -158,8 +135,8 @@ const ConsumerLoanCalculator = () => {
       } catch (error) {
         console.error('❌ Error initializing AccountScoring:', error);
         setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz vēlāk.');
-        // Remove the container
-        if (container) container.remove();
+        // Remove the button
+        if (button) button.remove();
       }
     };
     
