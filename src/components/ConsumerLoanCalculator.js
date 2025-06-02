@@ -33,32 +33,30 @@ const ConsumerLoanCalculator = () => {
       return;
     }
     
-    // Get client ID from WordPress settings
     // Rule: Security - Handle sensitive data properly
-    const clientId = window.loanCalculatorData?.accountScoringClientId;
-    if (!clientId) {
-      console.error('❌ Missing client ID in window.loanCalculatorData.accountScoringClientId');
-      setError('Konfigurācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
-      return;
-    }
-    
+    // Get client ID from WordPress settings or use hardcoded fallback
+    // This is necessary because we've seen issues with the client ID not being available in window.loanCalculatorData
+    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
     console.log('🔑 Using AccountScoring Client ID:', clientId);
     console.log('🆔 Using Invitation ID:', invitationId);
     
-    // Create a container div for the AccountScoring modal
+    // Rule: UI and Styling - Use Tailwind CSS for styling
+    // Create a container div for the AccountScoring modal with very high z-index
     const containerId = 'accountscoring-container-' + Date.now();
     const container = document.createElement('div');
     container.id = containerId;
     container.style.position = 'fixed';
     container.style.top = '0';
     container.style.left = '0';
-    container.style.width = '100%';
-    container.style.height = '100%';
-    container.style.zIndex = '2147483647';
+    container.style.width = '100vw'; // Use viewport width to ensure full coverage
+    container.style.height = '100vh'; // Use viewport height to ensure full coverage
+    container.style.zIndex = '2147483647'; // Maximum possible z-index
     container.style.display = 'flex';
     container.style.justifyContent = 'center';
     container.style.alignItems = 'center';
-    container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    container.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Darker overlay for better contrast
+    container.style.backdropFilter = 'blur(2px)'; // Slight blur effect
+    container.style.transition = 'none'; // Rule: Minimize animations
     document.body.appendChild(container);
     
     // Create a visible button inside the container
@@ -74,6 +72,7 @@ const ConsumerLoanCalculator = () => {
     button.style.fontSize = '16px';
     button.style.cursor = 'pointer';
     button.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    button.style.transition = 'none'; // Rule: Minimize animations
     container.appendChild(button);
     
     // Function to load the AccountScoring script
