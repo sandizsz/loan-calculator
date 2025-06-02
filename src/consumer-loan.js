@@ -5,47 +5,33 @@ import './styles/main.css';
 
 // Add AccountScoring script to the page
 function addAccountScoringScript() {
-  // First check if the script is already loaded
-  if (window.ASCEMBED) {
-    console.log('AccountScoring script already loaded');
-    return;
-  }
-  
-  // Remove any existing script to avoid duplicates
+  // Remove existing script to avoid duplicates
   const existingScript = document.getElementById('accountscoring-script');
   if (existingScript) {
     existingScript.remove();
   }
-  
-  // Check if we're in development mode
-  const isDev = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
-  
-  // Add the script with correct URL
+
   const script = document.createElement('script');
   script.id = 'accountscoring-script';
-  script.src = isDev 
-    ? 'https://prelive.accountscoring.com/static/asc-embed-v2.js'
-    : 'https://accountscoring.com/static/asc-embed-v2.js';
-  script.async = false; // Important: load synchronously
-  
-  // Add the script to the document head
-  document.head.appendChild(script);
-  
-  // Create container and button elements
+  script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js'; // Always prelive
+  script.async = false;
+
+  // Create container and modal button
   const ascContainer = document.createElement('div');
   ascContainer.id = 'asc-container';
-  
+
   const modalButton = document.createElement('button');
   modalButton.id = 'ascModal';
   modalButton.textContent = 'Savienot ar banku';
   modalButton.style.display = 'none';
-  
-  // Add container and button to the document
+
+  document.head.appendChild(script);
   document.body.appendChild(ascContainer);
   document.body.appendChild(modalButton);
-  
-  console.log(`AccountScoring script added from: ${script.src} (Dev mode: ${isDev ? 'Yes' : 'No'})`);
+
+  console.log('AccountScoring PRELIVE script added:', script.src);
 }
+
 
 function initApp() {
   const rootElement = document.getElementById('consumer-loan-calculator-root');
