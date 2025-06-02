@@ -53,57 +53,87 @@ const ConsumerLoanCalculator = () => {
 
   const initializeAccountScoring = useCallback((invitationId) => {
     if (!invitationId) {
-      console.error('Missing invitation ID');
+      console.error('❌ Missing invitation ID');
+      setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
       return;
     }
-  
-    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI'; // Your AccountScoring client ID
-  
-    // Load the embed script if it hasn't been loaded
-    if (!window.ASCEMBED) {
-      const script = document.createElement('script');
-      script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js';
-      script.async = true;
-      script.onload = () => {
-        launchModal();
-      };
-      document.body.appendChild(script);
-    } else {
-      launchModal();
-    }
-  
-    function launchModal() {
-      setTimeout(() => {
-        try {
-          window.ASCEMBED.initialize({
-            btn_id: 'ascModal',
-            invitation_id: invitationId,
-            client_id: clientId,
-            locale: 'lv_LV',
-            is_modal: true,
-            onConfirmAllDone: function (status) {
-              console.log('✅ All done:', status);
-              setIsBankConnected(true);
-              setStep(2);
-            },
-            onClose: function () {
-              console.log('Modal closed');
-            }
-          });
-  
-          // Simulate click after initialized
-          const btn = document.getElementById('ascModal');
-          if (btn) btn.click();
-          else console.warn('ascModal button not found!');
-        } catch (err) {
-          console.error('❌ Failed to initialize ASCEMBED:', err);
+    
+    // Get the client ID from window.loanCalculatorData or use the hardcoded value
+    const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
+    
+    console.log('🔑 Using AccountScoring Client ID:', clientId);
+    console.log('🆔 Using Invitation ID:', invitationId);
+    
+    // Function to initialize AccountScoring
+    const initASC = () => {
+      if (!window.ASCEMBED) {
+        console.log('⏳ ASCEMBED not available yet, loading script...');
+        
+        // Load the script if it's not already loaded
+        const existingScript = document.getElementById('accountscoring-script');
+        if (!existingScript) {
+          const script = document.createElement('script');
+          script.id = 'accountscoring-script';
+          script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js';
+          script.async = true;
+          script.onload = () => {
+            console.log('✅ AccountScoring script loaded, initializing...');
+            setTimeout(initASC, 300); // Try again after script is loaded
+          };
+          document.head.appendChild(script);
+        } else {
+          // Script exists but ASCEMBED not available yet, wait a bit longer
+          setTimeout(initASC, 500);
         }
-      }, 300); // Wait a bit to ensure ASCEMBED exists
-    }
-  }, [setStep, setIsBankConnected]);
-
-  
-  
+        return;
+      }
+      
+      try {
+        // Clear any previous initialization
+        if (typeof window.ASCEMBED.clear === 'function') {
+          window.ASCEMBED.clear();
+        }
+        
+        console.log('🚀 Initializing AccountScoring with modal version');
+        
+        // Initialize with the correct parameters for modal version
+        window.ASCEMBED.initialize({
+          btn_id: 'ascModal', // Button ID that will trigger the modal
+          invitation_id: invitationId,
+          client_id: clientId,
+          locale: 'lv_LV',
+          is_modal: true, // Using modal version
+          onConfirmAllDone: function(status) {
+            console.log('✅ Bank connection completed:', status);
+            setIsBankConnected(true);
+            setStep(2);
+          },
+          onClose: function() {
+            console.log('Modal closed');
+          }
+        });
+        
+        // Trigger the modal to open automatically
+        setTimeout(() => {
+          const modalButton = document.getElementById('ascModal');
+          if (modalButton) {
+            console.log('🖱️ Clicking modal button to open AccountScoring');
+            modalButton.click();
+          } else {
+            console.error('❌ Modal button not found');
+            setError('Kļūda - nevar atrast bankas savienojuma pogu.');
+          }
+        }, 300);
+      } catch (error) {
+        console.error('❌ Error initializing AccountScoring:', error);
+        setError('Kļūda inicializējot bankas savienojumu: ' + error.message);
+      }
+    };
+    
+    // Start the initialization process
+    initASC();
+    
+  }, [setStep, setIsBankConnected, setError]);
 
   // Watch form values for calculations
   const loanAmount = watch('loanAmount');
@@ -129,20 +159,29 @@ const ConsumerLoanCalculator = () => {
           <p className="text-sm text-blue-700 mb-4">
             {translate('Lai turpinātu pieteikumu, lūdzu, savienojiet savu bankas kontu, izmantojot drošo AccountScoring pakalpojumu.')}
           </p>
-          {/* The button will be moved here by the initializeAccountScoring function */}
+          {/* Hidden button for AccountScoring modal trigger */}
+          <button
+            id="ascModal"
+            type="button"
+            style={{ display: 'none' }}
+            className="w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all"
+          >
+            Savienot ar banku
+          </button>
         </div>
       );
     }
     return null;
   };
   
-  // Form submission handler
-  const onSubmit = async (data) => {
-    // Prevent validation errors from showing during submission
-    setIsSubmitting(true);
-    setError(null);
-    
-    if (step === 1) {
+  // Handle Step 1 submission (separate from main submit to avoid form validation issues)
+  const handleSubmitStep1 = async () => {
+    // Manual validation for required fields in step 1
+    const isValid = await handleSubmit(async (data) => {
+      // Validation passed, continue with submission
+      setIsSubmitting(true);
+      setError(null);
+      
       try {
         // Create invitation in AccountScoring
         const response = await axios.post('/wp-json/loan-calculator/v1/create-invitation', {
@@ -160,7 +199,7 @@ const ConsumerLoanCalculator = () => {
           // Store the invitation ID
           const invId = response.data.invitation_id;
           setInvitationId(invId);
-          console.log('Received invitation ID:', invId);
+          console.log('🆔 Received invitation ID:', invId);
           
           // Initialize and open AccountScoring modal
           initializeAccountScoring(invId);
@@ -168,7 +207,7 @@ const ConsumerLoanCalculator = () => {
           setError('Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.');
         }
       } catch (error) {
-        console.error('Error creating invitation:', error);
+        console.error('❌ Error creating invitation:', error);
         
         // Provide detailed error message
         let errorMessage = 'Kļūda izveidojot pieteikumu. Lūdzu, mēģiniet vēlreiz.';
@@ -187,6 +226,22 @@ const ConsumerLoanCalculator = () => {
       } finally {
         setIsSubmitting(false);
       }
+    })();
+    
+    // If validation fails, the handleSubmit function will handle errors
+    return isValid;
+  };
+  
+  // Form submission handler
+  const onSubmit = async (data) => {
+    // Prevent validation errors from showing during submission
+    setIsSubmitting(true);
+    setError(null);
+    
+    if (step === 1) {
+      // This should not be called directly anymore, using handleSubmitStep1 instead
+      // But keeping for compatibility
+      handleSubmitStep1();
       return;
     }
     
@@ -586,7 +641,27 @@ const ConsumerLoanCalculator = () => {
           )}
           
           {step === 1 ? (
-            <button id="ascModal">Open Modal</button>
+            <button
+              type="button"
+              onClick={handleSubmitStep1}
+              className={`w-full px-6 py-4 rounded-lg font-medium shadow-sm flex items-center justify-center ${isSubmitting ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all'}`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {translate('Apstrādā...')}
+                </>
+              ) : (
+                <>
+                  {translate('Turpināt')}
+                  <ChevronRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </button>
           ) : (
             <button
               type="submit"

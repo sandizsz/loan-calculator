@@ -11,25 +11,25 @@ function addAccountScoringScript() {
     existingScript.remove();
   }
 
+  // Create and add the script
   const script = document.createElement('script');
   script.id = 'accountscoring-script';
-  script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js'; // Always prelive
-  script.async = false;
-
-  // Create container and modal button
+  script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js'; // Using prelive environment
+  script.async = true;
+  
+  // Add script to head
+  document.head.appendChild(script);
+  
+  // Create container for non-modal version (if needed later)
   const ascContainer = document.createElement('div');
   ascContainer.id = 'asc-container';
-
-  const modalButton = document.createElement('button');
-  modalButton.id = 'ascModal';
-  modalButton.textContent = 'Savienot ar banku';
-  modalButton.style.display = 'none';
-
-  document.head.appendChild(script);
+  ascContainer.style.display = 'none';
   document.body.appendChild(ascContainer);
-  document.body.appendChild(modalButton);
-
-  console.log('AccountScoring PRELIVE script added:', script.src);
+  
+  console.log('✅ AccountScoring PRELIVE script added:', script.src);
+  
+  // Return the script element so we can attach onload handlers if needed
+  return script;
 }
 
 
@@ -37,13 +37,24 @@ function initApp() {
   const rootElement = document.getElementById('consumer-loan-calculator-root');
   
   if (rootElement) {
-    // First add the AccountScoring script
-    addAccountScoringScript();
+    // First add the AccountScoring script and get the script element
+    const scriptElement = addAccountScoringScript();
     
-    // Wait a bit to ensure script is loaded
-    setTimeout(() => {
-      createRoot(rootElement).render(<ConsumerLoanCalculator />);
-    }, 200);
+    // Create a global window object to store the ASCEMBED instance if needed
+    window.loanCalculatorData = window.loanCalculatorData || {};
+    
+    // Render the React component immediately
+    // The ConsumerLoanCalculator will handle its own initialization
+    createRoot(rootElement).render(<ConsumerLoanCalculator />);
+    
+    // Log when script is loaded
+    scriptElement.onload = () => {
+      console.log('🚀 AccountScoring script loaded successfully');
+    };
+    
+    scriptElement.onerror = () => {
+      console.error('❌ Failed to load AccountScoring script');
+    };
   } else {
     console.error('Consumer loan calculator root element not found');
   }
