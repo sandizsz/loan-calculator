@@ -586,7 +586,7 @@ const ConsumerLoanCalculator = () => {
           )}
           
           {step === 1 ? (
-            <button id="ascModal" style={{ display: 'none' }}>Open Modal</button>
+            <button id="ascModal">Open Modal</button>
           ) : (
             <button
               type="submit"
