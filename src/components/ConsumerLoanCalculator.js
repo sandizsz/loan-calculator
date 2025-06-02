@@ -41,15 +41,16 @@ const ConsumerLoanCalculator = () => {
     console.log('🆔 Using Invitation ID:', invitationId);
     
     // Rule: UI and Styling - Use Tailwind CSS for styling
-    // Create a hidden button that will be used by AccountScoring to trigger the modal
+    // Create a hidden trigger button for AccountScoring, appended directly to body
     const buttonId = 'accountscoring-button-' + Date.now();
     const button = document.createElement('button');
     button.id = buttonId;
-    button.textContent = 'Savienot banku'; // This text won't be visible
-    button.style.position = 'fixed';
+    button.type = 'button';
+    button.textContent = 'Savienot banku'; // Not visible
+    button.style.position = 'absolute';
     button.style.opacity = '0';
     button.style.pointerEvents = 'none';
-    button.style.zIndex = '-1';
+    button.style.zIndex = '2147483647';
     document.body.appendChild(button);
     
     // Function to load the AccountScoring script
@@ -89,7 +90,7 @@ const ConsumerLoanCalculator = () => {
         if (!window.ASCEMBED) {
           console.error('❌ ASCEMBED not available after script load');
           setError('Kļūda ielādējot bankas savienojuma skriptu. Lūdzu, mēģiniet vēlreiz vēlāk.');
-          if (button) button.remove();
+          if (container) container.remove();
           return;
         }
         
@@ -107,12 +108,12 @@ const ConsumerLoanCalculator = () => {
             console.log('✅ Bank connection completed:', status);
             setIsBankConnected(true);
             setIsSuccess(true);
-            // Remove the button
+            // Clean up the button after use
             if (button) button.remove();
           },
           onClose: function() {
             console.log('Modal closed');
-            // Remove the button
+            // Clean up the button after modal close
             if (button) button.remove();
           },
           onError: function(error) {
@@ -122,7 +123,7 @@ const ConsumerLoanCalculator = () => {
             } else {
               setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
             }
-            // Remove the button
+            // Clean up the button on error
             if (button) button.remove();
           }
         });
@@ -135,8 +136,8 @@ const ConsumerLoanCalculator = () => {
       } catch (error) {
         console.error('❌ Error initializing AccountScoring:', error);
         setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz vēlāk.');
-        // Remove the button
-        if (button) button.remove();
+        // Remove the container
+        if (container) container.remove();
       }
     };
     
