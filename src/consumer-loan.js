@@ -9,19 +9,25 @@ function addAccountScoringStyles() {
   // Add CSS to ensure modal appears correctly with high z-index
   const styleEl = document.createElement('style');
   styleEl.textContent = `
-    /* Force modal to be visible */
+    /* AccountScoring modal/overlay/iframe: always on top and full viewport */
     #accountscoring-modal-container,
     .accountscoring-modal-overlay,
     .accountscoring-modal,
     .accountscoring-iframe-container,
-    .accountscoring-iframe {
+    .accountscoring-iframe,
+    [id^="accountscoring-button-"],
+    [id^="asc-modal"],
+    [class*="accountscoring"],
+    [class*="modal-overlay"],
+    [id^="asc-modal"],
+    [id^="asc-modal-overlay"] {
       z-index: 2147483647 !important;
       position: fixed !important;
-      transition: none !important; /* Rule: Minimize animations */
+      transition: none !important;
     }
-    
-    /* Ensure modal overlay covers everything */
-    .accountscoring-modal-overlay {
+    .accountscoring-modal-overlay,
+    [class*="modal-overlay"],
+    [id^="asc-modal-overlay"] {
       top: 0 !important;
       left: 0 !important;
       width: 100vw !important;
@@ -29,8 +35,6 @@ function addAccountScoringStyles() {
       background: rgba(0,0,0,0.7) !important;
       backdrop-filter: blur(2px) !important;
     }
-    
-    /* Center the modal */
     #accountscoring-modal-container {
       top: 50% !important;
       left: 50% !important;
@@ -41,20 +45,16 @@ function addAccountScoringStyles() {
       border-radius: 8px !important;
       overflow: hidden !important;
     }
-    
-    /* Fix any potential iframe issues */
     .accountscoring-iframe {
       border: none !important;
       width: 100% !important;
       height: 100% !important;
       display: block !important;
     }
-    
-    /* Fix any potential button issues */
     [id^="accountscoring-button-"] {
       font-family: system-ui, -apple-system, sans-serif !important;
       font-weight: 500 !important;
-      transition: none !important; /* Rule: Minimize animations */
+      transition: none !important;
     }
   `;
   document.head.appendChild(styleEl);
@@ -79,7 +79,7 @@ function initApp() {
   }
 }
 
-// Initialize once page is fully loaded
+// Inicializējam, kad lapa ir pilnībā ielādēta
 window.addEventListener('load', function() {
   initApp();
 });

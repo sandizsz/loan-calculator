@@ -34,19 +34,23 @@ const ConsumerLoanCalculator = () => {
     }
     
     // Rule: Security - Handle sensitive data properly
-    // Get client ID from WordPress settings or use hardcoded fallback
-    // This is necessary because we've seen issues with the client ID not being available in window.loanCalculatorData
-    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    console.log('🔑 Using AccountScoring Client ID:', clientId);
+    // Iegūstam client_id no WordPress konfigurācijas (window.loanCalculatorData)
+    const clientId = window.loanCalculatorData?.accountScoringClientId;
+    if (!clientId) {
+      console.error('❌ Trūkst AccountScoring client_id!');
+      setError('Konfigurācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
+      return;
+    }
+    console.log('🔑 Izmantotais AccountScoring Client ID:', clientId);
     console.log('🆔 Using Invitation ID:', invitationId);
     
     // Rule: UI and Styling - Use Tailwind CSS for styling
-    // Create a hidden trigger button for AccountScoring, appended directly to body
+    // Izveidojam neredzamu pogu AccountScoring modālim (pievienota body)
     const buttonId = 'accountscoring-button-' + Date.now();
     const button = document.createElement('button');
     button.id = buttonId;
     button.type = 'button';
-    button.textContent = 'Savienot banku'; // Not visible
+    button.textContent = 'Savienot banku'; // Neredzama lietotājam
     button.style.position = 'absolute';
     button.style.opacity = '0';
     button.style.pointerEvents = 'none';
@@ -96,34 +100,27 @@ const ConsumerLoanCalculator = () => {
         
         console.log('✅ ASCEMBED is available, initializing...');
         
-        // Initialize with the correct parameters
+        // Inicializējam AccountScoring modāli ar v3 API
         window.ASCEMBED.initialize({
           btn_id: buttonId,
-          invitation_id: invitationId,
+          invitation_id: invitationId, // uuid no API atbildes
           client_id: clientId,
           locale: 'lv_LV',
           is_modal: true,
           environment: 'prelive',
           onConfirmAllDone: function(status) {
-            console.log('✅ Bank connection completed:', status);
+            console.log('✅ Bankas savienojums pabeigts:', status);
             setIsBankConnected(true);
             setIsSuccess(true);
-            // Clean up the button after use
             if (button) button.remove();
           },
           onClose: function() {
-            console.log('Modal closed');
-            // Clean up the button after modal close
+            console.log('Modālis aizvērts');
             if (button) button.remove();
           },
           onError: function(error) {
-            console.error('❌ AccountScoring error callback:', error);
-            if (error && error.status === 401) {
-              setError('Autentifikācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
-            } else {
-              setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
-            }
-            // Clean up the button on error
+            console.error('❌ AccountScoring kļūda:', error);
+            setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
             if (button) button.remove();
           }
         });
