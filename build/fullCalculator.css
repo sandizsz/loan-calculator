@@ -571,6 +571,9 @@ input[type="range"]::-webkit-slider-thumb {
 .pointer-events-none {
   pointer-events: none;
 }
+.visible {
+  visibility: visible;
+}
 .static {
   position: static;
 }
@@ -872,9 +875,6 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(2rem * 0);
   margin-bottom: calc(2rem * var(--tw-space-y-reverse));
-}
-.overflow-hidden {
-  overflow: hidden;
 }
 .whitespace-nowrap {
   white-space: nowrap;

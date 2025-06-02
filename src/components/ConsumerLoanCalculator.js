@@ -83,6 +83,7 @@ const ConsumerLoanCalculator = () => {
         }, true);
         
         // Initialize with the correct parameters for modal version
+        // Rule: UI and Styling - Implement responsive design
         window.ASCEMBED.initialize({
           btn_id: 'ascModal', // Button ID that will trigger the modal
           invitation_id: invitationId,
@@ -90,6 +91,16 @@ const ConsumerLoanCalculator = () => {
           locale: 'lv_LV',
           is_modal: true, // Using modal version
           environment: 'prelive', // Explicitly set to prelive environment
+          modal_options: {
+            overlay_opacity: 0.8,
+            overlay_background: '#000000',
+            z_index: 1000000, // Very high z-index to ensure it's above everything
+            position: 'fixed',
+            width: '90%',
+            max_width: '800px',
+            height: '90%',
+            max_height: '800px'
+          },
           onConfirmAllDone: function(status) {
             console.log('✅ Bank connection completed:', status);
             setIsBankConnected(true);
@@ -250,9 +261,10 @@ const ConsumerLoanCalculator = () => {
     await createInvitation(data);
   };
 
-  // Rule: tighter spacing between form rows (gap-4) and two-column layout for Step 1
+  // We don't need to render the button in the component as it's added to the body directly
+  // The modal will be triggered programmatically
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+    <div className="loan-calculator-container bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
           {error}
