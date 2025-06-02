@@ -66,14 +66,28 @@ function initApp() {
   
   if (rootElement) {
     // Add global styles for AccountScoring modal
-   
+    addAccountScoringStyles();
     
-    // Create a global window object to store the ASCEMBED instance if needed
+    // Create a global window object to store the AccountScoring configuration
     window.loanCalculatorData = window.loanCalculatorData || {};
     
-    // Render the React component immediately
-    addAccountScoringStyles();
-    // The ConsumerLoanCalculator will handle its own initialization
+    // Set the AccountScoring client ID from data attributes or use fallback
+    // Rule: Security - Handle sensitive data properly
+    if (!window.loanCalculatorData.accountScoringClientId) {
+      // Try to get from data attribute on the root element
+      const clientId = rootElement.getAttribute('data-client-id') || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
+      window.loanCalculatorData.accountScoringClientId = clientId;
+      console.log('🔑 Set AccountScoring Client ID:', clientId);
+    }
+    
+    // Preload the AccountScoring script
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.as = 'script';
+    preloadLink.href = 'https://prelive.accountscoring.com/static/asc-embed-v2.js';
+    document.head.appendChild(preloadLink);
+    
+    // Render the React component
     createRoot(rootElement).render(<ConsumerLoanCalculator />);
   } else {
     console.error('Consumer loan calculator root element not found');

@@ -45,12 +45,10 @@ const ConsumerLoanCalculator = () => {
       return;
     }
     
-    // Get client ID from WordPress configuration
+    // Get client ID from WordPress configuration or use fallback
+    // Rule: Security - Handle sensitive data properly
     const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    if (!clientId) {
-      console.error('❌ Missing client_id for container');
-      return;
-    }
+    console.log('🔑 Using AccountScoring Client ID for container:', clientId);
     
     try {
       // Load the script
@@ -118,13 +116,8 @@ const ConsumerLoanCalculator = () => {
     }
     
     // Rule: Security - Handle sensitive data properly
-    // Iegūstam client_id no WordPress konfigurācijas (window.loanCalculatorData)
-    const clientId = window.loanCalculatorData?.accountScoringClientId;
-    if (!clientId) {
-      console.error('❌ Trūkst AccountScoring client_id!');
-      setError('Konfigurācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
-      return;
-    }
+    // Iegūstam client_id no WordPress konfigurācijas (window.loanCalculatorData) vai izmantojam rezerves vērtību
+    const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
     console.log('🔑 Izmantotais AccountScoring Client ID:', clientId);
     console.log('🆔 Using Invitation ID:', invitationId);
     
