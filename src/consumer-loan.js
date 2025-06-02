@@ -66,12 +66,13 @@ function initApp() {
   
   if (rootElement) {
     // Add global styles for AccountScoring modal
-    addAccountScoringStyles();
+   
     
     // Create a global window object to store the ASCEMBED instance if needed
     window.loanCalculatorData = window.loanCalculatorData || {};
     
     // Render the React component immediately
+    addAccountScoringStyles();
     // The ConsumerLoanCalculator will handle its own initialization
     createRoot(rootElement).render(<ConsumerLoanCalculator />);
   } else {
