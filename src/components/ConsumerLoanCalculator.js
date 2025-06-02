@@ -40,95 +40,70 @@ const ConsumerLoanCalculator = () => {
     defaultValues: {
       loanAmount: 5000,
       loanTerm: 36,
-      firstName: '',
-      lastName: '',
-      personalCode: '',
-      email: '',
-      phone: '',
-      monthlyIncome: '1000',
+      firstName: 'Sandis',
+      lastName: 'Sirmais',
+      personalCode: '160600-22559',
+      email: 'sandissirmais8@gmail.com',
+      phone: '25641934',
+      monthlyIncome: '1200',
       otherLoans: 'no',
       consentToTerms: false
     }
   });
 
-// Fix for the AccountScoring integration
-const initializeAccountScoring = useCallback((invitationId) => {
-  if (!invitationId) {
-    console.error('No invitation ID provided');
-    setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
-    return;
-  }
-  
-  // Ensure we're using the correct client ID
-  const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-  
-  console.log('Using AccountScoring Client ID:', clientId);
-  
-  // Make sure the modal button exists
-  let modalButton = document.getElementById('ascModal');
-  if (!modalButton) {
-    modalButton = document.createElement('button');
-    modalButton.id = 'ascModal';
-    modalButton.textContent = 'Savienot ar banku';
-    modalButton.className = 'w-full px-6 py-4 rounded-lg font-medium shadow-sm bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all';
-    document.body.appendChild(modalButton);
-  }
-  
-  // Make the button visible
-  modalButton.style.display = 'block';
-  
-  // Move to bank connection section if it exists
-  const bankConnectionSection = document.getElementById('bank-connection-section');
-  if (bankConnectionSection) {
-    bankConnectionSection.appendChild(modalButton);
-  }
-  
-  // Important: Use setTimeout to ensure script is fully loaded
-  setTimeout(() => {
-    if (window.ASCEMBED) {
-      try {
-        // Clear any previous initialization
-        if (typeof window.ASCEMBED.clear === 'function') {
-          window.ASCEMBED.clear();
-        }
-        
-        // Initialize with the correct parameters
-        window.ASCEMBED.initialize({
-          btn_id: 'ascModal',
-          invitation_id: invitationId,
-          client_id: clientId,
-          locale: 'lv_LV',
-          is_modal: true,
-          onConfirmAllDone: function(status) {
-            console.log("Bank connection completed:", status);
-            setIsBankConnected(true);
-            setStep(2);
-          },
-          onClose: function() {
-            console.log("Modal closed");
-          }
-        });
-        
-        // Wait a bit to ensure initialization is complete before trying to open
-        setTimeout(() => {
-          if (typeof window.ASCEMBED.open === 'function') {
-            window.ASCEMBED.open();
-          } else {
-            console.error("ASCEMBED.open method not found after initialization");
-            // Alternative: Try clicking the button directly
-            modalButton.click();
-          }
-        }, 1000);
-      } catch (error) {
-        console.error('Error initializing AccountScoring:', error);
-        setError('Kļūda inicializējot bankas savienojumu: ' + error.message);
-      }
-    } else {
-      console.error("ASCEMBED object not available");
-      setError('Kļūda ielādējot AccountScoring bibliotēku. Lūdzu, atsvaidziniet lapu.');
+  const initializeAccountScoring = useCallback((invitationId) => {
+    if (!invitationId) {
+      console.error('Missing invitation ID');
+      return;
     }
-  }, 1000); // Give time for script to load
-}, [setStep, setIsBankConnected, setError]);
+  
+    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI'; // Your AccountScoring client ID
+  
+    // Load the embed script if it hasn't been loaded
+    if (!window.ASCEMBED) {
+      const script = document.createElement('script');
+      script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js';
+      script.async = true;
+      script.onload = () => {
+        launchModal();
+      };
+      document.body.appendChild(script);
+    } else {
+      launchModal();
+    }
+  
+    function launchModal() {
+      setTimeout(() => {
+        try {
+          window.ASCEMBED.initialize({
+            btn_id: 'ascModal',
+            invitation_id: invitationId,
+            client_id: clientId,
+            locale: 'lv_LV',
+            is_modal: true,
+            onConfirmAllDone: function (status) {
+              console.log('✅ All done:', status);
+              setIsBankConnected(true);
+              setStep(2);
+            },
+            onClose: function () {
+              console.log('Modal closed');
+            }
+          });
+  
+          // Simulate click after initialized
+          const btn = document.getElementById('ascModal');
+          if (btn) btn.click();
+          else console.warn('ascModal button not found!');
+        } catch (err) {
+          console.error('❌ Failed to initialize ASCEMBED:', err);
+        }
+      }, 300); // Wait a bit to ensure ASCEMBED exists
+    }
+  }, [setStep, setIsBankConnected]);
+
+  
+  
 
   // Watch form values for calculations
   const loanAmount = watch('loanAmount');
@@ -610,36 +585,40 @@ const initializeAccountScoring = useCallback((invitationId) => {
             </button>
           )}
           
-          <button
-            type="submit"
-            className={`w-full px-6 py-4 rounded-lg font-medium shadow-sm flex items-center justify-center ${
-              isSubmitting 
-                ? 'bg-gray-400 text-white cursor-not-allowed' 
-                : 'bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all'
-            }`}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {translate('Apstrādā...')}
-              </>
-            ) : (
-              <>
-                {step === 1 ? translate('Pieteikties') : translate('Iesniegt pieteikumu')}
-                <ChevronRight className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </button>
+          {step === 1 ? (
+            <button id="ascModal" style={{ display: 'none' }}>Open Modal</button>
+          ) : (
+            <button
+              type="submit"
+              className={`w-full px-6 py-4 rounded-lg font-medium shadow-sm flex items-center justify-center ${
+                isSubmitting 
+                  ? 'bg-gray-400 text-white cursor-not-allowed' 
+                  : 'bg-[#FFC600] hover:bg-[#E6B400] text-black transition-all'
+              }`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {translate('Apstrādā...')}
+                </>
+              ) : (
+                <>
+                  {translate('Iesniegt pieteikumu')}
+                  <ChevronRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </button>
+          )}
         </div>
       </form>
       
       {/* Hidden elements for AccountScoring */}
       <div id="asc-container" style={{ display: 'none' }}></div>
-      <button id="ascModal" style={{ display: 'none' }}>Savienot ar banku</button>
+
     </div>
   );
 };
