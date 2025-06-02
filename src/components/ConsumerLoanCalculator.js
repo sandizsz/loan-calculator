@@ -35,9 +35,9 @@ const ConsumerLoanCalculator = () => {
     
     // Get client ID from WordPress settings
     // Rule: Security - Handle sensitive data properly
-    const clientId = window.loanCalculatorData?.client_id;
+    const clientId = window.loanCalculatorData?.accountScoringClientId;
     if (!clientId) {
-      console.error('❌ Missing client ID in window.loanCalculatorData');
+      console.error('❌ Missing client ID in window.loanCalculatorData.accountScoringClientId');
       setError('Konfigurācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
       return;
     }
