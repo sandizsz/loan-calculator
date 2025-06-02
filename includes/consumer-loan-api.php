@@ -51,7 +51,6 @@ function create_accountscoring_invitation($request) {
             // Latvian banks
             'HABALV22',    // Swedbank
             'UNLALV2X',    // SEB
-            'PARXLV22',    // Citadele
             'NDEALV2X',    // Luminor
             'REVOGB21XXX', // Revolut
             'N26'          // N26
