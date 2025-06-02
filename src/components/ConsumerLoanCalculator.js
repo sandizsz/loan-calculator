@@ -108,47 +108,53 @@ const ConsumerLoanCalculator = () => {
         // Load the script
         await loadScript();
         
-        // Wait for ASCEMBED to be ready
-        window.ASCEMBED.ready(function() {
-          console.log('✅ ASCEMBED is ready');
-          
-          // Initialize with the correct parameters
-          window.ASCEMBED.initialize({
-            btn_id: buttonId,
-            invitation_id: invitationId,
-            client_id: clientId,
-            locale: 'lv_LV',
-            is_modal: true,
-            environment: 'prelive',
-            onConfirmAllDone: function(status) {
-              console.log('✅ Bank connection completed:', status);
-              setIsBankConnected(true);
-              setIsSuccess(true);
-              // Remove the container
-              if (container) container.remove();
-            },
-            onClose: function() {
-              console.log('Modal closed');
-              // Remove the container
-              if (container) container.remove();
-            },
-            onError: function(error) {
-              console.error('❌ AccountScoring error callback:', error);
-              if (error && error.status === 401) {
-                setError('Autentifikācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
-              } else {
-                setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
-              }
-              // Remove the container
-              if (container) container.remove();
+        // Check if ASCEMBED is available
+        if (!window.ASCEMBED) {
+          console.error('❌ ASCEMBED not available after script load');
+          setError('Kļūda ielādējot bankas savienojuma skriptu. Lūdzu, mēģiniet vēlreiz vēlāk.');
+          if (container) container.remove();
+          return;
+        }
+        
+        console.log('✅ ASCEMBED is available, initializing...');
+        
+        // Initialize with the correct parameters
+        window.ASCEMBED.initialize({
+          btn_id: buttonId,
+          invitation_id: invitationId,
+          client_id: clientId,
+          locale: 'lv_LV',
+          is_modal: true,
+          environment: 'prelive',
+          onConfirmAllDone: function(status) {
+            console.log('✅ Bank connection completed:', status);
+            setIsBankConnected(true);
+            setIsSuccess(true);
+            // Remove the container
+            if (container) container.remove();
+          },
+          onClose: function() {
+            console.log('Modal closed');
+            // Remove the container
+            if (container) container.remove();
+          },
+          onError: function(error) {
+            console.error('❌ AccountScoring error callback:', error);
+            if (error && error.status === 401) {
+              setError('Autentifikācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
+            } else {
+              setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
             }
-          });
-          
-          // Click the button automatically
-          setTimeout(() => {
-            button.click();
-          }, 500);
-        }, true);
+            // Remove the container
+            if (container) container.remove();
+          }
+        });
+        
+        // Click the button automatically after a short delay
+        setTimeout(() => {
+          console.log('🔄 Triggering click on modal button');
+          button.click();
+        }, 500);
       } catch (error) {
         console.error('❌ Error initializing AccountScoring:', error);
         setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz vēlāk.');
