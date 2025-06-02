@@ -1,6 +1,6 @@
 // src/consumer-loan.js
 import { createRoot } from 'react-dom/client';
-import ConsumerLoanCalculator from './components/ConsumerLoanCalculator';
+import { ConsumerLoanCalculator } from './components/ConsumerLoanCalculator';
 import './styles/main.css';
 
 // Rule: UI and Styling - Use Tailwind CSS for styling
