@@ -32,17 +32,30 @@ function create_accountscoring_invitation($request) {
         error_log('⚠️ Using fallback client ID (should be set in settings)');
     }
 
-    // Prepare the API URL
-    $api_url = 'https://prelive.accountscoring.com/api/v2/invitations';
+    // Prepare the API URL - using v3 endpoint
+    $api_url = 'https://prelive.accountscoring.com/api/v3/invitation';
 
-    // Build request payload
+    // Build request payload for v3 API
     $request_body = [
-        'email'         => $params['email'],
-        'phone'         => $params['phone'],
-        'first_name'    => $params['firstName'],
-        'last_name'     => $params['lastName'],
-        'personal_code' => $params['personalCode'],
-        'client_id'     => $client_id
+        'email'           => $params['email'],
+        'personal_code'   => $params['personalCode'],
+        'name'            => $params['firstName'] . ' ' . $params['lastName'],
+        'send_email'      => false,
+        'transaction_days' => 90,
+        'language'        => 'lv', // Latvian language
+        'redirect_url'    => isset($params['redirectUrl']) ? $params['redirectUrl'] : get_site_url(),
+        'valid_until'     => date('Y-m-d H:i:s', strtotime('+30 days')),
+        'webhook_url'     => null,
+        'client_id'       => $client_id,
+        'allowed_banks'   => [
+            // Latvian banks
+            'HABALV22',    // Swedbank
+            'UNLALV2X',    // SEB
+            'PARXLV22',    // Citadele
+            'NDEALV2X',    // Luminor
+            'REVOGB21XXX', // Revolut
+            'N26'          // N26
+        ]
     ];
 
     // Prepare headers
@@ -75,10 +88,11 @@ function create_accountscoring_invitation($request) {
     $code = wp_remote_retrieve_response_code($response);
     $body = json_decode(wp_remote_retrieve_body($response), true);
 
-    if ($code === 201 && isset($body['invitation_id'])) {
+    // V3 API returns a UUID field instead of invitation_id
+    if ($code === 201 && isset($body['uuid'])) {
         return rest_ensure_response([
             'success' => true,
-            'invitation_id' => $body['invitation_id']
+            'invitation_id' => $body['uuid'] // Return as invitation_id for backward compatibility
         ]);
     } else {
         return new WP_Error('api_error', 'Kļūda no AccountScoring API', [
