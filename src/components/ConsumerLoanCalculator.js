@@ -15,27 +15,43 @@ const ConsumerLoanCalculator = () => {
   // Function to load the AccountScoring script
   const loadScript = useCallback(() => {
     return new Promise((resolve, reject) => {
-      // Check if script already exists
       if (window.ASCEMBED) {
+        console.log('✅ ASCEMBED already loaded');
         resolve();
         return;
       }
       
+      // First remove any existing script to avoid conflicts
+      const existingScripts = document.querySelectorAll('script[src*="accountscoring.com"]');
+      existingScripts.forEach(script => script.remove());
+      
+      // Create and add the script
       const script = document.createElement('script');
       script.src = 'https://prelive.accountscoring.com/static/asc-embed-v2.js';
       script.async = true;
       
+      // Add event listeners
       script.onload = () => {
-        console.log('✅ AccountScoring script loaded');
-        resolve();
+        console.log('✅ ASCEMBED script loaded successfully');
+        
+        // Verify that ASCEMBED is actually available
+        if (window.ASCEMBED) {
+          console.log('✅ ASCEMBED object is available in window');
+          resolve();
+        } else {
+          console.error('❌ ASCEMBED object not found in window after script load');
+          reject(new Error('ASCEMBED not found after script load'));
+        }
       };
       
       script.onerror = (error) => {
-        console.error('❌ Error loading AccountScoring script:', error);
+        console.error('❌ Error loading ASCEMBED script:', error);
         reject(error);
       };
       
+      // Add the script to the document
       document.head.appendChild(script);
+      console.log('📝 Added ASCEMBED script to document head');
     });
   }, []);
   
@@ -47,14 +63,18 @@ const ConsumerLoanCalculator = () => {
     
     // Get the current invitation ID from state
     const invitationId = window.currentInvitationId;
+    console.log('🔍 Checking invitation ID:', invitationId);
+    
     if (!invitationId) {
       console.error('❌ No invitation ID available for bank selection');
-      setError('Kļūda inicializējot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
+      // Try to create a new invitation
+      setError('Nav pieejams ielūguma ID. Lūdzu, mēģiniet vēlreiz sākt procesu.');
       return;
     }
     
     try {
       // Load the AccountScoring script if not already loaded
+      console.log('🔎 Loading AccountScoring script...');
       await loadScript();
       
       // Check if ASCEMBED is available
@@ -64,58 +84,70 @@ const ConsumerLoanCalculator = () => {
         return;
       }
       
+      console.log('✅ ASCEMBED loaded successfully');
+      
       // Get client ID from WordPress configuration or use fallback
       // Rule: Security - Handle sensitive data properly
       const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
       console.log('🔑 Using AccountScoring Client ID for bank selection:', clientId);
       
-      // Initialize AccountScoring with the selected bank
-      console.log('🏦 Initializing AccountScoring for bank:', bankCode);
-      
-      // Create a modal button for the selected bank
-      // This is needed because AccountScoring still requires a button click to open the bank auth flow
+      // Create a visible button for debugging purposes
       const buttonId = 'accountscoring-button-' + Date.now();
       const button = document.createElement('button');
       button.id = buttonId;
       button.type = 'button';
       button.textContent = 'Connect to ' + bankCode;
-      button.style.position = 'absolute';
-      button.style.opacity = '0';
-      button.style.pointerEvents = 'none';
+      button.style.position = 'fixed';
+      button.style.bottom = '10px';
+      button.style.right = '10px';
+      button.style.zIndex = '9999';
+      button.style.padding = '10px';
+      button.style.background = '#007bff';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.borderRadius = '4px';
       document.body.appendChild(button);
       
+      console.log('🔍 Created button with ID:', buttonId);
+      
       // Initialize AccountScoring with modal version for the selected bank
-      window.ASCEMBED.initialize({
-        btn_id: buttonId,
-        invitation_id: invitationId,
-        client_id: clientId,
-        locale: 'lv_LV',
-        is_modal: true, // Use modal for the actual bank connection
-        environment: 'prelive',
-        bank_code: bankCode, // Specify the selected bank code
-        onConfirmAllDone: function(status) {
-          console.log('✅ Bankas savienojums pabeigts:', status);
-          setIsBankConnected(true);
-          setIsSuccess(true);
-          if (button) button.remove();
-        },
-        onClose: function() {
-          console.log('Banku savienojums aizvērts');
-          setSelectedBank(null);
-          if (button) button.remove();
-        },
-        onError: function(error) {
-          console.error('❌ AccountScoring kļūda:', error);
-          setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
-          if (button) button.remove();
-        }
+      console.log('🏦 Initializing AccountScoring for bank:', bankCode);
+      
+      // Add a click handler to the button for manual testing
+      button.addEventListener('click', function() {
+        console.log('🔍 Button clicked manually');
+        
+        // Initialize AccountScoring with modal version for the selected bank
+        window.ASCEMBED.initialize({
+          btn_id: buttonId,
+          invitation_id: invitationId,
+          client_id: clientId,
+          locale: 'lv_LV',
+          is_modal: true, // Use modal for the actual bank connection
+          environment: 'prelive',
+          bank_code: bankCode, // Specify the selected bank code
+          onConfirmAllDone: function(status) {
+            console.log('✅ Bankas savienojums pabeigts:', status);
+            setIsBankConnected(true);
+            setIsSuccess(true);
+            button.remove();
+          },
+          onClose: function() {
+            console.log('Banku savienojums aizvērts');
+            setSelectedBank(null);
+          },
+          onError: function(error) {
+            console.error('❌ AccountScoring kļūda:', error);
+            setError(error?.message || error?.error || 'Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
+          }
+        });
       });
       
       // Click the button automatically after a short delay
       setTimeout(() => {
         console.log('🔄 Triggering click on bank button');
         button.click();
-      }, 300);
+      }, 1000);
       
     } catch (error) {
       console.error('❌ Error handling bank selection:', error);
@@ -177,114 +209,50 @@ const ConsumerLoanCalculator = () => {
   // Create a real invitation using AccountScoring API v3
   // Rule: Error Handling - Handle network failures gracefully
   const createInvitation = async (formData) => {
-    setIsLoading(true);
-    setError(null);
-    
     try {
+      // Rule: minimizing animations and refreshes when interacting with form elements
+      setIsLoading(true);
+      setError(null);
+      
       // Rule: Security - Handle sensitive data properly
-      // API endpoint for AccountScoring v3
-      const apiUrl = 'https://prelive.accountscoring.com/api/v3/invitation';
-      
-      // Get client ID from WordPress settings
-      // Rule: Security - Handle sensitive data properly
-      const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-      
-      console.log('🔄 Creating invitation via AccountScoring API v3');
-      
-      // Prepare the request payload according to the API documentation
-      // Rule: Use Latvian language for all text
-      const requestPayload = {
+      // Prepare data for API call
+      const apiData = {
         email: formData.email,
-        personal_code: formData.personalCode,
-        name: `${formData.firstName} ${formData.lastName}`,
-        send_email: false,
-        transaction_days: 90,
-        language: 'lv', // Latvian language
-        redirect_url: window.location.href, // Return to the same page
-        valid_until: (() => {
-          // Set valid until to 30 days from now
-          const date = new Date();
-          date.setDate(date.getDate() + 30);
-          return date.toISOString().split('T')[0] + ' 23:59:59';
-        })(),
-        webhook_url: null,
-        // Include client ID in the payload as per API documentation
-        client_id: clientId,
-        allowed_banks: [
-          // Latvian banks
-          'HABALV22', // Swedbank
-          'UNLALV2X', // SEB
-          'PARXLV22', // Citadele
-          'NDEALV2X', // Luminor
-          'REVOGB21XXX', // Revolut
-          'N26' // N26
-        ]
+        phone: formData.phone,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        personalCode: formData.personalCode,
+        loanAmount: formData.loanAmount,
+        loanTerm: formData.loanTerm
       };
       
-      console.log('📤 Sending invitation request:', requestPayload);
+      console.log('💬 Creating invitation with data:', apiData);
       
-      // Since we don't have a real API key for direct API access,
-      // let's use the WordPress REST API endpoint that already has the API key configured
-      // Rule: Error Handling - Handle network failures gracefully
-      console.log('🔄 Using WordPress REST API as proxy for AccountScoring API');
+      // Call WordPress REST API endpoint that will proxy to AccountScoring
+      const response = await axios.post('/wp-json/loan-calculator/v1/create-invitation', apiData);
       
-      // Get the WordPress REST API URL
-      const restUrl = window.wpApiSettings?.root || '/wp-json/';
-      const restNonce = window.wpApiSettings?.nonce || '';
+      console.log('📡 API Response:', response.data);
       
-      const response = await axios.post(
-        `${restUrl}loan-calculator/v1/create-invitation`,
-        {
-          email: formData.email,
-          phone: formData.phone,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          personalCode: formData.personalCode
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-WP-Nonce': restNonce
-          },
-          timeout: 10000 // 10 second timeout
-        }
-      );
-      
-      // Check if the response contains the invitation_id
-      // The WordPress REST API returns a different format than the direct AccountScoring API
       if (response.data && response.data.success && response.data.invitation_id) {
         const invitationId = response.data.invitation_id;
-        console.log('✅ Received invitation ID from WordPress API:', invitationId);
-        console.log('📊 Full API response:', response.data);
+        console.log('✅ Got invitation ID:', invitationId);
         
-        // Initialize AccountScoring with the real invitation ID
+        // Store the invitation ID in window for debugging
+        window.currentInvitationId = invitationId;
+        console.log('💾 Stored invitation ID in window.currentInvitationId:', window.currentInvitationId);
+        
+        // Initialize AccountScoring with the invitation ID
         initializeAccountScoring(invitationId);
-        
-        // The initializeAccountScoring function will call initializeContainer internally
-        
         return true;
       } else {
-        console.error('❌ Invalid API response:', response.data);
-        setError('Kļūda saņemot bankas savienojuma ID. Lūdzu, mēģiniet vēlreiz.');
+        const errorMessage = response.data?.error || 'Kļūda veidojot ielūgumu. Lūdzu, mēģiniet vēlreiz vēlāk.';
+        console.error('❌ API Error:', errorMessage);
+        setError(errorMessage);
         return false;
       }
     } catch (error) {
       console.error('❌ Error creating invitation:', error);
-      
-      // Provide more detailed error information
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-      
-      // Provide a more specific error message if available
-      const errorMessage = error.response?.data?.messages?.[0] || 
-                          error.response?.data?.message || 
-                          'Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.';
-      
-      setError(errorMessage);
+      setError('Kļūda savienojoties ar serveri. Lūdzu, mēģiniet vēlreiz vēlāk.');
       return false;
     } finally {
       setIsLoading(false);
