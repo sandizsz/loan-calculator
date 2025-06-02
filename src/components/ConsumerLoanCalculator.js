@@ -34,13 +34,8 @@ const ConsumerLoanCalculator = () => {
     }
     
     // Rule: Security - Handle sensitive data properly
-    // Iegūstam client_id no WordPress konfigurācijas (window.loanCalculatorData)
-    const clientId = window.loanCalculatorData?.accountScoringClientId;
-    if (!clientId) {
-      console.error('❌ Trūkst AccountScoring client_id!');
-      setError('Konfigurācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
-      return;
-    }
+    // Lietojam hardcoded PRELIVE client_id pēc lietotāja pieprasījuma
+    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
     console.log('🔑 Izmantotais AccountScoring Client ID:', clientId);
     console.log('🆔 Using Invitation ID:', invitationId);
     
