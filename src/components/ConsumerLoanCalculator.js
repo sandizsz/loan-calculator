@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
 
 // Rule: Use functional and declarative programming patterns
 const ConsumerLoanCalculator = () => {
@@ -31,9 +32,9 @@ const ConsumerLoanCalculator = () => {
       return;
     }
     
-    // Hardcoded client ID for simplicity
-    const clientId = '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
-    
+    // Get client ID from WordPress settings
+    // Rule: Security - Handle sensitive data properly
+    const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';  
     console.log('🔑 Using AccountScoring Client ID:', clientId);
     console.log('🆔 Using Invitation ID:', invitationId);
     
@@ -53,6 +54,10 @@ const ConsumerLoanCalculator = () => {
             console.log('✅ AccountScoring script loaded, initializing...');
             setTimeout(initASC, 300); // Try again after script is loaded
           };
+          script.onerror = (error) => {
+            console.error('❌ Error loading AccountScoring script:', error);
+            setError('Kļūda ielādējot bankas savienojuma skriptu. Lūdzu, mēģiniet vēlreiz vēlāk.');
+          };
           document.head.appendChild(script);
         } else {
           // Script exists but ASCEMBED not available yet, wait a bit longer
@@ -69,6 +74,14 @@ const ConsumerLoanCalculator = () => {
         
         console.log('🚀 Initializing AccountScoring with modal version');
         
+        // Add global error handler for 401 errors
+        window.addEventListener('error', function(event) {
+          if (event.target && event.target.src && event.target.src.includes('accountscoring.com')) {
+            console.error('❌ AccountScoring API error:', event);
+            // Don't show error to user yet, as this might be a normal part of the flow
+          }
+        }, true);
+        
         // Initialize with the correct parameters for modal version
         window.ASCEMBED.initialize({
           btn_id: 'ascModal', // Button ID that will trigger the modal
@@ -76,6 +89,7 @@ const ConsumerLoanCalculator = () => {
           client_id: clientId,
           locale: 'lv_LV',
           is_modal: true, // Using modal version
+          environment: 'prelive', // Explicitly set to prelive environment
           onConfirmAllDone: function(status) {
             console.log('✅ Bank connection completed:', status);
             setIsBankConnected(true);
@@ -83,6 +97,14 @@ const ConsumerLoanCalculator = () => {
           },
           onClose: function() {
             console.log('Modal closed');
+          },
+          onError: function(error) {
+            console.error('❌ AccountScoring error callback:', error);
+            if (error && error.status === 401) {
+              setError('Autentifikācijas kļūda. Lūdzu, sazinieties ar atbalsta dienestu.');
+            } else {
+              setError('Kļūda bankas savienojumā. Lūdzu, mēģiniet vēlreiz vēlāk.');
+            }
           }
         });
         
@@ -108,32 +130,124 @@ const ConsumerLoanCalculator = () => {
     
   }, [setIsBankConnected, setError]);
   
-  // Create a mock invitation ID for testing
-  const createMockInvitation = () => {
+  // Create a real invitation using AccountScoring API v3
+  // Rule: Error Handling - Handle network failures gracefully
+  const createInvitation = async (formData) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // For testing, we'll use a hardcoded invitation ID
-      // In production, this would come from an API call
-      const mockInvitationId = 'test_invitation_' + Date.now();
+      // Rule: Security - Handle sensitive data properly
+      // API endpoint for AccountScoring v3
+      const apiUrl = 'https://prelive.accountscoring.com/api/v3/invitation';
       
-      // Initialize AccountScoring with the mock invitation ID
-      initializeAccountScoring(mockInvitationId);
+      // Get client ID from WordPress settings
+      // Rule: Security - Handle sensitive data properly
+      const clientId = window.loanCalculatorData?.accountScoringClientId || '66_vnOJUazTrxsQeliaw80IABUcLbTvGVs4H3XI';
       
-      return true;
+      console.log('🔄 Creating invitation via AccountScoring API v3');
+      
+      // Prepare the request payload according to the API documentation
+      // Rule: Use Latvian language for all text
+      const requestPayload = {
+        email: formData.email,
+        personal_code: formData.personalCode,
+        name: `${formData.firstName} ${formData.lastName}`,
+        send_email: false,
+        transaction_days: 90,
+        language: 'lv', // Latvian language
+        redirect_url: window.location.href, // Return to the same page
+        valid_until: (() => {
+          // Set valid until to 30 days from now
+          const date = new Date();
+          date.setDate(date.getDate() + 30);
+          return date.toISOString().split('T')[0] + ' 23:59:59';
+        })(),
+        webhook_url: null,
+        // Include client ID in the payload as per API documentation
+        client_id: clientId,
+        allowed_banks: [
+          // Latvian banks
+          'HABALV22', // Swedbank
+          'UNLALV2X', // SEB
+          'PARXLV22', // Citadele
+          'NDEALV2X', // Luminor
+          'REVOGB21XXX', // Revolut
+          'N26' // N26
+        ]
+      };
+      
+      console.log('📤 Sending invitation request:', requestPayload);
+      
+      // Since we don't have a real API key for direct API access,
+      // let's use the WordPress REST API endpoint that already has the API key configured
+      // Rule: Error Handling - Handle network failures gracefully
+      console.log('🔄 Using WordPress REST API as proxy for AccountScoring API');
+      
+      // Get the WordPress REST API URL
+      const restUrl = window.wpApiSettings?.root || '/wp-json/';
+      const restNonce = window.wpApiSettings?.nonce || '';
+      
+      const response = await axios.post(
+        `${restUrl}loan-calculator/v1/create-invitation`,
+        {
+          email: formData.email,
+          phone: formData.phone,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          personalCode: formData.personalCode
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-WP-Nonce': restNonce
+          },
+          timeout: 10000 // 10 second timeout
+        }
+      );
+      
+      // Check if the response contains the invitation_id
+      // The WordPress REST API returns a different format than the direct AccountScoring API
+      if (response.data && response.data.success && response.data.invitation_id) {
+        const invitationId = response.data.invitation_id;
+        console.log('✅ Received invitation ID from WordPress API:', invitationId);
+        console.log('📊 Full API response:', response.data);
+        
+        // Initialize AccountScoring with the real invitation ID
+        initializeAccountScoring(invitationId);
+        return true;
+      } else {
+        console.error('❌ Invalid API response:', response.data);
+        setError('Kļūda saņemot bankas savienojuma ID. Lūdzu, mēģiniet vēlreiz.');
+        return false;
+      }
     } catch (error) {
-      console.error('Error creating mock invitation:', error);
-      setError('Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.');
+      console.error('❌ Error creating invitation:', error);
+      
+      // Provide more detailed error information
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // Provide a more specific error message if available
+      const errorMessage = error.response?.data?.messages?.[0] || 
+                          error.response?.data?.message || 
+                          'Kļūda veidojot bankas savienojumu. Lūdzu, mēģiniet vēlreiz.';
+      
+      setError(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onSubmit = (data) => {
+  // Rule: Error Handling - Handle network failures gracefully
+  const onSubmit = async (data) => {
     console.log('Form data:', data);
-    createMockInvitation();
+    await createInvitation(data);
   };
 
   // Rule: tighter spacing between form rows (gap-4) and two-column layout for Step 1

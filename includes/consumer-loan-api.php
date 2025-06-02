@@ -88,3 +88,16 @@ function create_accountscoring_invitation($request) {
         ]);
     }
 }
+
+// Register REST API endpoints
+function register_consumer_loan_api_endpoints() {
+    register_rest_route('loan-calculator/v1', '/create-invitation', [
+        'methods' => 'POST',
+        'callback' => 'create_accountscoring_invitation',
+        'permission_callback' => function() {
+            return true; // Public endpoint, no permission check needed
+        }
+    ]);
+}
+
+add_action('rest_api_init', 'register_consumer_loan_api_endpoints');
